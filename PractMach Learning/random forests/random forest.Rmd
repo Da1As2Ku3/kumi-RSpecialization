@@ -1,0 +1,484 @@
+---
+title: "Random Forests"
+author: "David Asare Kumi"
+date: "July 11, 2019"
+output: html_document
+---
+
+## Random Forests
+
+- Random forests is an extension to bagging. Basic idea is very similar to bagging.
+
+1. Bootstrap samples (we take a resample of our observed data and our training data set).
+
+2. At each split, bootstrap variables.
+
+3. Grow multiple trees and vote.
+
+### Pros
+
+1. Accuracy.
+
+### Cons
+
+1. Speed (Quite slow).
+
+2. Interpretability (Difficult).
+
+3. Overfitting (very hard to understand which trees are contributing to the overfitting).
+
+## Random Forests (The ensemble model).
+
+### Example: Iris Data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+data(iris)
+inTrain <-createDataPartition(y=iris$Species,p=0.7,list=FALSE)
+training <-iris[inTrain,]
+testing <-iris[-inTrain,]
+modFit <-train(Species~.,data=training,method="rf",prox=TRUE)
+modFit$finalModel
+#Get a single tree
+library(randomForest)
+getTree(modFit$finalModel,k=2) # k=2 is the second tree.
+#Class Centers
+irisP <-classCenter(training[,c(3,4)],training$Species,modFit$finalModel$prox)
+irisP <-as.data.frame(irisP)
+irisP$Species <-rownames(irisP)
+p <-qplot(Petal.Width,Petal.Length,col=Species,data=training)
+p + geom_point(aes(x=Petal.Width,y=Petal.Length,col=Species),size=5,shape=4,data=irisP)
+#Predicting new values using the predict function
+pred <-predict(modFit,testing)
+pred
+testing$predRight <-pred==testing$Species
+table(pred,testing$Species)
+#Let's plot to see the points missed.
+qplot(Petal.Width,Petal.Length,color=predRight,data=testing,main="New data Prediction")
+
+```
+
+## Notes and further resources
+
+### Notes
+
+- Random forests are usually one of the two top performing algorithms along with boosting in prediction contest.
+
+- Random forests are difficult to interpret(because of multiple trees) but often very accurate.
+
+- Care should be taken to avoid overfitting (see rfcv function).
+
+### Further resources
+
+- Random Forest.
+
+- Random forest wikipedia.
+
+- Elements of Statistical Learning.
+
+
+## Boosting
+
+### Basic Idea
+
+1. Take lots of possibly weak predictors.
+
+2. Weight them and add them up.
+
+3. Get a stronger predictor.
+
+4. This is like random forest and bagging where we average our predictors.
+
+## Basic idea behind boosting
+
+1. Start with a set of classifiers h1,...,hk.
+
+- Example: All possible trees, all possible regression models, all possible cutoffs.
+
+2. Create a classify that combines classification functions:
+
+- Goal is to minimize error (on training set).
+
+- Iterative, select one h at each step.
+
+- Calculate weights based on errors.
+
+- Upweight missed classifications and select next h.
+
+3. Adaboost on Wikipedia; the most famous boosting algorithms.
+
+## Boosting in R
+
+- Boosting can be used with any subset of classifiers.
+
+- One large subclass is gradient boosting.
+
+- R has multiple boosting libraries. Differences include the choice of basic classification functions and combination rules.
+
+1. gbm: boosting with trees.
+
+2. mboost: model based boosting.
+
+3. ada: statistical boosting based on additive logistic regression.
+
+4. gamBoost: for boosting generalized additive models.
+
+- Most of these are available in the caret package.
+
+## How to apply boosting algorithms - Wage Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(ISLR)
+data(Wage)
+Wage <-subset(Wage,select= -c(logwage))
+inTrain <-createDataPartition(y=Wage$wage,p=0.7,list=FALSE)
+training <-Wage[inTrain,]
+testing <-Wage[-inTrain,]
+#Fit the model (install gbm package)
+modFit <-train(wage~.,method="gbm",data=training,verbose=FALSE)
+modFit
+#Plot the results
+qplot(predict(modFit,testing),wage,data=testing)
+
+```
+
+## Notes and further reading
+
+- A couple of nice tutorials for boosting.
+
+1. Freund and Shapire: http://www.cc.gatech.edu/~thad/6601-gradA1-fall2013/boosting.pdf
+
+2. Ron Meir: http://webee.technion.ac.il/people/rmeir/BoostingTutorial.pdf
+
+- Boosting, random forests, and model ensembling are the most common tools that win Kaggle and other prediction contests.
+
+1. http://www.netflixprize.com/assets/GrandPrize2009_BPC_BigChars.pdf
+
+## Model based prediction
+
+### Basic Idea
+
+1. Assume the data follow a probabilistic model.
+
+2. Use Bayes' theorem to identify optional classifiers.
+
+### Pros
+
+- Can take advantage of structure of the data.
+
+- May be computationally convenient.
+
+- Are reasonably accurate on real problems.
+
+### Cons
+
+- Make additional assumptions about the data.
+
+- When the model is incorrect, you may get reduced accuracy.
+
+## Model based approach
+
+1. Our goal is to build parametric model for conditional distribution P(Y=k/X=x).
+
+2. A typical approach is to apply Bayes' theorem.
+
+3. Typically, prior probabilities are set in advance.
+
+4. A common choice for a Gaussian distribution.
+
+5. Estimate the parameters from the data.
+
+6. Classify to the class with the highest value of P(Y=k/X=x). k is some specific class.P(Y=k) is prior probability.
+
+## Classifying Using the Model
+
+A range of models use this approach.
+
+- Linear discriminant analysis assumes fk(x) is multivariate Gaussian with same covariances.
+
+- Quadratic discriminant analysis assumes fk(x) is multivariate Gaussian with different covariances.
+
+- Model based prediction assumes more complicated versions for the covariance matrix.
+
+- Naive Bayes' assumes independence between features for model building.
+
+## Naive Bayes'
+
+- Suppose we have many predictors, we would want to model; P(Y=k/X1,...,Xm).
+
+- Assumption: One assumption we can make is that we assume all the predictor variables are independent of each other. This is a naive assumption.
+
+## Example: Iris Data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+data(iris)
+names(iris)
+table(iris$Species)
+#Create training and test sets
+inTrain <-createDataPartition(y=iris$Species,p=0.7,list=FALSE)
+training <-iris[inTrain,]
+testing <-iris[-inTrain,]
+#Build Predictions
+library(lda) # install.packages("lda")
+library(NB) # install.packages("NB")
+modlda <-train(Species~.,data=training,method="lda")
+modnb <-train(Species~.,data=training,method="nb")
+#Predict model
+predlda <-predict(modlda,testing)
+predlda
+prednb <-predict(modnb,testing)
+prednb
+table(predlda,prednb)
+#Comparison of the results
+equalPredictions <-(predlda==prednb)
+qplot(Petal.Width,Sepal.Width,color=equalPredictions,data=testing)
+
+```
+
+## Notes and Further reading
+
+- Introduction to Statistical Learning.
+
+- Elements of Statistical Learning.
+
+- Model based clustering.
+
+- Linear Discriminant Analysis.
+
+- Quadratic Discriminant Analysis.
+
+## Regularized Regression
+
+### Basic Idea
+
+1. Fit a regression model.
+
+2. Penalize (or shrink) large coefficients.
+
+### Pros
+
+- Can help with the bias/variance tradeoff.
+
+- Can help with model selection.
+
+### Cons
+
+- May be computationally demanding on large data sets.
+
+- Does not perform as well as random forests and boosting.
+
+## Example: Prostate Cancer
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(ElemStatLearn)
+data(prostate)
+dim(prostate)
+str(prostate)
+summary(prostate)
+
+```
+
+- As the number of predictors increase, the training set error decreases. As the number of predictors increase, the test set error decrease, hit a plateau and then goes up again. This is because we are overfitting the data in the training set.
+
+## Most common pattern
+
+- The train set error always goes monotonically down. The test set error will decrease for a while eventually hit a minimum and then start to increase again as the model gets too complex and overfits the data.
+
+## Model Selection Approach
+
+- Split Samples; The best approach is when you have the computation time, split the samples.
+
+- No method better when data/computation time permits it.
+
+- Approach
+
+1. Divide data into training/test/validation.
+
+2. Treat validation as test data, train all competing models on the train data and pick the best one on validation.
+
+3. To appropriately assess performance on new data apply to test set.
+
+4. You may re-split and perform steps 1-3.
+
+- Two common problems 
+
+1. limited data.
+
+2. computational complexity.
+
+## Another issue for high dimensional data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+small <-prostate[1:5,]
+lm(lpsa~.,data=small)
+#In this case some of the predictors will get estimates and some of them will be NA because our sample is too small and the number of predictors are many(more than 5). We have more predictors than samples. We have one approach in dealing with this problem - Hard thresholding.
+
+```
+
+## Hard Thresholding
+
+- Model Y = f(x) + E.
+
+- Constrain only lambda coefficients to be non-zero.
+
+- Selection problem is after choosing lambda figure out which P-lambda coefficients to make non-zero.
+
+- Another approach is to use regularized regression.
+
+## Regularization for Regression
+
+If the Bjs are unconstrained;
+
+- They can explode (if they are highly correlated).
+
+- And hence are susceptible to very high variance.
+
+- To control variance, we might regularize/shrink the coefficients. PRSS is a penalized form of the sum of squares.
+
+- Things that are commonly looked for;
+
+1. Penalty reduces complexity.
+
+2. Penalty reduces variance.
+
+3. Penalty respects structure of the problem.
+
+- The first approach used in this kind of penalized regression is Ridge regression.
+
+- We can fit ridge regression when the number of predictors is more than the number of observation or sample data.
+
+- As you increase lambda, all the coefficients get close to zero because we are penalizing the coefficients and make it smaller.
+
+## Ridge Coefficients Path
+
+- As lambda is zero, that is the standard linear regression value.
+
+### Tuning Parameter lambda
+
+- lambda controls the size of the coefficients.
+
+- lambda controls the amount of { \ bf regularization }.
+
+- As lambda approaches zero, we obtain the least squares solution.
+
+- As lambda approaches infinity, lambda penalizes the coefficients a lot in this situation.
+
+## Notes and further reading
+
+- Hector Corrada Bravo's Practical Machine Learning lecture notes.
+
+- Hector's penalized regression reading list.
+
+- Elements of statistical learning.
+
+- In caret methods are;
+
+1. ridge.
+
+2. lasso.
+
+3. relaxo.
+
+- Set method to be equal to any of the methods listed above.
+
+## Combining Predictors
+
+### Key Ideas
+
+- You can combine classifiers by averaging/voting.
+
+- Combining classifiers improves accuracy.
+
+- Combining classifiers reduces interpretability.
+
+- Boosting, bagging and random forests are variants on this theme.
+
+### Approaches for combining classifiers
+
+1. Bagging, Boosting, Random Forests (Similar Classifiers). Usually combine similar classifiers.
+
+2. Combining different classifiers.
+
+- Model Stacking.
+
+- Model Ensembling.
+
+### Example with wage data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ISLR)
+library(ggplot2)
+library(caret)
+data(Wage)
+names(Wage)
+Wage <-subset(Wage,select=-c(logwage))
+#create a building dataset and validation set
+inBuild <-createDataPartition(y=Wage$wage,p=0.7,list=FALSE)
+validation <-Wage[-inBuild,]
+buildData <-Wage[inBuild,]
+inTrain <-createDataPartition(y=buildData$wage,p=0.7,list=FALSE)
+training <-buildData[inTrain,]
+testing <-buildData[-inTrain,]
+dim(training)
+dim(testing)
+dim(validation)
+#Build two different models
+mod1 <-train(wage~.,method="glm",data=training)
+mod2 <-train(wage~.,method="rf",data=training,trControl=trainControl(method="cv",number=3))
+#Predict on the testing set
+pred1 <-predict(mod1,testing)
+pred2 <-predict(mod2,testing)
+qplot(pred1,pred2,color=wage,data=testing)
+#Fit a model that combines predictors
+predDF <-data.frame(pred1,pred2,wage=testing$wage)
+combModFit <-train(wage~.,method="gam",data=predDF)
+combPred <-predict(combModFit,predDF)
+combPred
+#Testing errors
+sqrt(sum((pred1-testing$wage)^2))
+sqrt(sum((pred2-testing$wage)^2))
+sqrt(sum((combPred-testing$wage)^2))#The combined predictor had the smallest error
+#Predict on validation data set
+pred1v <-predict(mod1,validation)
+pred2v <-predict(mod2,validation)
+predVDF <-data.frame(pred1=pred1v,pred2=pred2v,wage=validation$wage)
+combPredV <-predict(combModFit,predVDF)
+combPredV
+#A model on the test set is not a good representation of the out of sample error
+#Evaluate on validation
+sqrt(sum((pred1v-validation$wage)^2))
+sqrt(sum((pred2v-validation$wage)^2))
+sqrt(sum((combPredV-validation$wage)^2))#The combined predictor had the lowest error
+
+```
+
+## Notes and further Resources
+
+- Even simple blending can be useful.
+
+- Typical model for binary/multiclass data.
+
+1. Build an odd number of models.
+
+2. Predict with each model.
+
+3. Predict the class by majority vote.
+
+- This can get dramatically more complicated.
+
+1. Simple blending in caret; caret ensemble (use at your own risk).
+
+2. Wikipedia ensemble learning.
+
+

@@ -1,0 +1,157 @@
+---
+title: "Graphics Devices in R"
+author: "David Asare Kumi"
+date: "June 9, 2019"
+output: html_document
+---
+
+##What is a Graphics Device?
+
+- A graphics device is something or a window where you can make your plot appear.
+
+1. A window on your computer screen.
+
+2. A PDF file (file device).
+
+3. A PNG or JPEG file (file device).
+
+4. A scalable vector graphics (SVG) file (file device).
+
+##where plots are sent in R
+
+- The most common place for a plot to be sent is the screen device.
+
+1. On Mac the screen device is launched with the quartz().
+
+2. On Windows the screen device is launched with windows().
+
+3. On Unix/Linux the screen device is launched with X11().
+
+##How to determine what device the plot should be sent to
+
+- For quick visualizations and exploratory analysis,usually you want to use the screen device.
+
+1. Functions like plot in base , xyplot in lattice or qplot in ggplot2 will default to sending a plot to the  screen.
+
+2. On a given platform(Mac,Windows,Unix/Linux) there is only one screen device.
+
+- For plots that may be printed out or be incorporated into a document (e.g. papers/reports,slide presentations),usually a file device is more appropriate.
+
+
+##Create a plot and send to a file device (no plot appears on screen)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(datasets)
+data(faithful)
+names(faithful)
+#Open pdf device,create myplot.pdf in my working directory.
+pdf(file="myplot.pdf")
+#Create the plot and send to file device
+with(faithful,plot(eruptions,waiting,cex=2,pch=20,col="red"))
+title(main="Old Faithful Gayser data")
+dev.off()
+#plot can be found in your working directory not on the screen.
+
+```
+
+##Graphics Devices in R (part2)
+
+- There are two(2) basic types of file devices.
+
+1. Vector devices
+
+2. Bitmap devices
+
+###Vector Formats
+
+- PDF: Useful for linetype graphics,resizes well,usually portable.
+
+  Downside: Not efficient if a plot has many objects/points.
+
+- SVG: XML - based scalable vector graphics.
+
+1. Supports animation and interactivity.
+
+2. Potentially useful for web-based plots.
+
+- Win.metafile: Windows metafile format(only on windows).
+
+- Postscript:
+
+1. Older format.
+
+2. Also resizes well.
+
+3. Usually portable (can be used on any platform).
+
+3. Can be used to create encapsulated postscript files.
+
+4. Windows systems often don't have a postscript viewer.
+
+###Bitmap Formats(pixels)
+
+- PNG: portable network graphics
+
+1. Bitmapped format.
+
+2. Good for line drawings or images with solid colors.
+
+3. Uses lossless compression (like the old GIF format).
+
+4. Most web browsers can read this format natively.
+
+5. Good for plotting many many points.
+
+Downside: Does not resize well.
+
+- JPEG:
+
+1. Good for photographs or natural scenes.
+
+2. Uses lossy compression.
+
+3. Good for plotting many many many points.
+
+4. Can be read by almost any computer and any web browser.
+
+Downside: 
+
+1. Does not resize well.
+
+2. Not great for line drawings.
+
+
+- TIFF: Older formats of bitmap.
+
+1. Creates bitmap files in the tiff(TIFF) format.
+
+2. Supports lossless compression.Lossy compression - file sizes are very efficient, very small.
+
+
+- BMP:
+
+1. A native windows bitmapped  format.
+
+2. Commonly used for things like icons.
+
+###Key Notes
+
+- It is possible to open multiple graphics devices (screen, file or both).
+
+- Plotting can only occur on one graphics device at time.
+
+- The currently active graphics device can be found by calling dev.cur().
+
+- Every open graphics device is assigned an integer >=2.
+
+- You can change the active graphics device with dev.set(<integer>) where <integer> is the number associated with the graphics device you want to switch to.For example dev.set(2).
+
+- You can copy a plot from one device to another with dev.copy().
+
+- dev.copy2pdf specifically copies a plot to a pdf file. For example dev.copy(png,file="geyserplot.png"). This copies my plot to a png file.
+
+- Don't forget to close the png device with dev.off().
+
+
+
+

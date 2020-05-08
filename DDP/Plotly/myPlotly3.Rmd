@@ -1,0 +1,23 @@
+---
+title: "myPlotly3"
+author: "David Asare Kumi"
+date: "May 31, 2019"
+output: html_document
+---
+
+## Histogram
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE,comment=""}
+library(plotly)
+plot_ly(x=precip,type="histogram")
+
+```
+
+## Boxplots
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE,comment=""}
+library(plotly)
+plot_ly(iris,y=iris$Petal.Length,color=iris$Species,type="box")
+table(iris$Species)
+
+```

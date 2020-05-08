@@ -1,0 +1,471 @@
+---
+title: "Caret Functionality"
+author: "David Asare Kumi"
+date: "July 4, 2019"
+output: html_document
+---
+
+
+##Caret functionality
+
+- Some preprocessing (cleaning); preProcess.
+
+- Data splitting.
+
+1. createDataPartition.
+
+2. createResample.
+
+3. createTimeSlices.
+
+- Training/testing functions.
+
+1. train (function).
+
+2. predict (functions).
+
+- Model Comparison.
+
+1. confusionMatrix (this gives you information about how well the models do on new data sets).
+
+##Machine Learning Algorithms in R
+
+- Linear Discriminant Analysis (lda).
+
+- Regression (lm or glm).
+
+- Naive Bayes (nb).
+
+- Support Vector Machines.
+
+- Classification and Regression Trees.
+
+- Random Forests.
+
+- Boosting.
+
+- etc.
+
+##Why Caret?
+
+- Caret package provide a unifying framework that allows  you to predict using just one function without having to specify all the options that you might care about.
+
+##Spam Example: Data Splitting
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+inTrain <-createDataPartition(y=spam$type,p=0.75,list=FALSE)
+training <-spam[inTrain,]
+testing <-spam[-inTrain,]
+dim(training)
+dim(testing)
+#Fit a model
+set.seed(32343)
+modelFit <-train(type~.,data=training,method="glm")
+modelFit
+modelFit$finalModel #This gives the fitted values
+#You can predict using the prediction function.
+pred <-predict(modelFit,newdata=testing)
+#Confusion matrix evaluate the model
+confusionMatrix(pred,testing$type)
+
+```
+
+##Data Slicing
+
+- For building training/test sets.
+
+- For cross validation.
+
+- inTrain is used to subset out training and test sets.
+
+##SPAM Example; K-fold
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+set.seed(32343)
+folds <-createFolds(y=spam$type,k=10,list=TRUE,returnTrain=TRUE)
+sapply(folds,length)
+folds1 <-createFolds(y=spam$type,k=10,list=TRUE,returnTrain=FALSE)
+sapply(folds1,length)
+folds[[1]][1:10]
+
+```
+
+##Resampling
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+set.seed(32323)
+folds <-createResample(y=spam$type,times=10,list=TRUE)
+sapply(folds,length)
+folds[[1]][1:10]
+#Since we doing resampling you might get some of the same values back.
+
+```
+
+##Time Slices
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+set.seed(32323)
+tme <-1:1000
+folds <-createTimeSlices(y=tme,initialWindow = 20,horizon=10)
+names(folds)
+folds$train[[1]]
+folds$test[[1]]
+
+```
+
+##trainControl resampling
+
+- Method
+
+1. boot = bootstrapping.
+
+2. boot632 = bootstrapping with adjustment.
+
+3. cv = cross validation.
+
+4. repeatedcv = repeated cross validation.
+
+5. LOOCV = leave one out cross validation.
+
+- Number
+
+1. For boot/cross validation.
+
+2. Number of subsample to take.
+
+- Repeats
+
+1. Number of times to repeat subsampling.
+
+2. If big, this can slow things down.
+
+##Setting the seed
+
+- It is often useful to set an overall seed.
+
+- You can also set a seed for each resample.
+
+- Seeding each resample is useful for parallel fits.
+
+- Setting a seed is always good for reproducibility. You can share your data with some and then set the same seed to ensure that you get the same results.
+
+##Plotting Predictors
+
+###Example;predicting wages using the Wage data.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ISLR)
+library(ggplot2)
+library(lattice)
+library(caret)
+data(Wage)
+dim(Wage)
+str(Wage)
+summary(Wage)
+table(Wage$race)
+table(Wage$education)
+table(Wage$jobclass)
+table(Wage$region)
+table(Wage$health)
+#Get training/test sets
+inTrain <-createDataPartition(y=Wage$wage,p=0.70,list=FALSE)
+training <-Wage[inTrain,]
+testing <-Wage[-inTrain,]
+dim(training)
+dim(testing)
+#feature plot (caret package)
+featurePlot(x=training[,c("age","education","jobclass")],y=training$wage,plot="pairs")
+#Qplot(ggplot2 package)
+qplot(age,wage,data=training)
+#Qplot with color 
+qplot(age,wage,color=jobclass,data=training)
+#Add regression smoothers(ggplot2 package)
+qplot(age,wage,data=training)+geom_smooth(method="lm",formula=y~x)
+qplot(age,wage,color=education,data=training)+geom_smooth(method="lm",se=FALSE)
+
+```
+
+##cut2,making factors (Hmisc package)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ISLR)
+library(ggplot2)
+library(lattice)
+library(caret)
+data(Wage)
+inTrain <-createDataPartition(y=Wage$wage,p=0.70,list=FALSE)
+training <-Wage[inTrain,]
+testing <-Wage[-inTrain,]
+library(Hmisc)
+library(gridExtra)
+cutWage <-cut2(training$wage,g=3)
+table(cutWage)
+#Boxplots with cut2
+p1 <-qplot(cutWage,age,data=training,fill=cutWage,geom=c("boxplot"))
+p1
+#Base boxplot
+boxplot(age~cutWage,data=training,col="yellow",main="Boxplot of Age~cutWage")
+#Boxplots with points overlayed
+p2 <-qplot(cutWage,age,data=training,fill=cutWage,geom=c("boxplot","jitter"))
+grid.arrange(p1,p2,ncol=2)
+#Tables
+t1 <-table(cutWage,training$jobclass)
+t1
+prop.table(t1,1) #proportion
+
+```
+
+##Density plots
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+data(Wage)
+qplot(wage,color=education,data=training,geom="density")
+qplot(wage,data=training,geom="density",facets=.~education)
+
+```
+
+##Basic Preprocessing
+
+- Preprocessing can be more useful when using model based approaches than when you are using more nonparametric approaches. We preprocess predictor variables.
+
+###Why Preprocess
+
+- we preprocess to transform data so that the machine learning algorithms don't get tricked by the fact that it's skewed and highly variable.
+
+- One way that you can do this is by basically standardizing variables i.e. take the variable values, subtract their mean and divide that whole quantity by the standard deviation. When you do this, the mean of the variable that you have will be zero (0) and the standard deviation will be one (1). So this will reduce a lot of the variability in the data and it will standardize the variable somewhat.
+
+- When we apply a prediction algorithm to the test set. We can only use parameters that we estimated in the training set. In other words, when we apply this same standardization to the test set, we have to use the mean and standard deviation from the training set to standardize the testing set values. This means that when you do the standardizaiton the mean will not be exactly zero (0) in the test set and the standard deviation will not be exactly one (1), because we standardized by parameters estimated in the training set byt hopefully they will be close to those values. You can also use the preProcess function to do a lot of standardization. The preProcess function is built into the caret package.
+
+###Why preProcess?continued
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+inTrain <-createDataPartition(y=spam$type,p=0.75,list=FALSE)
+training <-spam[inTrain,]
+testing <-spam[-inTrain,]
+hist(training$capitalAve,main="",xlab="ave.capital run length",col="yellow")
+#The capitalAve variable is very skewed so we have to preProcess
+mean(training$capitalAve)
+sd(training$capitalAve) # This is very large so it is much much variable. We have to standardize.
+trainCapAve <-training$capitalAve
+trainCapAves <-(trainCapAve-mean(trainCapAve))/sd(trainCapAve)
+mean(trainCapAves)
+sd(trainCapAves)
+#We standardized to reduce the variability
+#Apply on the test set
+testCapAve <-testing$capitalAve
+testCapAves <-(testCapAve-mean(testCapAve))/sd(testCapAve)
+mean(testCapAves)
+sd(testCapAves)
+
+```
+
+##Use preProcess function to standardize
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+preObj <-preProcess(training[,-58],method=c("center","scale"))
+trainCapAves <-predict(preObj,training[,-58])$capitalAve
+mean(trainCapAves)
+sd(trainCapAves)
+#You can use the preProcessing object to apply the test set.
+testCapAves <-predict(preObj,testing[,-58])$capitalAve
+mean(testCapAves)
+sd(testCapAves)
+#Fit the model
+set.seed(32343)
+modelFit <-train(type~.,data=training,preProcess=c("center","scale"),method="glm")
+modelFit
+modelFit$finalModel
+
+```
+
+##Standardizing; Box-Cox transformations
+
+- Box-Cox transformations take continues data and try to make them look like normal data using maximum likelihood on a specific set of parameters.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+preObj <-preProcess(training[,-58],method=c("center","scale"))
+trainCapAves <-predict(preObj,training[,-58])$capitalAve
+par(mfrow=c(1,2))
+hist(trainCapAves)
+qqnorm(trainCapAves)
+
+```
+
+##Standardizing - Imputing Data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+library(RANN)
+data(spam)
+set.seed(13343)
+#make some values NA
+training$CapAve <-training$capitalAve
+selectNA <-rbinom(dim(training)[1],size=1,prob=0.05)==1
+training$CapAve[selectNA] <-NA
+#Impute and standardize
+preObj <-preProcess(training[,-58],method="knnImpute")
+CapAve <-predict(preObj,training[,-58])$capAve
+#standardize true values
+capAveTruth <-training$capitalAve
+capAveTruth <-(capAveTruth-mean(capAveTruth))/sd(capAveTruth)
+#We can look at these values to see how close they are[values are close to zero so the imputation worked #pretty well]
+quantile(CapAve-capAveTruth)
+quantile((CapAve-capAveTruth)[selectNA],na.rm=TRUE)
+quantile((CapAve-capAveTruth)[!selectNA],na.rm=TRUE)
+
+```
+
+##Notes and Further Reading
+
+- Training and test must be processed in the same way.
+
+- Test transformation will likely be imperfect. Especially if the test/training sets collected at different times.
+
+- Careful when transforming factor variables.
+
+- preProcessing with caret.
+
+##Covariate Creation
+
+- Covariates are sometimes called predictors and sometimes called features. There are two levels of covariate creation or feature creation.
+
+1. level1; The first level is taking the raw data that you have and turning it into a predictor that you can use.
+
+2. level2; The second level is transforming tidy covariates.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(kernlab)
+data(spam)
+spam$capitalAveSq <-spam$capitalAve^2
+
+```
+
+##Level1; Raw data covariates
+
+- Depends heavily on application.
+
+- The balancing act is summarization versus information loss.
+
+- Examples;
+
+1. Text files; Frequency of words, frequency of phrases(Google ngrams),frequency of capital letters.
+
+2. Images; Edges, corners, blobs, ridges (computer vision features detection).
+
+- Webpages; Number and type of images, position of elements, colors, videos (A/B Testing).
+
+1. People; Height, weight, hair color, sex, country of origin.
+
+- The more knowledge of the system you have the better the job you will do.
+
+- When in doubt, err on the side of more features.
+
+- Can be automated but use caution!
+
+##Level2; Tidy covariates (new covariates)
+
+- More necessary for some methods (regression,svms) than for others (classification trees).
+
+- Should be done only on the training set.
+
+- The best approach is through exploratory analysis (plotting/tables).
+
+- New covariates should be added to data frames.
+
+- Building features/covariates can happen in the training set only and not in the test set.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ISLR)
+library(ggplot2)
+library(lattice)
+library(caret)
+data(Wage)
+inTrain <-createDataPartition(y=Wage$wage,p=0.7,list=FALSE)
+training <-Wage[inTrain,]
+testing <-Wage[-inTrain,]
+#common covariates to add,dummy variables
+#Basic idea; convert factor variables to indicator variables
+table(training$jobclass)
+dummies <-dummyVars(wage~jobclass,data=training)
+head(predict(dummies,newdata=training))
+
+#Removing zero(0) covariates
+nsv <-nearZeroVar(training,saveMetrics=TRUE)
+nsv
+library(splines)
+bsBasis <-bs(training$age,df=3)
+
+#Fitting curves with Splines
+lm1 <-lm(wage~bsBasis,data=training)
+plot(training$age,training$wage,pch=19,cex=1)
+points(training$age,predict(lm1,newdata=training),col="red",pch=19,cex=1)
+
+#Splines on the test set
+prediction <-predict(bsBasis,age=testing$age)
+
+```
+
+##Notes and further reading
+
+- Level1 feature creation (raw data to covariates).
+
+1. Science is key, Google "feature extraction for (data type)".
+
+2. Err on over creation of features.
+
+3. In some applications(images,voices) automated feature creation is possible/necessary.
+
+4. http://www.cs.nyu.edu/~yann/talks/lecun-ranzato-icml2013.pdf
+
+- Level2 feature creation (covariates to new covariates).
+
+1. The function preProcess in caret will handle some preprocessing.
+
+2. Create new covariates if you think they will improve fit.
+
+3. Use exploratory analysis on the training set for creating them.
+
+4. Be careful about overfitting.
+
+- preProcess with caret.
+
+- If you want to fit spline models, use the gam method in the caret package which allows smoothing of multiple variables.
+
+- More on feature creation/data tidying in the obtaining Data course from the Data Science.
+

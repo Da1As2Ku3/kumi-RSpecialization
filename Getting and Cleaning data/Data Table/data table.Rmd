@@ -1,0 +1,797 @@
+---
+title: "Data.Table Package"
+author: "David Asare Kumi"
+date: "9/7/2019"
+output: html_document
+---
+
+
+## The data.table package
+
+### Create data tables just like data frames
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(data.table)
+DF <-data.frame(x=rnorm(9),y=rep(c("a","b","c"),each=3),z=rnorm(9))
+head(DF,3)
+DT <-data.table(x=rnorm(9),y=rep(c("a","b","c"),each=3),z=rnorm(9))
+head(DT,3)
+
+```
+
+### data.table
+
+- Inherits from data.frame.
+
+- All functions that accept data.frame work on data.table.
+
+- Written in C so it is much faster.
+
+- Much much faster at subsetting, group and updating.
+
+### Subsetting rows
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT[2,]
+DT[DT$y=="a",]
+DT[c(2,3),] # this takes the second and third rows
+DT[c(2,3)] # this takes the second and third rows
+
+```
+
+### Subsetting columns
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT[,c(2,3)]
+DT[,2:3]
+
+```
+
+### Column subsetting in data.table
+
+- The subsetting function is modified for data.table.
+
+- The argument you pass after the comma is called an "expression".
+
+- In R, an expression is a collection of statements enclosed in curly brackets.
+
+- {
+
+- x=1
+
+- y-2
+
+- }
+
+- k = {print(10);5}
+
+### Calculating values for variables with expression
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT[,list(mean(x),sum(z))]
+DT[,table(y)]
+
+```
+
+- With the columns pass a list and you will get your values.
+
+### Adding new columns
+
+- The data.table function does this faster and very efficiently.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT[,.(w=z^2)]
+DT[,.(w=(z^2))]
+cbind(DT,DT[,.(w=(z^2))])
+
+```
+
+- When you add a new column using a data frame, R will copy the entire data frame and add the column thus making two copies of the data and this could cause memory problems.
+
+- With data.table, this is dealt with efficiently. No copies are made, the new column is just added.
+
+### Adding new columns continued
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT2 <-DT
+DT[,y:=2]
+head(DT2,3)
+
+```
+
+### Multiple Operations
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT[,'m':={tmp<-(x+z);log2(tmp+5)}]
+
+```
+
+- Those in the curly brackets are expressions.
+
+- This is also a multiple step function - can be handled very easily by data.table.
+
+## plyr like operations
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT[,a:=x>0]
+DT[,.(a=x>0)]
+DT[,.(b=mean(x+DT$w),by=a)]
+
+```
+
+### Special variables in data.table
+
+- N an integer, length 1, containing the number r.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(123)
+DT <-data.table(x=sample(letters[1:3],1E5,TRUE))
+DT[,.N,by=x]
+
+```
+
+- .N counts the number of times the letters or a particular group appears.
+
+- 1E5 is 100,000.
+
+- .N is the total count.
+
+### Keys (You subset and sort rapidly than data.frame)
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=""}
+DT <-data.table(x=rep(c("a","b","c"),each=100),y=rnorm(300))
+setkey(DT,x) # want to subset x
+DT['a'] # put the code a
+
+```
+
+### Joins
+
+- You can also use key to facilitate joins between data.table.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+DT1 <-data.table(x=c('a','a','b','d+1'),y=1:4)
+DT2 <-data.table(x=c('a','b','d+2'),z=5:7)
+setkey(DT1,x)
+setkey(DT2,x)
+merge(DT1,DT2)
+
+```
+
+- Set the same key for both tables to achieve your objective.
+
+### Fast reading (fread)
+
+- The data.table is faster than the read.table when reading in data into R.
+
+### Summary
+
+- The latest development version contains new functions like melt and dcast for data.tables.
+
+- https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS?view=markup&root=datatable
+
+- Here is a list of differences between data.table and data.frame.
+
+- Notes based on Raphael Gottardo's notes https://github.com/raphg/Biostat-578/blob/master/Advanced_data_mannipulation
+
+- Rpres who got them from Kevin Ushey.
+
+### Differences between data.table and data.frame
+
+- http://stackoverflow.com/questions/13618488/what-you-can-do-with-data-frame-that-you-cant-in-data-table
+
+### What are the smaller syntax difference between data.frame and data.table
+
+- DT[3] refers to the third row, but DF[3] refers to the third column.
+
+- DT[3,]==DT[3], but DF[,3]==DF[3] (somewhat confusing).
+
+- For this reason we say the comma is optional in DT, but not optional in DF.
+
+- DT[[3,]]==DF[3]=DF[[3]].
+
+- DT[i,] where i is a single integer returns a single row, just like DF[i,], but unlike a matrix single row subset which returns a vector.
+
+- DT[,j,with=FALSE] where j is a single integer returns a one column data.table, unlike DF[,j] which returns a vector by default.
+
+- DT[,"colA",with=FALSE][[1]]==DF[,"colA"].
+
+- DT[,colA]==DF[,"colA"].
+
+- DT[,list(colA)]==DF[,"colA",drop=FALSE].
+
+- DT[NA] returns 1 row of NA, but DF[NA] returns a copy of DF containing NA throughout.
+
+- DT[c(TRUE,NA,FALSE)] treats the NA as FALSE, but DF[c(TRUE,NA,FALSE)] returns NA rows for each NA.
+
+- DT[colA==colB] is simpler than DF[!is.na(colA)&!is.na(colB)& colA==colB,]
+
+- Check.names is by default TRUE in data.frame but FALSE in data.table for convenience.
+
+- stringsAsFactors is by default TRUE in data.frame but FALSE in data.table for efficiency.
+
+- In data.frame we often set drop=FALSE, forgetting that bugs can arise in edge cases. In data.table drop is dropped.
+
+- data.frame(list(1:2,"k",1:4)) creates 3 columns, data.table one list column.
+
+### Assign a column with := named with a character object
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+new <-'w'
+dt <-DT[,(new):=DT$z^2]
+head(dt)
+
+```
+
+### Reading from mySQL
+
+- http://dev.mysql.com/doc/employee/en/sakila-structure.html
+
+### mySQL
+
+- Free and widely used open source database software.
+
+- Widely used in internet based applications.
+
+- Data are structured in;
+
+1. Database.
+
+2. Tables within databases.
+
+3. Fields within tables.
+
+- Each row is called a record.Note; row = record
+
+- Tables - dataset
+
+- Field - one of the columns to the dataset.
+
+### Example Structure
+
+### Database of employees
+
+- Departments.
+
+- Employees themselves.
+
+- Their salaries.
+
+- The department managers.
+
+- Their titles.
+
+- One box corresponds to one data frame in R.
+
+- step 1: install mySQL. Go to this website http://dev.mysql.com/doc/refman/5.7/en/installing.html
+
+- step 2: Install RmySQL. On a mac: install.packages("RMySQL")
+
+- On windows: official instructions - http://biostat.mc.vanderbilt.edu/wiki/Main/RMySQL
+
+- Potentially useful guide: http://www.ahschulz.de/2013/07/23/installing-rmysql-under-windows/
+
+### Example - UCSC database
+
+- http://genome/ucsc/edu/. UCSC is University of Carlifonia Santa Cruz.
+
+- They have mySQL server and we are going to connect to that in the middle of the page.
+
+- http://genome/ucsc.edu/goldenPath/help/mysql.html
+
+### Connecting and listing databases
+
+- ucscDb <- dbConnect(MySQL(),user="genome",host="genome"-mysql.cse.ucsc.edu")
+
+- result <-dbGetQuery(ucscDb,"show databases,");dbDisconnect(ucscDb);
+
+- dbDisconnect disconnects from the server.
+
+### Connecting to hg19 and listing tables
+
+- hg19 <-dbConnect(MySQL(),user="genome",db="hg19",host="genome mysql.cse.ucsc.edu")
+
+- allTables <-dbListTables(hg19)
+
+- length(allTables)
+
+- allTables[1:5]
+
+### Get dimensions of a specific table
+
+- dbListFields(hg19,"affyU133Plus2")
+
+- dbGetQuery(hg19,"selectcount(*)from affyU133Plus2")
+
+- count(*)
+
+### If you want to get one of the tables out
+
+- Read from table
+
+- affyData <-dbReadTable(hg19,"affyU133Plus2")
+
+- head(affyData)
+
+### Select a specific subset
+
+- query <-dbsendQuery(hg19,"select*from affyU133Plus2 where misMatches between 1 and 3")
+
+- affyMis <-fetch(query)
+
+- quantile(affyMis$misMatches)
+
+- 0%, 25%, 50%, 75%, 100%
+
+- affyMisSmall <-fetch(query,n=10)
+
+- dbClearResult(query)
+
+- [1] TRUE
+
+- dim(affyMisSmall)
+
+- [1] 10 22
+
+- Always clear the query when you are done.
+
+- Do not forget to close the connection!
+
+- dbDisconnect(hg19)
+
+- [1] TRUE
+
+### Further Resources
+
+- RMySQL vignette: http://cran.r-project.org/web/packages/RMySQL/RMySQL.pdf
+
+- list of commands: http://www.pantz.org/software/mysql/mysqlcommands.html
+
+1. Do not, do not delete, add or join things from ensembl. Only select.
+
+2. In general, becareful with mysql commands.
+
+- A nice blog post summarizing some other commands. https://www.r-bloggers.com/mysql-and-r/
+
+## Reading from HDF5
+
+- Used for storing large datasets.
+
+- Supports storing a range of data types.
+
+- Heirarchical data format.
+
+- Groups containing zero or more datasets and meta data.
+
+- Have a group header with group name and list of attributes.
+
+- Have a group symbol table with a list of objects in group.
+
+- datasets multidimensional array of data elements with metadata.
+
+1. Have a header with name, datatype, dataspace, and storage layout.
+
+2. Have a data array with the data. http://www.hdfgroup.org/
+
+### RHDF5 package
+
+- To install this package;
+
+- source("http://bioconductor.org/bioCLite.R")
+
+- bioCLite("rhdf5")
+
+- library(rhdf5)
+
+- created <-h5createFile("example.h5")
+
+- created
+
+- [1] TRUE
+
+- This will install packages from Bioconductor http://bioconductor.org/, primarily used for genomics but also has good "big data" packages.
+
+- Can be used to interface with hdf5 data sets.
+
+- This lecture is modeled very closely on the rhdf5 tutorial that can be found here;
+
+- http://www.bioconductor.org/packages/release/bioc/vignettes/rhdf5/inst/doc/rhdf5/pdf
+
+### Create groups
+
+- created <- h5createGroup("example.h5","foo").
+
+- created <- h5createGroup("example.h5","baa").
+
+- created <- h5createGroup("example.h5","foo/foobaa").
+
+- h5ls("example.h5").
+
+
+### Write to groups
+
+- A <-matrix(1:10,nrow=5,ncol=2)
+
+- hwrite(A,"example.h5","foo/A")
+
+- B <-array(seq(0,1,2,by=0.1),dim(c(5,2,2)))
+
+- attr(B,"scale") <-"liter"
+
+- h5write(B,"example.h5","foo/foobaa/B")
+
+- h5ls("example.h5")
+
+### Write a dataset
+
+- We can write a dataset directly to the top level.
+
+- df <-data.frame(1L:5L,seq(0,1,length.out=5),c("ab","cde","fghi","a","s"),stringsAsFactors=FALSE)
+
+- h5write(df,"example.h5", "df")
+
+- h5ls("example.h5")
+
+### Reading data
+
+- readA <-h5read("example.h5","foo/A")
+
+- readB <-h5read("example.h5","foo/foobaa/B")
+
+- readdf <-h5read("example.h5","df")
+
+
+
+### Writing and reading chunks
+
+- hfwrite(c(12,13,14),"example.h5","foo/A",index=list(1:3,1))
+
+- h5read("example.h5","foo/A")
+
+### Notes and further resources
+
+- hdf5 can be used to optimize reading/writing from disc in R.
+
+- The rhdf5 tutorial: http://www.bioconductor.org/packages/release/bioc/vignette/rhdf5/inst/doc/rhdf5.pdf
+
+- The HDF group has information on HDF5 in general: http://www.hdfgroup.org/HDF5/
+
+## Reading from the Web
+
+### Webscraping
+
+- Webscraping is programatically extracting data from HTML code of websites.
+
+- It can be a great way to get data: How Netflix reverse engineered Hollywood.
+
+- Many websites have information you may want to programatically read.
+
+- In some cases, this is against the terms of service for the website.
+
+- Attempting to read too many pages too quickly can get your IP address blocked.
+
+- http://en.wikipedia.org/wiki/web_scraping
+
+- Example: Google Scholar page.
+
+- http://scholar.google.com/citations?user=HI-I6COAAAAJ&hl=en
+
+### Getting data off webpages - readLines()
+
+- con <-url("http://scholar.google.com/citations?user=HI-I6COAAAAJ&hl=en)
+
+- htmlCode <-readLines(con)
+
+- close(con)
+
+- htmlCode
+
+### Parsing with XML
+
+- library(XML)
+
+- url <-"http://scholar.google.com/citations?user=HI-6COAAAAJ&hl=en"
+
+- html <-htmlTreeParse(url,useInternalNodes=T)
+
+- xpathSApply(html,"//title",xmlValue)
+
+- [1] "Jeff Leek-Google Scholar Citations"
+
+- xpathSApply(html,"//td[@id='col-citedby']",xmlValue)
+
+### GET from the httr package
+
+- library(httr)
+
+- html2 <-GET(url)
+
+- content2 <-content(html2,as="text")
+
+- parsedHtml <-htmlParse(content2,asText=TRUE)
+
+- xpathSApply(parsedHtml,"//title",xmlValue)
+
+- [1] "Jeef Leek-Google Scholar Citations"
+
+### Accessing websites with passwords
+
+- pg1 <-GET("http://httpbin.org/basic-auth/user/passwd")
+
+- pg1
+
+- http://cran.r-project.org/web/packages/httr/httr.pdf
+
+- What you need to do to access it.
+
+- pg2 <-GET("http://httpbin.org/basic-auth/user/passwd",authenticate("user","passwd"))
+
+- pg2
+
+- We can then use the content function to extract the contents of the website.
+
+### Using handles
+
+- Make sure you use handles.
+
+- google <-handle("http://google.com")
+
+- pg1 <-GET(handle=google,path="/")
+
+- pg2 <-GET(handle=google,path="search")
+
+- http://cran.r-project.org/web/packages/httr/httr.pdf
+
+### Notes and further resources
+
+- R bloggers has a number of examples of web scraping. http://www.r-bloggers.com?/s=Web+Scraping.
+
+- The httr helpfile has useful examples. http://cran.r-project.org/web/packages/httr/httr.pdf
+
+- See later lectures on APIs.
+
+### Reading from APIs
+
+### Creating an application
+
+- https://dev.twitter.com/apps
+
+- APIs: Application programming interfaces.
+
+### Application programming interfaces
+
+- https://dev.twitter.com/docs/api/1/get/blocks/blocking
+
+### Creating an application
+
+- In this case you have to create an account- not the user account but to create an application.
+https://dev.twitter.com/apps
+
+- Create a new application
+
+- read/write access to API.
+
+- The numbers below are private to you and you have to copy them because we will use them in Rcode to access API.
+
+### Accessing Twitter from R
+
+- library(httr).
+
+- myapp <-oauth_app("twitter",key="yourConsumerKeyHere",secret="yourConsumerSecretHere").
+
+- sig <-sign_oauth1.0(myapp,token="yourTokenHere",token_secret="yourTokenSecretHere"). I have created the credentials.
+
+- authenticate: homeTL <-GET("https://api.twitter.com/1.1/statuses/home_timeline.json",sig)
+
+### Converting the json object
+
+- json1 <-content(homeTL)
+
+- json2 <-jsonlite::fromJSON(toJSON(json1))
+
+- json2[1,1:4]
+
+- We use content to extract information.
+
+### How do I know what url to use
+
+- Use the Resources url to pass to your get command.
+
+### GET statuses/home_timeline
+
+- http://dev.twitter.com/docs/api/1.1/get/search/tweets
+
+### In general look at the documentation
+
+- If you want to get other information go to the main twitter documentation.
+
+- https://dev.twitter.com/docs/api/1.1/overview. On the page you will see REST API v1.1 resources.
+
+### In general look at the documentation
+
+- httr allows GET,POST,PUT,DELETE request if you are authorized.
+
+- You can authenticate with a user name or a password.
+
+- Most modern APIs use something like oauth.
+
+- httr works well with facebook,google,twitter,github,etc
+
+### Reading from other sources
+
+There is a package for that.
+
+- Roger has a nice video on how there are R packages for most things that you will want to access.
+
+- Here I'm going to briefly review a few useful packages.
+
+- In general the best way to find out if the R package exists is to Google "data storage mechanism R package".
+
+- For example: "MySQL R package".
+
+### Interacting more directly with files
+
+- file - open a connection to a text file.
+
+- url - open a connection to a url.
+
+- gzfile - open a connection to a .gz file.
+
+- bzfile - open a connection to a .bz2 file.
+
+- ?connections for more information.
+
+- Remember to close connections.
+
+## Foreign package
+
+- Loads that from Minitab, S, SAS, SPSS, Stata, Systat.
+
+- Basic functions read.foo
+
+1. read.arff(Weka).
+
+2. read.dta(Stata).
+
+3. read.mtp(Minitab).
+
+4. read.octave(Octave).
+
+5. read.spss(SPSS).
+
+6. read.xport(SAS).
+
+- See the help page for more details:http://cran.r-project.org/web/packages/foreign/foreign.pdf
+
+### Examples of other database packages
+
+- RPostresSQL provides a DBI compliant database connection from R.
+
+- Tutorial - https://code.google.com/p/rpostgresql/, help file - http://cran.r-project.org/web/packages/RPostgreSQL/RPostgreSQL.pdf
+
+- RODBC provides interfaces to multiple data bases including PostgreQL, MySQL, Microsoft Access and SQLite.
+
+- Tutorial- http://cran.r-project.org/web/packages/RODBC/vignettes/RODBC.pdf , help file - http://cran.r-project.org/web/packages/RMongo/RMongo.pdf(example of RMongo: http://www.r-bloggers.com/r-and-mongodb/) and rmongodb provide interfaces to MongoDb.
+
+### Reading Images
+
+- jpeg - http://cran.r-project.org/web/packages/jpeg/index.html
+
+- readbitmap - http://cran.r-project.org/web/packages/readbitmap/index.html
+
+- png - http://cran.r-project.org/web/packages/png/index.html
+
+- EBImage(Bioconductor) - http://www.bioconductor.org/packages/2.13/bioc/html/EBImage.html
+
+### Reading GIS data
+
+- rdgal - http://cran.r-project.org/web/packages/rgdal/inex.html
+
+- rgeos - http://cran.r-project.org/web/packages/rgeos/index.html
+
+- raster - http://cran.r-project.org/web/packages/raster/index.html
+
+### Reading music data
+
+- tuneR - http://cran.r-project.org/web/packages/tuneR/
+
+- seewave - http://rug.mnhn.fr/seewave/
+
+## How to install MySQL on my windows machine
+
+- To download mysql installer, go to the following link; http://dev.mysql.com/downloads/installer/
+
+- There are two files available;
+
+1. mysql-installer-web-community.exe i.e. if you are connected to the web.
+
+2. mysql-installer-community.exe i.e. if you want to install mysql offline.
+
+### Install MySQL via MySQL installer
+
+- To install MySQL using the MySQL installer, double click on the MySQL installer file and follow the steps below;
+
+1. Install MySQL step 1: Windows configures MySQL Installer.
+
+2. Install MySQL step 2: Welcome screen. A welcome screen provides several options. Choose the first option. Install MySQL products.
+
+3. Step 3: Download the latest MySQL products.
+
+- check connect to the internet.
+
+- check Fetch product update information.
+
+4. Step 4: Click next button to continue.
+
+5. Step 5: Choosing the setup type - choose the full option to install all MySQL products and features.
+
+6. Step 6: check requirements.
+
+7. Step 7: Installation Progress downloading Products in progress. Click next when complete to continue.
+
+8. Step 8: Configuration overview. Click next.
+
+- choose configuration type and MySQL port Number 3006/3306 by default and click next.
+
+- Choose a password for the root account. Please note the password down and keep it securely. Choose windows service details including windows service name and account type. Click next.
+
+- Wait until it is done and click next.
+
+- MySQL installs sample databases and sample models.
+
+9. Step 9: Installation completes. Click finish.
+
+## Install C++ (google - C++ installer)
+
+- Go to the MinGw site and follow the directions to download and then run the MinGW installer program. Install the following;
+
+- mingw-developer-tookit, mingw32-gcc-g++, mingw32-gdb, msys-base, msys-make.
+
+- Check your installation. Open a windows cmd window. Click the windows start button and type "cmd". Step down to the bin directory inside the directory where you installed MinGw, for example, if you installed it in the default location of C:\MinGw, then you should do cd\MinGw\bin
+
+- Give the commands; g++ -- version, gdb -- version, mingw32-make-- version.
+
+- Each should result in a message indicating that the program started successfully.
+
+### Add the compilers to your path
+
+- The %PATH% in windows is the list of directories where windows will search for executable programs.
+
+- Which ever compiler you choose, add the bin directory containing the g++ and other compiler executables to your windows PATH.
+
+- To add a path to the path environment variable;
+
+1. On the start menu right click computer.
+
+2. On the context menu, click properties.
+
+3. In the system dialog box, click Advanced System settings.
+
+4. On the Advanced tab of the system Properties dialog box, click Environment variables.
+
+5. In the System Variables box of the Environment variables dialog box, scroll to PATH and select it.
+
+6. Click the lower of the two Edit buttons in the dialog box.
+
+7. In the Edit system variable dialog box, scroll to the end of the string in the variable value box and add a semi colon(;).
+
+8. Add the new Path after the semi colon.
+
+9. Click ok in three successive dialog boxes and then close the system dialog box.
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+
+
+

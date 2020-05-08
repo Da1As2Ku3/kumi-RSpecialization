@@ -1,0 +1,370 @@
+---
+title: "Loop Functions - lapply"
+author: "David Asare Kumi"
+date: "10/29/2019"
+output: html_document
+---
+
+
+## Looping on the command line
+
+- Writing for, while loops is useful when programming but not particularly easy when working interactively on the command line. There are some functions which implement looping to make life easier.
+
+- Lapply: loop over a list and evaluate a function on each element.
+
+- Sapply: same as lapply but try to simplify the results.
+
+- Apply: A function over the margins of an array.
+
+- Tapply: Apply a function over subsets of a vector.
+
+- Mapply: Multivariate version of lapply.
+
+- An auxiliary function "split" is also useful, particularly in conjunction with lapply.
+
+## Lapply
+
+- lapply takes 3 arguments;
+
+1. a list x.
+
+2. a function (or the name of a function)FUN.
+
+3. Other arguments via its ... argument.
+
+- If x is not a list, it will be coerced to a list using as.list.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+function(x,FUN,...){
+  FUN <-match.fun(FUN)
+  if(!is.vector(x)||is.object(x))
+    x <-as.list(x)
+  .Internal(lapply(x,FUN))
+}
+
+```
+
+- The actual looping is done internally in c code.
+
+- If it is not possible to coerce x into a list you will get an error.
+
+- lapply always returns a list, regardless of the class of the input. A list can contain any kind of object like matrices, vectors, data frame etc.
+
+## Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(a=1:5,b=rnorm(10))
+lapply(x,mean)
+
+```
+
+- The list is the same name as the original list a and b.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(a=1:4,b=rnorm(10),c=rnorm(20,1),d=rnorm(100,5))
+lapply(x,mean)
+x <-1:4
+lapply(x,runif)
+x <-1:4
+lapply(x,runif,min=0,max=10)
+
+```
+
+- runif: This is uniform random variables.
+
+- 0, 1 is the default for uniform random variable.
+
+- The min = 0 and max = 10 are run within the ... argument of lapply.
+
+- lapply and friends (associated functions) make heavy use of anonymous functions.
+
+- Anonymous functions are functions that do not have a name so you don't assign them a name but you can generate them on the fly.
+
+- Suppose you want to extract the first column of the matrix below.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(a=matrix(1:4,2,2),b=matrix(1:6,3,2))
+x
+#anonymous function for extracting the first column of each matrix
+lapply(x,function(elt)elt[,1])
+sapply(x,function(elt)elt[,1])
+
+```
+
+- This function does not exist except within the context of lapply and after the lapply function it is finished. This is an anonymous function.
+
+- sapply also returns a list when we use the anonymous function.
+
+## Sapply
+
+- This is the variant of lapply(alternate).
+
+- Sapply will try to simplify the result of lapply if possible.
+
+- If the result is a list where every element is length 1, then a vector is returned.
+
+- If the result is a list where every element is a vector of the same length(>1), a matrix is returned.
+
+- If it can't figure things out, a list is returned.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(a=1:4,b=rnorm(10),c=rnorm(20,1),d=rnorm(100,5))
+lapply(x,mean)
+sapply(x,mean)
+
+```
+
+- Note that mean(x) will return an error because mean is not meant to be applied to list.
+
+## Apply
+
+- Apply function is used to evaluate a function(often an anonymous one) over the margins of an array.
+
+- It is most often used to apply a function to the rows or columns of a matrix.
+
+- It can be used with general arrays, e.g. taking the average of an array of matrices.
+
+- It is not really faster than writing a loop, but it works in one line!
+
+- We always use apply because it involves less typing. Less typing is always better because good programs are always lazy.
+
+- Apply is very useful on the command line because you want to do little typing.
+
+## How does apply work?
+
+- str(apply)= args(apply). function(x,MARGIN,FUN,...).
+
+- x is an array.
+
+- MARGIN is an integer vector indicating which margins should be "retained".
+
+- FUN is a function to be applied.
+
+- ... is for other arguments to be passed to FUN.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-matrix(rnorm(200),20,10)
+apply(x,2,mean) #This gives the mean of each of the 10 columns
+apply(x,1,mean) #This gives the mean of each of the 20 rows
+apply(x,2,sum) # This gives the sum of each of the 10 columns
+apply(x,1,sum) # This gives the sum of each of the 20 rows.
+
+```
+
+- It is important to note that, 2 stands for columns and 1 stands for rows.
+
+## Col/Row Sums and Means
+
+- For sums and means of matrix dimensions, we have some shortcuts.
+
+- rowSums = apply(x,1,sum).
+
+- rowMeans = apply(x,1,mean).
+
+- colSums = apply(x,2,sum).
+
+- colMeans = apply(x,2,mean).
+
+- The shortcut functions are much faster, but you wouldn't notice unless you are using a large matrix.
+
+## Other Ways to Apply
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-matrix(rnorm(200),20,10)
+apply(x,1,quantile,probs=c(0.25,0.75))
+
+```
+
+- Average matrix in an array.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+a <-array(rnorm(2*2*10),c(2,2,10)) # 2rows*1columns*10dims
+apply(a,c(1,2),mean)
+rowMeans(a,dims=2)
+
+```
+
+## Loop Functions - mapply
+
+- mapply is a multivariate apply of sorts which applies a function in parallel over a set of arguments.
+
+- str(mapply). function(FUN,...,MoreArgs=NULL,SIMPLIFY=TRUE,USE.NAMES=TRUE).
+
+- FUN is a function to apply.
+
+- ... contains arguments to apply over.
+
+- MoreArgs is a list of other arguments to FUN.
+
+- SIMPLIFY indicates whether the result should be simplified.
+
+- lapply, sapply, tapply, apply functions over a single list. With mapply it can take multiple list and applies the function in parallel.
+
+## Example
+
+- The following is tedious to type.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+list(rep(1,4),rep(2,3),rep(3,2),rep(4,1))
+# Instead we can do 
+mapply(rep,1:4,4:1)
+
+```
+
+- mapply can be used to apply functions to multiple sets of arguments.
+
+## Vectorizing a function
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+noise <-function(n,mean,sd){
+  rnorm(n,mean,sd)
+}
+noise(5,1,2)
+noise(1:5,1:5,2)
+# This function does not really work properly
+
+```
+
+- When we use the mapply function we get a more efficient results.
+
+## Instant Vectorization
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+mapply(noise,1:5,1:5,2)
+
+```
+
+- Which is the same as:
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+list(noise(1,1,2),noise(2,2,2),noise(3,3,2),noise(4,4,2),noise(5,5,2))
+
+```
+
+- Here we fix the sd to be 2 and be changing n and the mean.
+
+- This is how we instantly vectorize a function that doesn't allow for vector arguments/vector inputs.
+
+## Loop Functions - Tapply
+
+- tapply is used to apply a function over subsets of a vector. I don't know why it is called tapply.
+
+- str(tapply). function(x,INDEX,FUN=NULL,...,simplify=TRUE).
+
+- x is a vector.
+
+- INDEX is a factor or a list of factors(or else they are coerced to factors).
+
+- FUN is a function to be applied.
+
+- ... contains other arguments to be passed to FUN.
+
+- simplify, should we simplify the results?
+
+- Index could be male or female (factor variable).
+
+## tapply
+
+- Take group means.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c(rnorm(10),runif(10),rnorm(10,1))
+f <-gl(3,10)
+f
+tapply(x,f,mean)
+#Take group means without simplification, you get a list
+tapply(x,f,mean,simplify=FALSE)
+#Find group ranges
+tapply(x,f,range) #List with a vector of length 2
+
+```
+
+## Loop Functions - Split
+
+- Split takes a vector or other objects and splits it into groups determined by a factor or list of factors.
+
+- str(split). function(x,f,drop=FALSE,...).
+
+- x is a vector (or list) or data frame.
+
+- f is a factor (or coerced to one) or a list of factors.
+
+- drop indicates whether empty factor levels should be dropped.
+
+- Split is not a loop function but it is a very handy function that can be used along side lapply, tapply etc.
+
+- After splitting, you can then use the other loop functions.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c(rnorm(10),runif(10),rnorm(10,1))
+f <-gl(3,10)
+split(x,f) #split according to the factor variable.
+
+```
+
+- Split always returns the list back.
+
+- A common idiom is split followed by an lapply.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c(rnorm(10),runif(10),rnorm(10,1))
+f <-gl(3,10)
+Sp <-split(x,f)
+lapply(Sp,mean)
+#alternatively
+lapply(split(x,f),mean)
+tapply(x,f,mean) #use tapply function which is more compact to derive the same results.
+
+```
+
+## Splitting a Data Frame
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(airquality)
+head(airquality)
+tail(airquality)
+dim(airquality)
+summary(airquality)
+s <-split(airquality,airquality$Month)
+lapply(s,function(x)colMeans(x[,c("Ozone","Solar.R","Wind")],na.rm=TRUE))
+#The factor we use here is the month variable
+
+```
+
+- The anonymous function here is the colMeans.
+
+- Each element of the list is a vector of length 3.
+
+- We can also call sapply here.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+sapply(s,function(x)colMeans(x[,c("Ozone","Solar.R","Wind")],na.rm=TRUE))
+
+```
+
+- The NA's are removed. When you have the NA's in the data, you cannot calculate the means.
+
+- Split is a very handy function for splitting arbitrary objects according to the levels and factor and then apply any of the loop functions (lapply/sapply).
+
+## Splitting on more than one level:
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-rnorm(10)
+f1 <-gl(2,5)
+f2 <-gl(5,2)
+f1
+f2
+interaction(f1,f2) #interactions can create empty levels
+str(split(x,list(f1,f2)))
+str(split(x,list(f1,f2),drop=TRUE))
+split(x,list(f1,f2),drop=TRUE)
+
+```
+
+- When you use the split function, you don't have to use the interaction function, you just have to pass in the list with the factors. This also returns a list.
+
+- To drop the empty levels, the split function has an argument drop.
+
+
+

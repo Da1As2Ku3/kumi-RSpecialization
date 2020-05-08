@@ -1,0 +1,100 @@
+---
+title: "ggplot2 Graphics"
+author: "David Asare Kumi"
+date: "June 10, 2019"
+output: html_document
+---
+
+
+##What is ggplot2?
+
+- An implementation of the grammar of graphics by Leland Wilkinson.
+
+- Written by Hadley Wickham (while he was a graduate student at Iowa State University).
+
+- A "third" graphics system for R (along with base and lattice).
+
+- Available from CRAN via install.packages().
+
+- Website: http://ggplot2.org (better documentation).
+
+- Grammar of graphics represents an abstraction of graphics ideas/objects.
+
+- Think "verb","noun","adjective" for graphics.
+
+- Allows for a theory of graphics on which to build new graphics and graphics objects.
+
+- According to Hadley Wickham, he wants to "shorten the distance from mind to page".
+
+
+##The Basics: qplot()
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+dim(mpg)
+str(mpg)
+#some summary tables
+summary(mpg)
+table(mpg$cyl)
+table(mpg$class)
+table(mpg$drv)
+table(mpg$fl)
+#scatterplot
+qplot(displ,hwy,data=mpg)
+#specify color=drv(a factor of categorical variable)
+qplot(displ,hwy,data=mpg,color=drv,main="Scatterplot of Displ and Hwy")
+#adding a geom
+qplot(displ,hwy,data=mpg,geom=c("point","smooth"))
+#histogram
+qplot(hwy,data=mpg,geom="histogram")
+qplot(hwy,data=mpg,fill=drv)
+qplot(hwy,data=mpg,facets=.~drv)
+#density
+qplot(hwy,data=mpg,geom="density")
+qplot(hwy,data=mpg,geom="density",color=drv)
+qplot(hwy,data=mpg,geom="density",facets=.~drv)
+
+```
+
+##Facets
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+qplot(displ,hwy,data=mpg,facets=.~drv)+geom_smooth(method="lm")
+qplot(displ,hwy,data=mpg,facets=.~drv)+geom_smooth(method="lm",se=FALSE)
+
+```
+
+##Scatterplots
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+qplot(displ,hwy,data=mpg)
+qplot(displ,hwy,data=mpg,shape=drv)
+qplot(displ,hwy,data=mpg,color=drv)+geom_smooth(method="lm",se=FALSE)
+#facets are used in splitting up the data and also for conditioning on factor variables
+qplot(displ,hwy,data=mpg,facets=.~drv)+geom_smooth(method="lm",se=FALSE)
+
+```
+
+##Building Plots with ggplot2
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+g <-ggplot(mpg,aes(displ,hwy))
+g1<-geom_point(size=2,color="red")
+g2<-facet_grid(.~drv)
+g3<-geom_smooth(method="lm",se=FALSE)
+g4<-labs(title="Scatterplot of Displ and Hwy conditioned on Drv")
+
+g #This gives you the plot area
+g+g1 #This gives the plot area plus the plotted points
+g+g1+g2 #This splits the entire graph according to the factor variable drv
+g+g1+g2+g3 #This fits the straight line on the splitted graphs
+g+g1+g2+g3+g4 #This adds the title to the final plot.
+
+```

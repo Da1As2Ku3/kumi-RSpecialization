@@ -1,0 +1,455 @@
+---
+title: "Installing R"
+author: "David Asare Kumi"
+date: "10/11/2019"
+output: html_document
+---
+
+
+## Installing R on Windows
+
+1. Open a web browser.
+
+2. Type cran.r-project.org.
+
+3. Go to windows version.
+
+4. Go to base link.
+
+5. Go to download R.3.5.2 for windows.
+
+6. Download R.3.5.2 for windows and the download will start.
+
+7. When the download is finished click on it and go through the installation.
+
+8. By default, R will install both 32/64 bits.
+
+9. When the installation is done, click on finish.
+
+10. You must have R already installed before you install RStudio.
+
+- go to rstudio website www.rstudio.com. There are two versions.
+
+- Desktop version.
+
+- Server version.
+
+- Download the desktop version.
+
+## Writing Code/Setting your working directory (windows)
+
+- Working directory: You can find out this by typing getwd().
+
+- Change Working directory: In the R console,
+
+1. go to the file menu.
+
+2. change directory.
+
+3. local disk.
+
+4. Users.
+
+5. dir() gives you the list of files on your desktop say.
+
+- I recommend you create a folder for the coursera course and put all your data in this folder and save it on desktop.
+
+## Writing R Code
+
+- file.
+
+- new script.
+
+- here we use text editor to write R code.
+
+### To copy the work in the text editor
+
+- Ctrl A.
+
+- Ctrl c.
+
+- click in the console  and press Ctrl V.
+
+- ls() lists all.
+
+1. click into R editor.
+
+2. go to file menu.
+
+3. save as;
+
+4. let's say My Code.R into the coursera folder/dir().
+
+5. Source("My Code.R").
+
+6. ls().
+
+7. We use the editor to edit and load R.
+
+8. Every time you use the editor, you have to save it.
+
+9. If you want to extract that code into R use the source function in the R console.
+
+## R Console Input and Evaluation 
+
+- At the R prompt, we type expressions.
+
+- The <- symbol is the assignment operator.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-1 # numeric vector with the first element the number 1
+x
+print(x)
+
+msg <-"hello" # character vector with the first element the string Hello
+print(msg)
+  
+```
+
+- x <-## incomplete expression. The # character indicates a comment. Anything to the right of the # (including the # itself is ignored).
+
+- The grammar of the language determines whether an expression is complete or not.
+
+### Evaluation
+
+- When a complete expression is entered at the prompt it is evaluated and the result of the evaluated expression is returned. The result may be auto printed.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-5 # nothing printed
+x     # auto printing occurs
+print(x) # explicit printing
+
+```
+
+- The [1] indicates X is a vector and 5 is the first element.
+
+- Printing
+
+1. auto printing.
+
+2. explicit printing.
+
+### Printing
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-1:20
+x
+
+```
+
+- The : operator is used to create integer sequences.
+
+## Data Types - R Objects and Attributes
+
+### Objects
+
+- R has five(5) basic or "atomic" class of objects:
+
+1. character.
+
+2. numeric (real numbers).
+
+3. integer.
+
+4. complex.
+
+5. logical (TRUE/FALSE).
+
+- The most basic object is a vector.
+
+1. A vector can only contain objects of the same class (Not mixed classes).
+
+2. BUT: The one exception is a list, which is represented as a vector but can contain objects of different classes (indeed, that's usually why we use them).
+
+3. Empty vectors can be created with the vector () function.
+
+4. Vector function have two main auguments;
+
+- class of the object.
+
+- length. Note: vector(class,length).
+
+### Numbers
+
+- Numbers in R are generally treated as numeric objects (i.e. double precision real numbers).
+
+- If you explicitly want an integer, you need to specify the L suffix.
+
+- Entering 1 gives you a numeric object; entering 1L explicitly gives you an integer.
+
+- There is also a special number Inf which represents infinity; e.g. 1/0; Inf can be used in ordinary calculations; e.g. 1/Inf = 0.
+
+- The value NaN represents an undefined value ("not a number"); e.g. 0/0; NaN can also be thought of as a missing value (more on that later).
+
+### Attributes
+
+- R objects can have attributes.
+
+1. names, dimnames.
+
+2. dimensions (e.g. matrices, arrays).
+
+3. class.
+
+4. length.
+
+5. Other user - defined attributes/metadata.
+
+6. Attributes of an object can be accessed using the attribute () function.
+
+## R Data Types - Vectors and Lists
+
+### Creating Vectors
+
+- The c() function can be used to create vectors of objects.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c(0.5,0.6) #Numeric
+x
+x <-c(TRUE,FALSE) #Logical
+x
+x <-c(T,F) #Logical
+x
+x <-c("a","b","c") #Character
+x
+x <-9:29 #Integer
+
+```
+
+- x <-c(1+oi,2+4i) complex.
+
+## Using the vector function
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-vector("numeric",length = 10)
+x
+
+```
+
+- For numeric vectors the default value is zero (0).
+
+## Mixing Objects
+
+### What about the following?
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+y1 <-c(1.7,"a") #character
+y1
+y2 <-c(TRUE,2) #numeric
+y2
+y3 <-c("a",TRUE) #character
+y3
+
+```
+
+- When different objects are mixed in a vector, coercion occurs so that every element in the vector is of the same class. Here R will create a least common denominator.
+
+### Explicit Coercion
+
+- Objects can be explicitly coerced from one class to another using the as.functions, if available.
+
+- as.functions include as.numeric,as.logicl,as.integer,as.complex,as.character etc.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-0:6
+class(x)
+as.numeric(x)
+as.logical(x)
+as.character(x)
+as.complex(x)
+
+```
+
+- character objects are strings.
+
+- Nonsensical coercion will result in NAs.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c("a","b","c")
+x
+class(x)
+as.numeric(x)
+as.logical(x)
+as.complex(x)
+
+```
+
+### Lists 
+
+- Lists are a special type of vector that can contain elements of different classes. Lists are a very important data type in R and you should get to know them well.
+
+- The elements of a list are indexed by a double bracket.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(1,"a",TRUE,1+4i)
+x
+
+```
+
+### Matrices (R Data Types)
+
+- Matrices are vectors with a dimension attribute. The dimension attribute is itself an integer vector of length 2(nrow,ncol).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+m <-matrix(nrow=2,ncol=3)
+m
+dim(m)
+attributes(m)
+
+```
+
+- Matrices are constructed column-wise, so entries can be thought of starting in the "upper left" corner and running down the columns.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+m <-matrix(1:6,nrow=2,ncol=3)
+m
+
+```
+
+- Matrices can also be created directly from vectors by adding a dimension attribute.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+m <-1:10 #sequence
+m
+dim(m) <-c(2,5) #vector (2,5)
+m
+
+```
+
+- Another way to create a matrix is by binding columns and by binding rows.
+
+### cbinding and rbinding
+
+- Matrices can be created by column binding or row binding with cbind() and rbind().
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-1:3
+y <-10:12
+cbind(x,y)
+rbind(x,y)
+
+```
+
+### R Data Types - Factors
+
+- Factors are used to represent categorical data. Factors can be ordered or unordered. One can think of a factor as an integer vector where each integer has a label.
+
+- Factors are treated specially by modelling functions like lm() and glm().
+
+- Using factors with labels is better than using integers because factors are self describing: having a variable that has values "Male" and "Female" is better than a variable that has values 1 and 2.
+
+- Ordered: full professors, associate professors etc. 1 low, 2 medium, 3 high.
+
+- Factors can be created with the factor function and the innputs into the factor function is a character vector.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-factor(c("yes","yes","no","yes","no"))
+x
+table(x)
+unclass(x)
+
+```
+
+### Factors
+
+- The order of the levels can be set using the levels argument to factor(). This can be important in linear modelling because the first level is used as the baseline level.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-factor(c("yes","yes","no","yes","no"),levels=c("yes","no"))
+x
+
+```
+
+## R Data Types - Missing Values
+
+### Missing Values
+
+- Missing values are denoted by NA or NaN for undefined mathematical operations.
+
+- is.na() is used to test for objects if they are NA.
+
+- is.nan() is used to test for NaN.
+
+- NA values have a class also, so there are integer NA, character NA, etc.
+
+- A NaN value is also NA but the converse is not true.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c(1,2,NA,10,3)
+is.na(x)
+is.nan(x)
+x <-c(1,2,NaN,NA,4)
+is.na(x)
+is.nan(x)
+
+```
+
+## Data Types - Data Frame
+
+- Data frames are used to store tabular data.
+
+- They are represented as spacial type of list where every element of the list has to have the same length.
+
+- Each element of the list can be thought of as a column and the length of each element of the list is the number of rows.
+
+- Unlike matrices, data frames can store different classes of objects in each column (just like list): matrices must have every element to be of the same class.
+
+- Data frames also have a special attribute called row.names.
+
+- Data frames are usually created by calling read.table() or read.csv().
+
+- Can be converted to a matrix by calling data.matrix().
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-data.frame(foo=1:4,bar=c(T,T,F,F))
+x
+nrow(x)
+ncol(x)
+
+```
+
+## Data Type - Names Attribute
+
+- R objects can also have names, which is very useful for writing readable code and self describing objects.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-1:3
+x
+names(x)
+names(x) <-c("foo","bar","norf")
+x
+names(x)
+
+```
+
+- Lists can also have names.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(a=1,b=2,c=3)
+x
+
+```
+
+- Matrices can also have names called dimnames.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+m <-matrix(1:4,nrow=2,ncol=2)
+dimnames(m) <-list(c("a","b"),c("c","d"))
+m
+
+```
+
+## Data Types - Summary
+
+- atomic classes: numeric, logical, character, integer, complex.
+
+- vectors, lists.
+
+- factors.
+
+- missing values.
+
+- data frames.
+
+- names.
+

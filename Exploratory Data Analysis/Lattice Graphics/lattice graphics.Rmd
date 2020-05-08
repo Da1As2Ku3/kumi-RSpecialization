@@ -1,0 +1,91 @@
+---
+title: "Lattice Plotting System(Part1)"
+author: "David Asare Kumi"
+date: "June 10, 2019"
+output: html_document
+---
+
+
+##Lattice Plots
+
+- Different from base plotting system.
+
+- Useful for plotting high dimensional data.
+
+- Using for making many many plots at (panel plots) once.
+
+##Functions of the Lattice Plotting System
+
+The lattice plotting system is implemented using the following packages.
+
+- Lattice: Contains code for producing Trellis graphics which are independent of the base graphics system; includes functions like xyplots,bwplots,levelplots.
+
+- Grid: implements a different graphing system independent of the base system; the lattice package builds on top of grid. We seldom call functions from the grid package directly.
+
+- The lattice plotting system does not have a two phase aspect with separate plotting and annotation like in base plotting.
+
+- All plotting/annotation is done at once with a single function call.
+
+- Some of the main lattice functions include;
+
+1. xyplot; this is the main function for creating scatterplots.
+
+2. bwplot; box and whiskers plots ("boxplots").
+
+3. histogram; histograms.
+
+4. stripplot; like a boxplot but with actual points.
+
+5. dotplot; plot dots on "violin strings".
+
+6. Splom; scatterplot matrix - like pairs in base plotting system.
+
+7. levelplot, contourplot; for plotting "image" data.
+
+
+##Simple lattice plot
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,fig.width=10}
+library(datasets)
+library(lattice)
+data(airquality)
+names(airquality)
+xyplot(Ozone~Wind,data=airquality)
+
+#lattice plot involving factor variable
+library(lattice)
+library(datasets)
+data(airquality)
+str(airquality)
+Month <-as.factor(airquality$Month)
+class(Month)
+xyplot(Ozone~Wind|Month,data=airquality,layout=c(5,1))
+
+```
+
+##Lattice Plotting System (Part 2)
+
+- Lattice functions have a panel function which controls what happens inside each panel of the plot.
+
+- The lattice package comes with default panel functions, but you can supply your own if you want to customize what happens in each panel.
+
+- Panel functions receive the x/y coordinates of the data points in their panel (along with any optional arguments).
+
+
+##Custom Panel function
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(lattice)
+library(datasets)
+data(airquality)
+names(airquality)
+Month <-as.factor(airquality$Month)
+x <-airquality$Wind
+y <-airquality$Ozone
+xyplot(y~x|Month,panel=function(x,y,...){
+  panel.xyplot(x,y,...)
+  panel.lmline(x,y,col="red")
+})
+
+```
+

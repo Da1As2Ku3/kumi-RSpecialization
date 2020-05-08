@@ -1,0 +1,793 @@
+---
+title: "Reproducibility"
+author: "David Asare Kumi"
+date: "8/31/2019"
+output: html_document
+---
+
+
+## Reproducibility
+
+- Reproducibility makes an analysis more useful to others because the data and code that actually conducted the analysis are available. Reproducible research focuses on;
+
+1. The concepts and tools behind reporting modern data analysis in a reproducible manner.
+
+2. It is the idea that data analysis, and more generally, scientific claims, are published with their data and software code so that others may verify the findings and build upon them.
+
+3. This course focuses on literate statistical analysis tools which allow one to publish data analyses in a single document that allows others to easily execute the same analysis to obtain the same results.
+
+## Syllabus
+
+- Literate programming tools.
+
+- Evidence based data analysis.
+
+- Organizing data analysis.
+
+- Write documents using Rmarkdown.
+
+- Integrate live R code into a literate statistical program.
+
+- Compile Rmarkdown documents using knitr and related tools.
+
+- Publish reproducible documents to the web.
+
+- Organize a data analysis so that it is reproducible and accessible to others.
+
+## Course Content
+
+- Structuring and organizing a data analysis.
+
+- Markdown and Rmarkdown .
+
+- knitr/Rpubs.
+
+- Reproducible research checklist.
+
+- Evidence-based data analysis.
+
+- Case studies in air pollution epidermiology and high through-put biology.
+
+## Course Book
+
+- Report writing for data science in R. 
+
+1. Available from Leanpub.
+
+2. pdf,ePub,and mobi - all in electronic form.
+
+## What is Reproducible Research About?
+
+- How do you develop a score(like the book produced by musicians) for data analysis so that you can communicate to some one what was done and if they want to reproduce the work, how do they do it.
+
+- A foundamental problem in data analysis is that we don't have an agreed notation system for communicating data analysis.
+
+## Reproducible Analysis
+
+### Concepts and Ideas(part1)
+
+- Replication; The ultimate standard for strengthening scientific evidence is replication of findings and conducting studies with independent;
+
+1. Investigators.
+
+2. Data.
+
+3. Analytical methods.
+
+4. Laboratories.
+
+5. Instruments.
+
+- Replication is particularly important in studies that can impact broad policy or regulatory decisions.
+
+## What is wrong with Replications
+
+- Actually there is nothing wrong with replication.
+
+- Challenges; Some studies cannot be replicated.
+
+1. No time, opportunistic.
+
+2. No money.
+
+3. Unique.
+
+- Reproducible Research; Make analytic data and code available so that others may reproduce findings.
+
+## How can we bridge the gap between replication and nothing?
+
+- Replication is the gold standard and nothing is the worse standard. Reproducible research bridges the gap between replication and nothing (Reproducibility).
+
+## Why do we need this kind of middle ground - Reproducible Research?
+
+- New technologies increasing data collection throughput. Data are more complex and extremely high dimensional.
+
+- Existing data bases can be merged into new "megadatabases".
+
+- Computing power is greatly increased, allowing more sophisticated analysis.
+
+- For every field "X" there is a field "Computational X".
+
+## Example; Reproducible Air Pollution and Health
+
+- Estimating small (but important) health effects in the presence of much stronger signals.
+
+- Results inform substantial policy decisions, affect many stake holders - EPA regulations can cost billions of dollars.
+
+- Complex statistical methods are needed and subjected to intense scrutiny.
+
+## Reproducible Research
+
+### Concepts and Ideas(part2)
+
+- Research Pipeline;
+
+1. Measured Data then processing code.
+
+2. Analytic Data then analytic code.
+
+3. Computational results.
+
+4. Presentation code; We have figures, tables and numerical summaries.
+
+5. Article, Text.
+
+- Here we try to allow the author and the reader to meet in the middle.
+
+## The IOM Report
+
+- In the Discovery/Test validation stage of omics-based tests: recommendations
+
+- Data/metadata used to develop test should be made publicly available.
+
+- The computer code and fully specified computational procedures used for development of the candidate omics-based test should be made sustainably available.
+
+- "Ideally, the  computer code that is released will encompass all of the steps of computational analysis, including all data preprocessing steps, that have been described in this chapter. All aspects of the analysis need to be traansparently reported".
+
+## What do we need for Reproducibility?
+
+- Analytic data are available.
+
+- Analytic code are available.
+
+- Documentation of code and data.
+
+- Standard means of distribution.
+
+## Who are the players of Reproducibility?
+
+- Authors;
+
+1. Want to make their research reproducible.
+
+2. Want tools for RR to make their lives easier ( or at least not much harder).
+
+- Readers;
+
+1. Want to reproduce ( and perhaps expand upon) interesting findings.
+
+2. Want tools for RR to make their lives easier. Note that RR is Research Report.
+
+## Challenges
+
+- Authors must undertake considerable effort to put data/results on the web (may not have resources like a web server).
+
+- Readers must download data/results individually and piece together which data go with which code sections,etc.
+
+- Readers may not have the same resources as authors.
+
+- Few tools to help authors/readers (although toolbox is growing!).
+
+## What happens in Reality...
+
+- Authors
+
+1. Just put stuff on the web.
+
+2. (Infamous) Journal supplementary materials.
+
+3. There are some central data bases for various fields (e.g. biology,ICPSR).
+
+- Readers
+
+1. Just download the data and (try to) figure it out.
+
+2. Piece together the software and run it.
+
+## Reproducible Research
+
+### Concepts and Ideas (part 3)
+
+#### Literate (Statistical) Programming (This makes things a bit easier)
+
+- An article is a stream of text and code.
+
+- Analysis code is divided into text and code "chunk".
+
+- Each code chunk loads data and computes results.
+
+- Presentation code formats results (tables,figures,etc).
+
+- Article text explains what is going on.
+
+- Literate programs can be weaved to produce human-readable documents and tangled to produce machine-readable documents.
+
+- Literate programming is a general concept that requires 
+
+1. A documentation language (human readable).
+
+2. A programming language (machine readable).
+
+- Sweave uses LATEX and R as the documentation and programming languages.
+
+- Sweave was developed by Friedrich Leisch (member of the R core) and is maintained by the R core.
+
+- Main web site: http://www.statistik.lmu.de/~leisch/Sweave
+
+## Sweave Limitations
+
+- Sweave has many limitations.
+
+- Focused primarily on LaTeX, a difficult to learn markup language used only by weirdos.
+
+- Lacks features like caching,multiple plots per chunk, mixing programming languages and many other technical items.
+
+- Not frequently updated or very actively developed.
+
+## Literate (Statistical) Programming contd
+
+- One of the alternatives of Sweave is;
+
+- knitr is an alternative (more recent) package.
+
+- Brings together many features added on to Sweave to address limitations.
+
+- knitr uses R as the programming language (although others are allowed) and variety of documentation languages - LaTeX,Markdown,HTML.
+
+- knitr was developed by Yihui Xie (while a graduate student in statistics at IOWA state).
+
+- See http://yihui.name/knitr/
+
+## Summary
+
+- Reproducible research is important as a minimum standard, particularly for studies that are difficult to replicate.
+
+- Infrustructure is needed for creating and distributing reproducible documents, beyond what is currently available.
+
+- There is a growing number of tools for creating reproducible documents.
+
+## Scripting Your Analysis
+
+- Basic idea here is to write things down(scripting).
+
+- In music they use the score i.e. write down everything about the music.
+
+- In this course we do the same thing as the musician by scripting.
+
+## What it means to script something
+
+- Open up R-studio.
+
+- Open an R script i.e. the text editor.
+
+## Structure of a Data Analysis (part 1)
+
+- First;Steps in a data analysis.
+
+- Define the Question.
+
+- Define the ideal data set.
+
+- Determine what data you can access.
+
+- Obtain the data.
+
+- clean the data.
+
+- Second; Steps in a data analysis.
+
+- Exploratory data analysis.
+
+- Statistical prediction/modeling.
+
+- Interpret results.
+
+- Challenge results.
+
+- Synthesize/write up results.
+
+- Create reproducible code.
+
+### The key challenge in data analysis
+
+- Knowing all of the given information in advance.
+
+- Not having surplus information.
+
+- Have to filter information out.
+
+- Having insufficient information and have to go find some. Dan Myer!!!
+
+### Structure of a Data Analysis
+
+- The first part is about defining a question.
+
+1. Statistical methods development.
+
+2. Danger zone.
+
+3. Proper data analysis.
+
+- Think about what type of question you ask. The danger zone is the application of statistics to raw data without any sense of science.
+
+- A proper data analysis has 
+
+1. A scientific context.
+
+2. Has a general question that we try to investigate.
+
+## An Example
+
+- Start with a general question.
+
+- Can I automatically detect emails that are SPAM, that are not?
+
+### Make it Concrete
+
+- Can I use quantitative characteristics of the emails to classify them as SPAM/HAM?
+
+### Define the ideal data set
+
+- The data set may depend on your goal.
+
+1. Descriptive - a whole population.
+
+2. Exploratory - a random sample with many variables measured.
+
+3. Inferential - the right population randomly sampled.
+
+4. Predictive - a training and test data set from the same population.
+
+5. Causal - data from a randomized study.
+
+6. Mechanistic - data about all components of the system.
+
+## Our Example
+
+- With our example, we know that if you use gmail all your emails will be stored on google data center so we don't have to worry about sampling because we have all the data. 
+
+### Determine what data you can access
+
+- Sometimes you can find data free on the web.
+
+- Other times you may need to buy the data.
+
+- Be sure to respect the terms of use.
+
+- If the data don't exist, you may need to generate it yourself.
+
+### Back to our Example
+
+- Getting all the data from google is not going to be easy because of security issues.
+
+### A possible solution
+
+- Getting data from the UCI machine repository. When you obtain the data the first goal is to
+
+1. Try to obtain the raw data.
+
+2. Be sure to reference the source.
+
+3. Polite emails go a long way.
+
+4. If you will load the data from an internet source, record the url and time/date accessed.
+
+### Our data set
+
+The data set that we are going to talk about is the spam emails data from CRAN R package. The first thing you need to do with any data set is clean the data.
+
+- Raw data often needs to be processed.
+
+- If it is pre-processed, make sure you understand how.
+
+- Understand the source of the data (census,sample,etc).
+
+- May need reformating, sub-sampling-record these steps.
+
+- Determine if the data are good enough - if not, quit or change data.
+
+## Structure of a Data Analysis (part 2)
+
+- Our clean data that we are going to use.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(kernlab)
+data(spam)
+dim(spam)
+
+```
+
+- This lecture is going to focus on the second half of the steps in a data analysis.
+
+1. Exploratory data analysis.
+
+2. Statistical prediction/modeling.
+
+3. Interpret results.
+
+4. Challenge results.
+
+5. Synthesize/write up results.
+
+6. Create reproducible code.
+
+### An example
+
+- Start with a general question.
+
+- Can I automatically detect emails that are SPAM or not?
+
+- Make it concrete.
+
+- Can I use quantitative characteristics of the emails to classify them as SPAM/HAM?
+
+### Subsampling our data set
+
+- We need to generate a test and training set (prediction).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(kernlab)
+data(spam)
+# Perform the subsampling 
+set.seed(3435)
+trainIndicator <-rbinom(4601,size=1,prob=0.5)
+table(trainIndicator)
+trainSpam <-spam[trainIndicator==1,]
+testSpam <-spam[trainIndicator==0,]
+
+```
+
+- The idea is that we will use part of the dataset to build the model.
+
+- We will then use the other part of the data to determine how good the model is i.e. train set and test set.
+
+- The first thing to do is;
+
+### Exploratory data analysis
+
+- Look at summaries of the data.
+
+- Check for missing data.
+
+- Create exploratory plots.
+
+- Perform exploratory analysis (e.g clustering).
+
+- Here we focus on the train data set.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+names(trainSpam)
+head(trainSpam)
+# summaries
+table(trainSpam$type)
+# make some plots
+plot(trainSpam$capitalAve~trainSpam$type)
+
+```
+
+- The data are highly skewed so we transform that by using logs. Because of the zeroes(0) we add 1 to avoid taking logs of zeroe(0).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+plot(log10(trainSpam$capitalAve+1)~trainSpam$type)
+# We can also look at pairwise relationships between predictors
+plot(log10(trainSpam[,1:4]+1))
+
+```
+
+## Clustering
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+hCluster <-hclust(dist(t(trainSpam[,1:57])))
+plot(hCluster)
+
+```
+
+- Clustering is sensitive to skewness of a distribution. To resolve this skewness, we take logs.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+hClusterUpdated <-hclust(dist(t(log10(trainSpam[,1:55]+1))))
+plot(hClusterUpdated)
+
+```
+
+- Once we have done some exploratory analysis we can move on to do;
+
+## Statistical prediction/modeling
+
+- Should be informed by the results of your exploratory analysis.
+
+- Exact methods depend on the question of interest.
+
+- Transformations/processing should be accounted for when necessary.
+
+- Measures of uncertainty should be reported.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+trainSpam$numType <-as.numeric(trainSpam$type)-1
+costFunction <-function(x,y)sum(x!=(y>0.5))
+cvError <-rep(NA,55)
+library(boot)
+# for(i in 1:55){
+#  lmFormula <-reformulate(names(trainSpam[1],response="numType"))
+#  glmFit <-glm(lmFormula,family="binomial",data=trainSpam)
+#  cvError[i] <-cv.glm(trainSpam,glmFit,costFunction,2)$delta[2]
+# }
+# which predictor has minimum cross-validated error?
+# names(trainSpam)[which.min(cvError)]
+
+```
+
+- This model has a single predictor in it.
+
+## Get a measure of uncertainty
+
+- Use the best model from the group.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+predictionModel <-glm(numType~charDollar,family="binomial",data=trainSpam)
+# get prediction on the test set
+# predictionTest <-predict(predictionModel,testspam)
+# predictedSpam <-rep("nonspam",dim(testSpam)[1])
+# classify as spam for those with prob > 0.5
+# predictedSpam[predictionModel$fitted>0.5]="spam"
+# In logistic regression, we use probability to determine whether it is spam or not.
+# classification table
+# table(predictedSpam,testSpam$type)
+ErrorRate <-(61+458)/(1346+458+61+449)
+ErrorRate # This is about 22.4%
+
+```
+
+## Interpret results
+
+- Use the appropriate language.
+
+1. describes
+
+2. correlates with/associated with
+
+3. leads to/causes
+
+4. predicts
+
+- Give an explanation.
+
+- Interpret coefficients.
+
+- Interpret measures of uncertainty.
+
+## Our Example
+
+- The fraction of characters that are dollar signs can be used to predict if an email is spam.
+
+- Anything with more than 6.6% dollar signs is classified as spam.
+
+- More dollar signs always means more spam under our prediction.
+
+- Our test set error rate was 22.4%
+
+## Challenge Results
+
+- Challenge all steps;
+
+1. Question.
+
+2. Data Source.
+
+3. Processing.
+
+4. Analysis.
+
+5. Conclusions.
+
+- Challenge measures of uncertainty.
+
+- Challenge choices of terms to include in models.
+
+- Think of potential alternative analysis.
+
+## Synthesize/write-up results
+
+- Lead with the question.
+
+- Summarize the analysis into the story.
+
+- Don't include every analysis, include it;
+
+1. If it is needed for the story.
+
+2. If it is needed to address a challenge.
+
+- Order analysis according to the story, rather than chronologically.
+
+- Include "pretty" figures that contribute to the story.
+
+### In our example
+
+- Lead with the question.
+
+1. Can I use quantitative characteristics of the emails to classify tham as SPAM/HAM?
+
+- Describe the approach.
+
+1. Collected data from UCI and created training/test sets.
+
+2. Explored relationships.
+
+3. Choose logistic model on training set by cross validation.
+
+4. Applied to test, 78% test set accuracy.
+
+- Interpret results.
+
+1. Number of dollar signs seems reasonable,  e.g."Make money with Viagra".
+
+- Challenge results.
+
+1. 78% is not that great.
+
+2. I could use more variables.
+
+3. Why logistic regression?
+
+### Create reproducible code
+
+- Use tools like;
+
+1. Rmarkdown in Rstudio.
+
+2. knitr in Rstudio.
+
+- Preserve your code.
+
+### Organizing Your Analysis
+
+- There is no universal way to organize your analysis so that it can be reproducible by yourself or some one else. Below are some basic steps adopted to do that.
+
+### Data analysis files
+
+- Data;
+
+1. Raw data
+
+2. Processed data
+
+- Figures
+
+1. Exploratory figures
+
+2. Final figures
+
+- R code
+
+1. Raw/unused scripts
+
+2. Final scripts
+
+3. R markdown files
+
+- Text
+
+1. README files
+
+2. Text of analysis/report
+
+### Raw Data
+
+- The raw data can come in any form - records, text etc.
+
+- Should be stored in your analysis folder.
+
+- If accessed from the web, include url, description, and date/time accessed in README.
+
+### Processed data
+
+- This is cleaner than the raw data. It can come in a variety of forms.
+
+- rows and columns in a table.
+
+- Processed data should be named so it is easy to see which script generated the data.
+
+- The processing script - processed data mapping should occur in the README(mapping raw data to processed).
+
+- Proccessed data should be tidy.
+
+### Exploratory figures
+
+- Figures made during the course of your analysis, not necessarily part of your final report.
+
+- They do not need to be "pretty".
+
+### Final figures
+
+- Usually a small subset of the original figures.
+
+- Axes/colors set to make the figures clear.
+
+- Possibly multiple panels.
+
+- Figures must be labelled well.
+
+### Raw Scripts
+
+- May be less commented(but comments help you!).
+
+- May be multiple versions.
+
+- May include analysis that are later discarded.
+
+### Final Scripts
+
+- Clearly commented;
+
+1. Small comments liberally - what, when, why, how.
+
+2. Bigger commented blocks for whole sections.
+
+- Include processing details.
+
+- Only analysis that appear in the final write-up.
+
+## Rmarkdown Files
+
+- They are very useful even though they may not be required.
+
+- Rmarkdown files can be used to generate reproducible reports.
+
+- Text and R code are interpreted.
+
+- Very easy to create in Rstudio.
+
+## README files
+
+- They are useful because they explain what's going on in your project directory.
+
+- Not necessary if you use Rmarkdown.
+
+- Should contain step-by-step instructions for analysis.
+
+- Here is an example https://github.com/jtleek/swfdr/blob/master/README.md
+
+## Text of the document(summary paper)
+
+- It should include a title, introduction(motivation), methods(statistics you used), results(including measures of uncertainty), and conclusions(including potential problems).
+
+- It should tell a story.
+
+- It should not include every analysis you performed.
+
+- References should be included for statistical methods.
+
+- Software  used.
+
+## Further Resources
+
+- Information about a non reproducible study that led to cancer patients being mistreated: The Duke saga Starter Set.
+
+- Reproducible research  and Biostatistics.
+
+- Managing a statistical analysis project guidelines and best practices.
+
+- Project template - a pre-organized set of files for data analysis.
+
+
+
+
+
+
+
+
+
+
+
+

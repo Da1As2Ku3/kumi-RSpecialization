@@ -1,0 +1,8 @@
+base
+ggplot2
+lattice
+caret
+kernlab
+ISLR
+rpart
+rattle

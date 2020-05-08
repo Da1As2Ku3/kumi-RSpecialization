@@ -1,0 +1,477 @@
+---
+title: "Tabular Data"
+author: "David Asare Kumi"
+date: "10/21/2019"
+output: html_document
+---
+
+
+## Reading Tabular Data
+
+### Reading Data
+
+- There are a few principal functions reading data into R.
+
+- read.table, read.csv, for reading tabular data.
+
+- readLines, for reading lines of a text file.
+
+- Source, for reading in R code files (inverse of dump).
+
+- dget, for reading in R  code files (inverse of dput).
+
+- load, for reading in saved workspaces (binary objects).
+
+- unserialize, for reading single R objects in binary form.
+
+### Writing Data
+
+- There are analogous functions for writing data files.
+
+- write.table / read.table.
+
+- writeLines / readLines.
+
+- dump / source.
+
+- dput / dget.
+
+- save / load.
+
+- serialize / unserialize.
+
+### Reading Data files with read.table
+
+- The read.table function is one of the most commonly used functions for reading data. It has a few important arguments.
+
+- file; the name of a file, or a connection.
+
+- header, logical indicating if the file has a header line.
+
+- sep, a string indicating how the columns are separated.
+
+- colClasses, a character vector indicating the class of each column in the dataset.
+
+- nrows, the number of rows in the dataset.
+
+- comment.char, a character string indicating the comment character.
+
+- skip, the number of lines to skip from the beginning.
+
+- stringsAsFactors, should character variables be coded as Factors?
+
+### read.table
+
+- For small to moderately sized datasets, you can usually call read.table without specifying any other arguments.
+
+- data <-read.table("foo.txt").
+
+- R will automatically skip lines that begin with a #.
+
+- Figure out how many rows there are ( and how much memory needs to be allocated).
+
+- Figure what type of variable is in each column of the table. Telling R all these things directly makes R run faster and more efficiently.
+
+- read.csv is identical to read.table except that the default separator is a comma.
+
+- read.csv always specify header is true (header=TRUE).
+
+- sep for read.table is a space.
+
+### Reading in Larger Datasets with read.table
+
+- With much larger datasets, doing the following things will make your life easier and will prevent R from choking.
+
+- Read the help page for read.table, which contains many hints.
+
+- Make a rought calculation of the memory required to store your dataset. If the dataset is larger than the amount of RAM on your computer, you can probably stop right here.
+
+- Set comment.char = " ", if there are no commented lines in your file.
+
+- Use the colClasses argument. Specifying this option instead of using the default can make read.table run MUCH faster, often twice as fast.
+
+- In order to use this option, you have to know the class of each column in your data frame. If all of the columns are "numeric", for example, then you can just set colClasses="numeric".
+
+- A quick and dirty way to figure out the classes of each column is the following:
+
+1. initial <-read.table("datatable.txt",nrow=100).
+
+2. classes <-sapply(initial,class).
+
+3. tabAll <-read.table("datatable.txt",colClasses=classes).
+
+- Set nrows. This does not make R run faster but it helps with memory usage. A mild over estimate is ok.
+
+- You can use the Unix tool wc to calculate the number of lines in a file.
+
+## Know Thy System
+
+- In general, when using R with larger datasets, it is useful to know a few things about your system.
+
+1. How much memory is available?
+
+2. What other applications are in use?
+
+3. Are there other users logged into the same system?
+
+4. What operating system?
+
+5. Is the OS 32 or 64 bit?
+
+## Calculating Memory Requirements
+
+- I have a dataframe with 1,500,000 rows and 120 columns, all of which are numeric data. Roughly, how much memory is required to store this data frame?
+
+- 1,500,000 * 120 * 8 bytes/numeric.
+
+- 1440000000 bytes.
+
+- 1440000000/2^20 bytes/MB.
+
+- 1,373.29 MB.
+
+- 1.34 GB.
+
+- Each number require 8 bytes of memory to store for numeric.
+
+- 1,373.29/2^10 = 1.34 GB.
+
+- The rule of thumb is to have about twice of 1.34 GB to be more safer.
+
+- Doing this calculation is very very very important.
+
+## Textual Data Formats
+
+### dput(), dump()
+
+- dumping and dputing are useful because the resulting textual format is editable, and in the case of corruption, potentially recoverable.
+
+- Unlike writing out a table or csv file, dump and dput preserve the metadata (sacrificing some readability), so that another user does not have to specify it all over again.
+
+- Textual formats can work much better with version control programs like subversion or git which can only track changes meaningfully in text files.
+
+- Textual formats can be longer-lived; If there is corruption somewhere in the file it can be easier to fix the problem.
+
+- Textual formats adhere to the "Unix philosophy".
+
+- Downside: The format is not very space - efficient.
+
+### Advantages of Textual formats
+
+- longer - lived.
+
+- editable/recoverable.
+
+- works better with version control.
+
+- preserve metadata.
+
+### Disadvantages
+
+- Textual formats takes a lot of space and often needs to be compressed.
+
+## dput-ting R Objects
+
+- Another way to pass data around is by deparsing the R object with dput and reading it back in using dget.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+y <-data.frame(a=1,b="a")
+dput(y)
+dput(y,file="y.R")
+new.y <-dget("y.R")
+new.y
+
+```
+
+- dput() writes R code which can be used to reconstruct R objects.
+
+## Dumping R Objects
+
+- Multiple objects can be deparsed using the dump function and read back in using source.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-"foo"
+y <-data.frame(a=1,b="a")
+dump(c("x","y"),file="data.R")
+rm(x,y)
+source("data.R")
+y
+x
+
+```
+
+- dget can be used on a single R object.
+
+- dump can be used on multiple R objects.
+
+## Connections: Interfaces to the Outside World
+
+- Data are read in using connection interfaces. Connections can be made to files (most common) or to other more exotic things.
+
+- file, opens a connection to a file (e.g. text files,uncompressed).
+
+- gz file, opens a connection to a file compressed with gzip.
+
+- bz file, opens a connection to a file compressed with bzip2.
+
+- url, opens a connection to a webpage.
+
+### File Connections
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+str(file)
+
+```
+
+- description is the name of the file.
+
+- open is a code indicating 
+
+1. "r" read only.
+
+2. "w" writing (and initializing a new file).
+
+3. "a" appending.
+
+4. "rb", "wb", "ab" reading, writing, or appending in binary mode(Windows).
+
+- In general connections are powerful tools that let you navigate files or other external objects. In practice, we often don't need to deal with the connection interface directly.
+
+- con <-file("foo.txt","r").
+
+- data <-read.csv(con).
+
+- close(con).
+
+- Is the same as:
+
+- data <-read.csv("foo.txt").
+
+## Read Lines of a Text file
+
+- con <-gzfile("words.gz")
+
+- x <-readLines(con,10)
+
+- x
+
+- writeLines takes a character vector and writes each element one line at a time to a text file.
+
+- readLines can be useful for reading in lines of webpages.
+
+- This might take time;
+
+- con <-url("http://www.jhsph.edu","r")
+
+- x <-readLines(con)
+
+- head(x)
+
+## Sebsetting - Basics
+
+### Subsetting Objects in R
+
+- There are a number of operators that can be used to extract subsets of R objects.
+
+- [ always returns an object of the same class as the original. Can be used to select more than one element (there is one exception).
+
+- [[ is used to extract elements of a list or a data frame.
+
+- It can only be used to extract a single element and the class of the returned object will not necessarily be a list or data frame.
+
+- $ is used to extract elements of a list or data frame by name.
+
+- Semantics are similar to that of [[.
+
+- [ returns objects of the same class and extracts more than one object.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c("a","b","c","c","a")
+x[1] # here we subsetting using a numeric integer
+x[2]
+x[1:4]
+x[x>"a"]
+#subsetting logical index
+u <-x>"a"
+u
+x[u]
+
+```
+
+## Subsetting - Lists
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(foo=1:4,bar=0.6)
+x[1]
+x[[1]]
+x$bar
+x[["bar"]]
+x["bar"]
+
+```
+
+- The name of the object helps you reference.
+
+- If you want to extract multiple elements use the single bracket[].
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(foo=1:4,bar=0.6,baz="Hello")
+# We want to extract the elements 1 and 3
+x[c(1,3)]
+
+```
+
+- The [[ operator can be used with computed indices.
+
+- $ can only be used with literal names.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(foo=1:4,bar=0.6,baz="Hello")
+name <-"foo"
+x[[name]] # computed index for "foo"
+x$name
+x$foo
+
+```
+
+## Subsetting Nested Elements of a List
+
+- The [[ ]] can take an integer sequence.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(a=list(10,12,14),b=c(3.14,2.81))
+x[[c(1,3)]] # third element in first item
+x[[1]][[3]]
+x[[c(2,1)]] # first element in 2nd item
+
+```
+
+## Subsetting Matrices
+
+- Matrices can be subsetted in the usual way with (i,j) type indices.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-matrix(1:6,2,3)
+x
+x[1,2] # first row second column
+x[2,1] # second row first column
+# indices can also be missing
+x[1,] # only the first row with all columns
+x[,2] # only the second column with all rows
+
+```
+
+- By default, when a single element of a matrix is retrieved, it is returned as a vector of length 1 rather than a 1 X 1 matrix.
+
+- This behaviour can be turned off by setting drop=FALSE.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-matrix(1:6,2,3)
+x[1,2]
+x[1,2,drop=FALSE]
+
+```
+
+- Similarly, subsetting a single column or a single row will give you a vector, not a matrix (by default).
+
+- drop = FALSE changes vector into a matrix.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-matrix(1:6,2,3)
+x[1,]
+x[1,,drop=FALSE]
+
+```
+
+## Subsetting Partial Matching
+
+- Partial matching of names is allowed with [[]] and $.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-list(aardvark=1:5)
+x$a
+x[["a"]]
+x[["a",exact=FALSE]]
+
+```
+
+- Partial matching is very useful when working on the command line.
+
+- By default the [[]] does not do partial matching like the $ unless you introduce the argument exact=FALSE.
+
+## Removing NA Values
+
+- A common task is to remove missing values (NAs).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c(1,2,NA,4,NA,5)
+bad <-is.na(x)
+x[!bad] # !bad means not bad
+#what if there are multiple things and you want to take the subset with no missing values
+x <-c(1,2,NA,4,NA,5)
+y <-c("a","b",NA,"d",NA,"f")
+good <-complete.cases(x,y)
+good
+x[good]
+y[good]
+
+```
+
+## Removing NAs from Data Frame
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(airquality)
+dim(airquality)
+summary(airquality)
+sum(is.na(airquality))
+airquality[1:6,] # this code gives you the first 6 rows with all the columns
+good <-complete.cases(airquality)
+airquality[good,][1:6,]
+
+```
+
+## Vectorized Operations
+
+- This is one of the features of the R language.
+
+- The idea of vectorized operations is that things can happen in parallel.
+
+- Many operations in R are vectorized making code more efficient, concise, and easier to read.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-1:4
+y <-6:9
+x+y
+x>2
+x>=2
+y==8 #test for equality
+x*y
+x/y
+
+```
+
+## Vectorized Matrix Operations
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-matrix(1:4,2,2)
+x
+y <-matrix(rep(10,4),2,2)
+y
+x*y #element-wise multiplication
+x/y #element-wise division
+x%*%y #true matrix multiplication
+
+```
+
+## How can I save everything from console
+
+- sink("dataout.txt"). This saves only the graphs.
+
+- You can use savehistory to save the commands and save.image to save the objects created.
+
+- Often we use packages like brew, rweave, pander, knitr etc to create reproducible reports of our analysis.
+
+- You can use savehistory("dataout.txt") which will write the entire history as plain text. You can also use the .rhistory extension instead of .txt.
+
+- source("myfile.R"). Load and execute a script of R commands.

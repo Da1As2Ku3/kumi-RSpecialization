@@ -1,0 +1,333 @@
+---
+title: "Working With Dates"
+author: "David Asare Kumi"
+date: "9/30/2019"
+output: html_document
+---
+
+
+## Starting Simple
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(1234)
+d1 <-date()
+d1
+class(d1)
+# Date Class
+d2 <-Sys.Date()
+d2
+class(d2)
+
+```
+
+## Formatting Dates
+
+- %d = day as a number (0-31).
+
+- Weekday
+
+1. %a = abbreviated weekday.
+
+2. %A = unabbreviated weekday.
+
+- Month
+
+1. %m = month(00-12).
+
+2. %b = abbreviated month.
+
+3. %B = unabbreviated month.
+
+- Year
+
+1. %y = two(2) digit year.
+
+2. %Y = four(4) digit year.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(1234)
+format(d2,"%a %b %d")
+format(d2,"%A %B %d")
+
+```
+
+### Creating Dates
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-c("1jan1960","2jan1960","31mar1960","30jul1960")
+z <-as.Date(x,"%d%b%Y")
+z
+#Time difference of -1 day
+z[1]-z[2]
+as.numeric(z[1]-z[2])
+
+```
+
+### Converting to Julian
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+weekdays(d2)
+months(d2)
+julian(d2)
+
+```
+
+- The number of days that have occured since the origin day (1970) i.e. 1970-01-01.
+
+### Lubridate
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(lubridate)
+ymd("20140108")
+mdy("08/04/2013")
+dmy("03-04-2013")
+
+```
+
+- Lubridate convert a number to date. Lubridate is very important because you don't have to format the date.
+
+### Dealing with Times
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+ymd_hms("2011-08-03 10:15:03")
+ymd_hms("2011-08-03 10:15:03",tz="Pacific/Auckland")
+
+```
+
+- ?Sys.timezone gives you more information on time zones.
+
+### Some functions have slightly different Syntax
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-dmy(c("1jan2013","2jan2013","31mar2013","30jul2013"))
+wday(x[1])
+wday(x[1],label=TRUE)
+
+```
+
+- lubridate; wday.
+
+### Notes and Further Resources
+
+- More information in this nice lubridate tutorial http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/
+
+- The lubridate vignette is the same content http://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html
+
+- Ultimately you want your dates and times as class "Date" or the classes "POSIXct","POSIXlt". For more information type ?POSIXlt.
+
+### Data Resources
+
+### Open Government Sites
+
+- United Nations http://data.un.org/
+
+- U.S. http://www.data.gov/ -list of cities/states with open data
+
+- United Kingdom http://data.gov.uk/
+
+- France http://www.data.gouv.fr/
+
+- Ghana http://data.gov.gh/
+
+- Australia http://data.gov.au/
+
+- Germany https://www.govdata.de/
+
+- Hong Kong http://www.gov.hk/en/theme/psi/datasets/
+
+- Japan http://www.data.go.jp/
+
+- Many more http://www.data.gov/opendatasites
+
+- Gapminder also has a large number of datasets available http://www.gapminder.org/
+
+- Survey data from the United States http:www.asdfree.com/ This site gives you information about how to access the various data.
+
+- Infochimps Market place http://www.infochimps.com/marketplace
+
+- Kaggle (They offer datascience competitions) http://www.kaggle.com/
+
+### Collections by data Scientists
+
+- Hilary Mason http://bitly.com/bundles/hmason/1
+
+- Peter Skomoroch https://delicious.com/psomoroch/dataset
+
+- Jeff Hammerbacher http://www.quora.com/Jeff-Hammerbacher/Introduction-to-Data-Science-Data-Sets
+
+- Gregory Piatetsky-Shapiro http://www.kdnuggets.com/gps.html
+
+- http://blog.mortardata.com/post/67652898761/6-dataset-lists-curated-by-data-scientists
+
+### More Specialized Collections
+
+- Stanford Large Network Data.
+
+- UCI Machine Learning.
+
+- KDD Nugets Datasets.
+
+- CMU Statlib.
+
+- Gene expression omnibus.
+
+- ArXiv Data.
+
+- Public Datasets on Amazon Web Services.
+
+### Some API's with R interfaces
+
+- twitter and twitter R package.
+
+- figshare and rfigshare.
+
+- PLoS and rplos.
+
+- rOpenSci.
+
+- Facebook and RFacebook.
+
+- Google maps and RGoogleMaps.
+
+NB: You can use gsub to remove commas. gsub(pattern=",",replacement="",x=GDP).
+
+## Exporting data from R
+
+- For excel, you will need the xlsReadWrite package.
+
+1. To a tab delimited text file;
+
+- write.table(mydata,"C:/mydata.txt",sep="\t")
+
+2. To an Excel spreadsheet;
+
+- library(xlsx)
+
+- write.xlsx(mydata,"C:/mydata.xlsx")
+
+### To SPSS
+
+- library(foreign)
+
+- write.foreign(mydata,"C:/mydata.txt","C:/mydata.spss",package="SPSS")
+
+### To SAS
+
+- library(foreign)
+
+- write.foreign(mydata,"C:/mydata.txt","C:/mydata.sas",package="SAS")
+
+### To Stata
+
+- library(foreign)
+
+- write.dta(mydata,"C:/mydata.dta")
+
+### To Word
+
+- Create a table or data frame in R.
+
+- Write this table to a comma separated .txt file using write.table().
+
+- Copy and paste the content of the .txt file into word.
+
+- In word,
+
+1. Select the text you just pasted from the .txt file.
+
+2. Go to table, convert, convert text to table.
+
+3. Make sure "commas" is selected under "Separate text at".
+
+4. Click OK.
+
+### Example
+
+- write.table(mtcars,file="mtcars.txt",sep="\t",row.names=TRUE,colnames=NA).
+
+- Copy and paste and change the font to a monoSpace font like;
+
+1. consolas.
+
+2. Lucida console.
+
+3. write.csv(mtcars,file="mtcars.csv").
+
+4. write.table(mtcars,file="mtcars.txt",sep=",",quote=FALSE,row.names=F).
+
+5. write.table(Data to Export,file="Data to Export.csv",sep=",",row.names=FALSE).
+
+6. Double click on the file and it will open in excel by default. Set row.names=FALSE to get rid of the row names.
+
+7. write.csv(mydata,file="mydata.csv"). Here exclude sep=",".
+
+
+## Import Data from SPSS
+
+- Package need to be installed.
+
+- library(foreign).
+
+- df <- read.spss("dataset.sav", use.value.label=TRUE, to.data.frame=TRUE).
+
+- df is the name of data frame created in R, and dataset.sav is the file name of SPSS dataset we want to import, and use.value.label=TRUE to convert variables with value labels in SPSS into R factors, and to.data.frame=TRUE to make as data frame.
+
+## Import Data from Stata
+
+- To import a dataset from Stata into R, the function read.dta() from foreign package is used.
+
+- library(foreign).
+
+- df <- read.dta("dataset.dta").
+
+- df is the name of data frame in R, and dataset.dta is the file name of Stata dataset we want to import.
+
+## Import Data from SAS
+
+- To import a dataset from SAS into R there are different methods, but most recommended is to export first the dataset from SAS into CSV and then to import in R.
+
+- First use the code below in SAS (not R) to export data:
+
+- run in SAS
+
+- proc export data=dataset
+
+- outfile="datast.csv"
+
+- dbms=csv;
+
+- run;
+
+- Now that your data is exported you can import in R by using the code below:
+
+- df <- read.csv("dataset.csv",header=T,as.is=T).
+
+- Another way to upload SAS files (.XPT) direct to R environment is by using Hmisc package.
+
+- library(Hmisc)
+
+- df <- sasxport.get("/filename.xpt")
+
+## Import Data from CSV
+
+- df <- read.table("dataset.csv", header=TRUE, sep=",").
+
+- df <- read.csv("dataset.csv",header=T,as.is=T).
+
+## Import data from TXT
+
+- df <- read.table("dataset.txt", as.is=TRUE, header=T).
+
+- df <- read.table("dataset.txt", header=TRUE, sep=",").
+
+- df <- read.table("dataset.txt", header=T, strings=F).
+
+## Load Rdata in R
+
+- save(df, file="mydata.Rdata").
+
+- load("mydata.Rdata").
+
+- To load Rdata in R is easy and straightforward method. However, first we need to know how to save the dataframe in R. The function used for saving the dataframe is save(objectlist, file="myfile"), where objectlist is the name of your current dataframe and myfile is the filename of RDATA you will save on your computer. The function to upload the Rdata in R is load().
+
+- Other interesting functions are ls() which list the objects in the current workspace, rm(objectlist) which delete objects in your workspace.

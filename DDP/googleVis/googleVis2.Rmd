@@ -1,0 +1,16 @@
+---
+title: "googleVis2"
+author: "David Asare Kumi"
+date: "May 30, 2019"
+output: html_document
+---
+
+
+```{r,dependson="gv",results="asis",cache=TRUE,warning=FALSE,message=FALSE,comment=""}
+library(googleVis)
+
+G <-gvisGeoChart(Exports,locationvar="Country",colorvar="Profit",options=list(width=600,                                                                             height=400))
+print(G,"chart")
+plot(G)
+
+```

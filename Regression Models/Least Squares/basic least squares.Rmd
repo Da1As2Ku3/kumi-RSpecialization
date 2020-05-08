@@ -1,0 +1,420 @@
+---
+title: "Basic Least Squares"
+author: "David Asare Kumi"
+date: "June 20, 2019"
+output: html_document
+---
+
+
+## Introduction: Basic Least Squares
+
+- Let's look at the data first used by Francis Galton in 1885.
+
+- Galton was a statistician who invented the term and concepts of regression and correlation, founded the journal Biometrika, and was the cousin of Charles Darwin.
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(ggplot2)
+library(HistData)
+data(Galton)
+head(Galton)
+library(reshape)
+long <-melt(Galton)
+g <-ggplot(long,aes(x=value,fill=variable))
+g <-g+geom_histogram(color="black",binwidth=1)
+g <-g+facet_grid(.~variable)
+g
+
+```
+
+## Introductory Data
+
+### Example
+
+- comparing children's heights and their parent's heights.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(ggplot2)
+data(Galton)
+g <-ggplot(Galton,aes(x=parent,y=child))+geom_point(color="red",size=2,alpha=1)
+g
+
+```
+
+## Least Squares Estimation of Regression Lines
+
+- Least squaress minimizes the error sum of squares.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(ggplot2)
+data(Galton)
+x <-Galton$parent
+y <-Galton$child
+g <-ggplot(Galton,aes(x,y))+geom_point(color="red",size=2,alph=1)+geom_smooth(method="lm",size=1,
+    color="blue")+labs(x="Parent",y="Child")+labs(title="Scatterplot of Parent and Child")
+g
+#Fitting the best line
+fit <-lm(y~x,data=Galton)
+summary(fit)$coef
+
+#Fitting the best line (alternative approach)
+slope <-cor(y,x)*sd(y)/sd(x)
+slope
+intercept <-mean(y)-slope*mean(x)
+intercept
+#The slope of the regression line with X as the outcome and y as the predictor
+slope1 <-cor(y,x)*sd(x)/sd(y)
+slope1
+intercept1 <-mean(x)-slope1*mean(y)
+intercept1
+#correlation y,x = correlation x,y
+cor(y,x)
+cor(x,y)
+
+```
+
+- Regression to the origin yielded the same slope as a linear regression which does not necessarily have zero(0) intercept if you mean centered the y's and you mean centered the x's.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(ggplot2)
+data(Galton)
+x <-Galton$parent
+y <-Galton$child
+yc <-y-mean(y) #y centered
+xc <-x-mean(x) #x centered
+beta1 <-sum(yc*xc)/sum(xc^2)
+beta1
+#Alternatively
+c(beta1,coef(lm(y~x))[2]) #[2] grabs the second coefficient i.e. the slope
+c(beta1,coef(lm(y~x))[1]) #[1] grabs the intercept i.e. the constant term
+c(coef(lm(y~x))[1],coef(lm(y~x))[2]) # grabs the intercept and the slope
+#Plot
+g <-ggplot(Galton,aes(xc,yc))+geom_point(color="red",alpha=1)+geom_smooth(method="lm",se=FALSE)+labs(x="Centered X",y="Centered Y")+labs(title="Scatterplot of Centered X and Centered Y")
+g
+#Regression to the origin using lm (get rid of the intercept)
+lm(yc~xc-1) #-1 takes the intercept out
+
+```
+
+## Normalizing variables results in the slope being the correlaiton
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(ggplot2)
+data(Galton)
+x <-Galton$parent
+y <-Galton$child
+yn <-(y-mean(y))/sd(y)
+xn <-(x-mean(x))/sd(x)
+#concatenate
+c(cor(y,x),cor(yn,xn),coef(lm(yn~xn))[2])
+sd(yn)
+sd(xn)
+#Plot
+g <-ggplot(Galton,aes(xn,yn))+geom_point(color="red",size=2,alpha=1)+geom_smooth(method="lm",se=FALSE,color="green")+labs(x="Normalized X",y="Normalized Y")+labs(title="Scatterplot of Normalized X and Normalized Y")
+g
+  
+```
+
+## Regression to the Mean
+
+- Suppose that we normalize X (child's height) and Y (parent's height) so that they both have mean 0 and variance 1.
+
+- Then recall our regression line passes through (0,0) the mean of X and Y.
+
+- If the slope of the regression line is cor(y,x),regardless of which variable is the outcome (recall, both standard deviation are 1).
+
+- Notice, if X is the outcome and you create a plot where X is the horizontal axis, the slope of the least squares line that you plot is 1/cor(y,x).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(MASS)
+library(HistData)
+library(ggplot2)
+library(lattice)
+library(Hmisc)
+library(backports)
+library(htmlTable)
+library(UsingR)
+data(father.son)
+dim(father.son)
+names(father.son)
+summary(father.son)
+y <-(father.son$sheight-mean(father.son$sheight))/sd(father.son$sheight)
+x <-(father.son$fheight-mean(father.son$fheight))/sd(father.son$fheight)
+rho <-cor(x,y)
+g <-ggplot(data.frame(x=x,y=y),aes(x=x,y=y))
+g <-g + geom_point(size=6,color="black",alpha=0.2)
+g <-g + geom_point(size=6,color="salmon",alpha=0.2)
+g <-g + xlim(-4,4) + ylim(-4,4)
+g <-g +geom_abline(intercept=0,slope=1)
+g <-g + geom_vline(xintercept=0)
+g <-g + geom_hline(yintercept=0)
+g <-g + geom_abline(intercept=0,slope=rho,size=2,color="red")
+g <-g + geom_abline(intercept=0,slope=1/rho,size=2,color="blue")
+g
+#Regression to the mean is important for longitudinal data.
+
+```
+
+## Linear Regression and Multivariable Regression
+
+### Basic regression model with additive gaussian errors
+
+- Least squares is an estimation too, how do we do inference?
+
+- Consider developing a probabilistic model for linear regression Yi=Bo + B1Xi + Ei.
+
+- Here the Ei are assumed independent and identically distributed (iid) N(0,variance).
+
+- Note, E(Yi/Xi=xi)=mean=Bo+B1Xi.
+
+- Note, Var(Yi/Xi=xi)=variance.
+
+- It is important to note that;
+
+1. Yi is known as the dependent, response, outcome or the regressand variable.
+
+2. Xi is known as the independent, predictor, explanatory or the regressor variable.
+
+3. Bo is a population parameter to estimate and it is known as the intercept or constant term.
+
+4. B1 is a population parameter to estimate and it is known as the slope or the gradient term.
+
+
+## Interpreting regression coefficients 
+
+- Bo is the intercept and it is the expected value of the response variable when the predictor is 0.
+
+- B1 is the slope and it is the expected change in response for a 1 unit change in the predictor.
+
+
+## Linear Regression for Prediction
+
+- When you plug in the x value you will get the predicted value for y.
+
+- The x value must be within the range of x values in the data (interpolation).
+
+- Extrapolation; predicting outside the range of x values given.
+
+## Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(reshape)
+library(Hmisc)
+library(backports)
+library(htmlTable)
+library(ggplot2)
+library(UsingR)
+data(diamond)
+dim(data)
+str(diamond)
+summary(diamond)
+g <-ggplot(diamond,aes(x=carat,y=price))
+g <-g + xlab("Mass(carats)")
+g <-g + ylab("Price(SIN$)")
+g <-g + geom_point(size=6,color="black",alpha=0.2)
+g <-g + geom_point(size=5,color="blue",alpha=0.2)
+g <-g + geom_smooth(method="lm",color="black",se=FALSE)
+g
+
+#Fitting the linear regression model.
+fit <-lm(price~carat,data=diamond)
+fit
+coef(fit)
+summary(fit)$coef
+summary(fit)
+
+```
+
+### Interpretation of the coefficients
+
+- Price = -259.63 + 3721.02Carat
+
+1. Slope; we estimate an expected 3721.02(SIN) dollar increase in price for every carat increase in mass of diamond.
+
+2. The intercept -259.63 is the expected price of a zero(0) carat diamond.
+
+### Getting a more interpretable intercept
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+#mean center the predictor variable
+fit2 <-lm(price~I(carat-mean(carat)),data=diamond)
+coef(fit2)
+#I function helps us do arithmetic operations inside equations in lm.
+
+```
+
+### Revised interpretation of the intercept
+
+- Price = 500.08 + 3721.02Carat
+
+1. $500.08 is the expected price for the average sized diamond of the data (0.2042 carats).
+
+2. The slope remains the same but the intercept changes to 500.08.
+
+## Predicting the Price of a diamond
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+newx <-c(0.16,0.27,0.34)
+coef(fit)[1]+coef(fit)[2]*newx
+#General method
+predict(fit,newdata=data.frame(carat=newx))
+
+```
+
+## Residuals
+
+- Unexplained variations by our model.Residuals are the observable errors from the estimated coefficients.In a sense, the residuals are estimates of the errors.
+
+- Errors; unobservable true errors from the known coefficients.
+
+- SSR; sum of squares due to regression - this measures the variation in the fitted values.
+
+- SSE; sum of squares due to error - this measures the discrepancy between the observed and the fitted values.
+
+- SST; sum of squares due to total - this measures the variation in the observed values.
+
+
+## Residuals and Residual Variations
+
+### Motivating Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(reshape)
+library(Hmisc)
+library(backports)
+library(htmlTable)
+library(ggplot2)
+library(UsingR)
+data(diamond)
+g <-ggplot(diamond,aes(x=carat,y=price))
+g <-g + geom_point(size=2,color="red",alpha=1) + geom_smooth(method="lm",color="blue",se=FALSE)
+g <-g + labs(x="Carat(Mass)",y="Price(SIN$)")
+g <-g + labs(title="Scatterplot of Carat and Price")
+g
+
+```
+
+## Properties of the Residuals
+
+- E(ei)=0.
+
+- If an intercept is included, summation(ei)=0.
+
+- If a regressor variable,Xi, is included in the model summation(eiXi)=0.
+
+- Residuals are useful for investigating poor model fit.
+
+- Positive residuals are above the line and negative residuals are below the line.
+
+- Residuals can be thought of as the outcome(y) with the linear regression of the predictor(X) removed.
+
+- Residual plots highlights poor model fit.
+
+## Residuals, coding example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,fig.height=8,fig.width=8,comment=""}
+library(HistData)
+library(reshape)
+library(Hmisc)
+library(backports)
+library(htmlTable)
+library(ggplot2)
+library(UsingR)
+data(diamond)
+y <-diamond$price
+x <-diamond$carat
+n <-length(y)
+fit <-lm(y~x,data=diamond)
+e <-resid(fit)
+e
+plot(e,cex=2,pch=20,col="red")
+abline(h=0,lwd=2,lty=2,col="blue")
+par(mfrow=c(2,2),mar=c(4,4,2,1),oma=c(0,0,2,0))
+plot(fit)
+#Predict fitted line
+yhat <-predict(fit)
+yhat
+max(abs(e-(y-yhat)))
+max(abs(e-(y-coef(fit)[1]-coef(fit)[2]*x)))
+
+#Check sum of residuals
+sum(e)
+sum(e*x)
+
+#Plot the residuals on the vertical axis versus mass on the horizontal axis.
+plot(x,e,xlab="Carat(Mass)",ylab="Residuals(SIN$)",col="black",cex=2,pch=20)
+abline(h=0,lwd=2,col="red",lty=1)
+
+#Grabbing residual variation
+summary(fit)$sigma
+sqrt(sum(resid(fit)^2/(n-2)))
+
+```
+
+- Heteroskedasticity refers to the circumstances in which the variability of a variable is unequal across the range of values of a second variable that predicts it. for e.g. annual income and age.
+
+## Inference in Regression
+
+- Inference is the process of drawing conclusions about a population using a sample. Hypothesis test and confidence intervals are among the most common forms of statistical inference.
+
+## Getting Confidence Interval
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(reshape)
+library(Hmisc)
+library(backports)
+library(htmlTable)
+library(ggplot2)
+library(UsingR)
+data(diamond)
+y <-diamond$price
+x <-diamond$carat
+fit <-lm(y~x,data=diamond)
+sumCoef <-summary(fit)$coef
+sumCoef
+#confidence interval
+sumCoef[1,1]+c(-1,1)*qt(0.975,df=fit$df)*sumCoef[1,2]
+sumCoef[2,1]+c(-1,1)*qt(0.975,df=fit$df)*sumCoef[2,2]
+
+```
+
+## Prediction
+
+- Consider predicting Y at a value of X. For e.g. predicting the price of diamond given the carat.
+
+- The obvious estimate for prediction at pt Xo is Bo + B1(Xo).
+
+- A standard error is needed to create a prediction interval.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(reshape)
+library(Hmisc)
+library(backports)
+library(htmlTable)
+library(ggplot2)
+library(UsingR)
+data(diamond)
+y <-diamond$price
+x <-diamond$carat
+fit <-lm(y~x,data=diamond)
+summary(fit)$coef
+#Predict
+newx <-c(0.16,0.27,0.34)
+#Manual approach
+coef(fit)[1]+coef(fit)[2]*newx
+#General method
+predict(fit,newdata=data.frame(x=newx))
+
+```
+
+
+
+

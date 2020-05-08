@@ -1,0 +1,370 @@
+---
+title: "Forecasting"
+author: "David Asare Kumi"
+date: "7/18/2019"
+output: html_document
+---
+
+
+## Forecasting
+
+Forecasting simply applies to time series data.
+
+### What is different
+
+- Data are dependent over time (this makes prediction challenging).
+
+- Specific pattern types.
+
+1. Trends; long term increase or decrease.
+
+2. Seasonal patterns; patterns related to time of week,month,year etc.
+
+3. Cycles; patterns that rise and fall periodically.
+
+- Subsampling into training/test is more complicated.
+
+- Similar issues arise in spatial data.
+
+1. Dependency between nearby observations.
+
+2. Location specific effects.
+
+- Typically, goal is to predict one or more observations into the future.
+
+- All standard predictions can be used (with caution!)
+
+- Beware of spurious correlations. A spurious correlation is a relationship between two variables that appear to have interdependence or association with each other but actually do not. Spurious correlation is often caused by a third factor that is not apparent at the time of examination. The third factor can be said to be a confounding factor.
+
+- Beware of extrapolation; This type of extrapolation can be dangerous in the future.
+
+## Example: Google financial data
+
+1. library(xts)
+
+2. library(TTR)
+
+3. library(zoo)
+
+4. library(quantmod)
+
+5. library(Quandl)
+
+6. from.dat <-as.Date("01/01/08",format="%m%d%y")i.e. specify to and from dates
+
+7. to.dat <-as.Date("12/31/10",format="%m%d%y")
+
+8. getSymbols("AAPL",src="google",from=from.dat,to=to.dat,auto.assign=TRUE)
+
+9. head(GOOG)
+
+10. Summarize monthly and store as time series
+
+- mGoog = to.monthly(GOOG)
+
+- googOpen = Op(mGoog)
+
+- ts1 = ts(googOpen,frequency = 12)
+
+- plot(ts1,xlab="Year + 1",ylab="GOOG")
+
+11. Extract the closing price and covert it to yearly time series (12 observations per year)
+
+- ts=ts(Cl(mGoog),frequency=12)
+
+
+## Example: Time series decomposition
+
+- Trend; Consistently increasing pattern over time.
+
+- Seasonal; When there is a pattern over a fixed period of time that recurs.
+
+- Cyclic; When data rises and falls over non fixed periods.
+
+## Decompose a time series into parts.
+
+- plot(decompose(ts1),xlab="Years + 1)
+
+## Training and test sets
+
+- ts1Train = window(ts1,start=1,end=5).
+
+- ts1Test = window(ts1,start=5,end=(7-0.01)).
+
+- ts1Train (this gives the table).
+
+- We use consecutive time points for our train/test set.
+
+## Different ways of forecasting (install and load forecast)
+
+1. Simple moving average (sma)/ma. plot(ts1Train). lines(ma(ts1Train,order=3),col="red")
+
+2. Exponential Smoothing; Example- simple exponential smoothing. ets1 = ets(ts1Train,model="MMM").
+
+3. fcast = forecast(ets1).
+
+4. plot(fcast)
+
+5. lines(ts1Test,col="red")
+
+## Get the accuracy
+
+- accuracy(fcast,ts1Test)
+
+## install package forecast
+
+- load forecast library; library(forecast).
+
+- find the number of rows(years); rows= ceiling(length(ts)/12).
+
+- use 90% of the data to create training set; tsTrain = window(ts,start=1,end=floor(rows*0.9)-0.01).
+
+- use the rest of the data to create test set; tsTest = window(ts,start=floor(row*0.9)).
+
+- plot the training set; plot(tsTrain).
+
+- add the moving average in red; lines(ma(tsTrain,order=3),col="red").
+
+- note that ts is time series.
+
+
+## Notes and further Resources
+
+- Forecasting and time series prediction is an entire field.
+
+- Rob Hyndman's Forecasting; principles and practice is a good place to start.
+
+- Cautions
+
+1. Be wary of spurious correlations.
+
+2. Be careful how far you predict (extrapolation).
+
+3. Be wary of dependencies over time.
+
+4. See quantmod or quandl packages for financial related problems.
+
+
+## Unsupervised Prediction
+
+### Key Ideas
+
+- Sometimes you don't know the labels for prediction.
+
+- To build a predictor;
+
+1. Create clusters.
+
+2. Name clusters(challenging).
+
+3. Build predictor for clusters.
+
+- In a new data set;
+
+1. Predict clusters.
+
+## Iris Example; ignoring species labels
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(gridExtra)
+library(caret)
+library(rpart)
+data(iris)
+inTrain <-createDataPartition(y=iris$Species,p=0.7,list=FALSE)
+training <-iris[inTrain,]
+testing <-iris[-inTrain,]
+dim(training)
+dim(testing)
+#Cluster with k-means
+kMeans1 <-kmeans(subset(training,select=-c(Species)),centers=3)
+training$clusters <-as.factor(kMeans1$cluster)
+p1 <-qplot(Petal.Width,Petal.Length,color=clusters,data=training)+ggtitle("Clusters Classification")
+p1
+p2 <-qplot(Petal.Width,Petal.Length,color=Species,data=training)+ggtitle("Species Classification(Truth)")
+p2
+grid.arrange(p1,p2,ncol=2)
+#Compare to real labels
+table(kMeans1$cluster,training$Species)
+#Build predictor
+modFit <-train(clusters~.,data=subset(training,select=-c(Species)),method="rpart")
+modFit
+table(predict(modFit,training),training$Species)
+#aplly on test set
+testClusterPred <-predict(modFit,testing)
+table(testClusterPred,testing$Species)
+
+```
+
+## Notes and further reading
+
+- The cl_predict function in the clue package provides similar functionality.
+
+- Beware of over interpretation of clusters.
+
+- This is one basic approach to recommendation engines.
+
+- Elements of Statistical Learning.
+
+- Introduction to Statistical Learning.
+
+## Spurious Correlation
+
+- This is a mathematical relationship in which two or more events or variables are not causally related to each other, yet it may be wrongly inferred that they are, due to either coincidence or the presence of a certain third, unseen factor(referred to as confounding factor or common response variable or lurking variable).
+
+## Summary of packages
+
+### Regularized Regression
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(MASS)
+library(ggplot2)
+library(dplyr)
+library(lars)
+library(elasticnet)
+library(caret)
+data(Insurance)
+names(Insurance)
+glimpse(Insurance)
+tab1 <-table(Insurance$District)
+tab1
+tab2 <-table(Insurance$Age)
+tab2
+tab3 <-table(Insurance$Group)
+tab3
+cbind(tab1,tab2,tab3)
+inTrain <-createDataPartition(y=Insurance$Holders,p=0.7,list=FALSE)
+training <-Insurance[inTrain,]
+testing <-Insurance[-inTrain,]
+modFit <-lm.ridge(Holders~.,data=training,lambda=5)
+modFit
+#Note:the predictors are centered and scaled first before the regression is run
+#lambda=5 is the tuning parameter
+modFit$xm # returns column/predictor mean from the data
+modFit$scale # returns the scaling performed on the predictors for the ridge regression
+modFit$coef # returns the conditional coefficients Bj from the ridge regression
+modFit$y # returns mean of outcome
+#perform ridge regression with given outcome and predictors using caret package
+modFit1 <-train(Holders~.,data=training,method="ridge",lambda=5)
+modFit1
+
+```
+
+### Regularized Regression - Adaptive foreward backward greedy algorithm for learning sparse representation (foba)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(MASS)
+library(ggplot2)
+library(dplyr)
+library(caret)
+data(Insurance)
+inTrain <-createDataPartition(y=Insurance$Holders,p=0.7,list=FALSE)
+training <-Insurance[inTrain,]
+testing <-Insurance[-inTrain,]
+#perform ridge regression with variable selection
+#lambda = 5 is the tuning parameter
+#k=4 is the number of variables that should be retained. This means that length (predictors) - k variables will be eliminated.
+
+```
+
+### Regularized Regression - LASSO regression
+
+- LASSO; least absolute shrinkage and selection operator was introduced by Tibshirani (Journal of the Royal Statistical society 1996).
+
+- Similar to ridge with slightly different penalty terms.
+
+- We have the penalized regression sum of squares (PRSS).
+
+- Lambda is the tuning parameter and it controls the size of coefficients or the amount of regularization.
+
+- Large values of lambda will set some coefficients equal to zero (0).
+
+- Note; lasso effectively performs model selection (choose subset of predictors) while shrinking other coefficients where as ridge only shrinks the coefficients.
+
+- Note; the predictors are centered and scaled first before the regression is run.
+
+- as.matrix(x); the predictors must be in matrix /dataframe format.
+
+- trace = TRUE prints progress of the lasso regression.
+
+- lasso$lambda returns the lambdas used for each step of the lasso regression.
+
+- plot(lasso) prints plots that shows the regression of the coefficients as they are set to zero one by one.
+
+- predict.lars(lasso,test) uses the lasso model to predict on test data.
+
+- cv.lars(as.matrix(x),y,K=10,type="lasso",trace=TRUE) computes K-fold cross validaited mean squared prediction errors for lasso regression.
+
+- Note; lasso regression is a special case of the elastic net regression and forcing lambda=0 tells the function to fit a lasso regression.
+
+- lasso = enet(predictors,outcome,lambda=0) perform elastic net regression on given predictors and outcome.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(MASS)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(lars)
+library(elasticnet)
+library(caret)
+data(Boston)
+dim(Boston)
+names(Boston)
+inTrain <-createDataPartition(y=Boston$tax,p=0.8,list=FALSE)#p=0.8 to make testing data small
+training <-Boston[inTrain,]
+testing <-Boston[-inTrain,]
+lasso <-lars(as.matrix(Boston),y=Boston$tax,type="lasso",trace=TRUE)#perform lasso regression by adding predictors one at time (or setting variables to 0)
+lasso$lambda #returns the lambdas used for each step of the lasso regression
+plot(lasso)
+predict.lars(lasso,testing)
+cv.lars(as.matrix(Boston),y=Boston$tax,K=10,type="lasso",trace=TRUE)
+lasso1 <-enet(as.matrix(Boston),y=Boston$tax,lambda=0)#perform elastic net regression on given predictors and outcome
+plot(lasso1)#print plot that shows the progression of the coefficients as they are set to zero one by one
+predict.enet(lasso1,testing)
+#caret package
+modFit <-train(tax~.,data=training,method="lasso")
+modFit$finalModel
+pred <-predict(modFit,testing)
+pred
+
+```
+
+### Regularized Regression - relaxo regression
+
+- Performs relaxed lasso regression on given predictors and outcome.
+
+- lambda = 5 say, is the tuning parameter.
+
+- phi = 0.3 say, is the relaxation parameter.
+
+- phi = 1 corresponds to the regular lasso solutions.
+
+- phi = 0 computes the OLS estimates on the set of variables selected by the lasso.
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(MASS)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(lars)
+library(elasticnet)
+library(relaxo)
+library(caret)
+data(Boston)
+dim(Boston)
+names(Boston)
+inTrain <-createDataPartition(y=Boston$tax,p=0.7,list=FALSE)#p=0.8 to make testing data small
+training <-Boston[inTrain,]
+testing <-Boston[-inTrain,]
+#modFit <-train(tax~.,data=training,method="relaxo",lambda=5,phi=0.3)
+#modFit$finalModel
+#pred1 <-predict(modFit,testing)
+#pred1
+#perform lasso regression
+lasso.fit <-lars(as.matrix(Boston),y=Boston$tax,type="lasso",trace=TRUE)
+#plot lasso regression model
+plot(lasso.fit,breaks=FALSE,cex=0.75)
+
+```

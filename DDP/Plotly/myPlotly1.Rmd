@@ -1,0 +1,30 @@
+---
+title: "myPlotly1"
+author: "David Asare Kumi"
+date: "May 31, 2019"
+output: html_document
+---
+
+
+```{r,echo=TRUE,eval=TRUE,warning=FALSE,message=FALSE,comment=""}
+library(datasets)
+data(mtcars)
+names(mtcars)
+library(ggplot2)
+library(plotly)
+set.seed(123)
+plot_ly(mtcars,x=mtcars$wt,y=mtcars$mpg,type="scatter")
+
+table(mtcars$cyl)
+#Change the color of a factor in plotly
+plot_ly(mtcars,x=mtcars$wt,y=mtcars$mpg,mode="markers",color=as.factor(mtcars$cyl))
+
+#Equating color to a continous variable
+plot_ly(mtcars,x=mtcars$wt,y=mtcars$mpg,mode="markers",color=mtcars$disp)
+#Plotly treats it as a continous color gradient
+
+#Change the size of the points in a scatterplot
+plot_ly(mtcars,x=mtcars$wt,y=mtcars$mpg,mode="markers",color=as.factor(mtcars$cyl),size=mtcars$hp)
+#hp is a continous variable
+
+```

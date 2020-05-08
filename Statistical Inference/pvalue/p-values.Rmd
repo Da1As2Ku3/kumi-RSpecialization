@@ -1,0 +1,660 @@
+---
+title: "P Value"
+author: "David Asare Kumi"
+date: "8/26/2019"
+output: html_document
+---
+
+
+## P- Values
+
+- P-values are a convenient way to communicate the results of a hypothesis test. When communicating the p-value, the reader can perform the test at whatever Type I error rate that they would like. Just compare the p-value to the desired Type I error rate and if the P-value is smaller reject the null hypothesis.
+
+### p-values
+
+- Most common measure of statistical significance.
+
+- Their ubiquity, along with concern over their interpretation and use makes them controversial among statisticians.
+
+- http://warnercnr.colostate.edu/~anderson/thompson1.html
+
+- Also see statistical evidence A likelihood paradigm by Richard Royall.
+
+- Toward Evidence-Based Medical Statistics 1: The p-value fallacy by Steve Goodman.
+
+- The hilariously titled: The Earth is Round (p < 0.05) by Cohen.
+
+- Some positive comments
+
+1. Simply Statistics.
+
+2. Normal deviates.
+
+3. Error Statistics.
+
+### What is a P-value?
+
+- Suppose nothing is going on - how unusual it is to see the estimate we got.
+
+### Approach
+
+1. Define the hypothetical distribution of a data summary (statistic) when "nothing is going on"(null hypothesis).
+
+2. Calculate the summary/statistic with the data we have (test statistic).
+
+3. Compare what we calculated to our hypothetical distribution and see if the value is "extreme" (p-value).
+
+## P-value
+
+- The p-value is probability under the null hypothesis of obtaining evidence as extreme or more extreme than that obtained. Evidence - test statistic.
+
+- If the p-value is small, then either Ho is true and we have observed a rare event or Ho is false.
+
+- A test statistic is a statistic (a quantity derived from the sample) used in statistical hypothesis testing.[1] A hypothesis test is typically specified in terms of a test statistic, considered as a numerical summary of a data-set that reduces the data to one value that can be used to perform the hypothesis test. In general, a test statistic is selected or defined in such a way as to quantify, within observed data, behaviours that would distinguish the null from the alternative hypothesis, where such an alternative is prescribed, or that would characterize the null hypothesis if there is no explicitly stated alternative hypothesis.
+
+- An important property of a test statistic is that its sampling distribution under the null hypothesis must be calculable, either exactly or approximately, which allows p-values to be calculated. A test statistic shares some of the same qualities of a descriptive statistic, and many statistics can be used as both test statistics and descriptive statistics. However, a test statistic is specifically intended for use in statistical testing, whereas the main quality of a descriptive statistic is that it is easily interpretable. Some informative descriptive statistics, such as the sample range, do not make good test statistics since it is difficult to determine their sampling distribution.
+
+- Two widely used test statistics are the t-statistic and the F-test.
+
+- Degrees of freedom encompasses the notion that the amount of independent information you have limits the number of parameters that you can estimate. Typically, the degrees of freedom equal your sample size minus the number of parameters you need to calculate during an analysis. It is usually a positive whole number.
+
+- Degrees of freedom is a combination of how much data you have and how many parameters you need to estimate. It indicates how much independent information goes into a parameter estimate. In this vein, it’s easy to see that you want a lot of information to go into parameter estimates to obtain more precise estimates and more powerful hypothesis tests. So, you want many degrees of freedom!
+
+- The significance level, in the simplest of terms, is the threshold probability of incorrectly rejecting the null hypothesis when it is in fact true. This is also known as the type I error rate. The significance level or alpha is therefore associated with the overall confidence level of the test, meaning that the higher the value of alpha, the greater the confidence in the test.
+
+- A type I error, or an error of the first kind, occurs when the null hypothesis is rejected when in reality it is true. In other words, a type I error is comparable to a false positive. Type I errors are controlled by defining an appropriate level of significance. Best practice in scientific hypothesis testing calls for selecting a significance level before data collection even begins.
+
+- The most common significance level is 0.05 (or 5%) which means that there is a 5% probability that the test will suffer a type I error by rejecting a true null hypothesis. This significance level conversely translates to a 95% level of confidence, meaning that over a series of hypothesis tests, 95% will not result in a type I error.
+
+- The other kind of error that is possible occurs when we do not reject a null hypothesis that is false. This sort of error is called a type II error and is also referred to as an error of the second kind. In addition, a type II error is rejecting as false an alternative hypothesis that is infact true or failing to reject the null hypothesis when it is false.
+
+- Type II errors are equivalent to false negatives. If we think back again to the scenario in which we are testing a drug, what would a type II error look like? A type II error would occur if we accepted that the drug had no effect on a disease, but in reality, it did.
+
+- The probability of a type II error is given by the Greek letter beta. This number is related to the power or sensitivity of the hypothesis test, denoted by 1 – beta.
+
+## Example
+
+- Suppose that you get a T statistic of 2.5 for 15 df testing. Ho:U = Uo and Ha:U > Uo. What is the probability of getting a T statistic as large as 2.5.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+pt(2.5,15,lower.tail=FALSE)
+# Since the p-value = 0.01225 is lesser than alpha = 0.05, we reject the null hypothesis.
+
+```
+
+### The attained significance level
+
+- Our test statistic for Ho:U = 30 versus Ha:U > 30. Notice that we rejected the one sided test when alpha = 0.05, would we reject if alpha = 0.01, how about 0.001? The smallest value for alpha for which you will reject the null hypothesis.
+
+- The p-value is an extremely convenient test statistic to communicate to people.
+
+## Notes
+
+1. By reporting a p-value, the reader can perform the hypothesis test at whatever alpha level he or she chooses.
+
+2. The simple rule is if the p-value is less than alpha, then you reject the null hypothesis; If the p-value is greater than alpha, you fail to reject the null hypothesis.
+
+3. For two sided hypothesis test, double the smaller of the two one sided hypothesis test p-values. Always check with results obtained from using the test statistic.
+
+## P-value Further Examples
+
+- Revisiting an earlier example; Suppose a friend has 8 children, 7 of which are girls and none are twins. If each gender has an independent 50% probability for each birth, what is the probability of getting 7 or more girls out of 8 births?
+
+- Ho: p = 0.5 versus Ha: p > 0.5.
+
+- The p-value is the binomial calculation for 7 and 8.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+choose(8,7)*0.5^8 + choose(8,8)*0.5^8
+pbinom(6,size=8,prob=0.5,lower.tail=FALSE)
+
+```
+
+## Procedure for getting a two sided p-value
+
+1. probability of 7 or larger.
+
+2. probability of 7 or smaller.
+
+3. Take the smaller one and double it.
+
+## Poisson Example
+
+- Suppose that a hospital has an infection rate of 10 infections per 100 person/days ata risk (rate of 0.1) during the last monitoring period.
+
+- Assume that an infection rate of 0.05 is an important bench mark.
+
+- Given the model, could the observed rate being larger than 0.05.
+
+- Ho: lambda = 0.05 so that Ha: lambda > 0.05. lambda * 100 = 0.05*100 = 5.
+
+- Find the p(10 or more). Because it is discrete, we start at 9 since we want the upper tail.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+ppois(9,5,lower.tail=FALSE)
+
+```
+
+## Power
+
+- The most frequent use of power is to help us design studies.
+
+### The Power of a test
+
+- The power of a test is the probability of rejecting the null hypothesis when it is false. Ego, power (as its name suggests) is a good thing. You want more power. The probability of a type II error is usually called Beta (greek).
+
+- Power = 1 - Beta(β).
+
+- Type I error = alpha(α).
+
+- Type II error = Beta(β).
+
+### Notes
+
+- Consider our previous example involving RDI. Ho:U = 30; H1:U > 30.
+
+- Then power is p((Xbar - 30)/s/sqrt(n) > t1-α,n-1;u=30) = α .
+
+- Note that this is a function that depends on the specific value of Ua.
+
+- Notice as Ua approaches 30, the power approaches α. Xbar is sample mean and 30 is hypothesized value.
+
+- Power: p((Xbar - 30)/s/sqrt(n)>t1- α,n-1;u=Ua)where Ua > 30 say 40.
+
+- Power is a function that depends on the mean under the null hypothesis.
+
+### Calculating Power
+
+- We assume that the sample mean Xbar ~ Normally distributed.
+
+### Calculating Power for Gaussian data
+
+- We reject if (Xbar - 30)/σ/sqrt(n) > Z1-α.
+
+- Equivalently, if Xbar > 30 + Z1-α * (σ/sqrt(n)). Under Ho: Xbar ~ N(Uo,sigma squared/n); Under Ha: Xbar ~ N(Ua,sigma squared/n).
+
+- In R our power will be Z <-qnorm(1-alpha).
+
+- pnorm(muO + Z*sigma/sqrt(n),mean=mua,sd=sigma/sqrt(n),lower.tail=FALSE). We put lower.tail = FALSE so that we get the upper probability.
+
+## Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+muo <-30
+mua <-32
+sigma <-4
+n <-16
+alpha <-0.05
+z <-qnorm(1-alpha)
+pnorm(muo + z *sigma/sqrt(n),mean=mua,sd=sigma/sqrt(n),lower.tail=FALSE)
+# There is a 64% probability of detecting a mean as large as 32 or larger if we conduct this experiment.
+
+```
+
+### Notes
+
+- If we increase alpha, power increases. If we decrease alpha, power decreases.
+
+- If we increase sigma, we will have a lower power.
+
+- If we increase mean, we increase the power.
+
+- When we increase n, we have much better power. When we decrease n, we have lower power (decrease).
+
+
+### Notes on Power
+
+- When testing Ha: u > Uo, notice if power is 1 - Beta. 1-Beta = p(Xbar > Uo + Z1-alpha*σ/sqrt(n);u=Ua)
+
+- Where Xbar ~ N(Ua,sigma squared/n).
+
+- Unknowns; Ua,sigma,n,Beta.
+
+- Knowns; Uo,alpha.
+
+- Specify any 3 of the unknowns and you can solve for the remainder.
+
+### Notes
+
+- The calculations for Ha; u < Uo is similar.
+
+- For Ha: u not equal to Uo calculate the one sided power using alpha/2 (this is only approximately right, it excludes the probability of getting a large TS in the opposite direction of the truth).
+
+### Notes
+
+1. As alpha gets larger, power gets larger (power goes up).
+
+2. Power of a one sided test is greater than the power of the associated two sided test.
+
+- Power goes up as U1 (mean1) gets further away from Uo.
+
+- Power goes up as n goes up.
+
+- Power doesn't need Ua, sigma and n, instead only sqrt(n)(Ua - Uo)/sigma.
+
+- The quantity (Ua - Uo)/sigma is called the effect size, the difference in the means in standard deviation units. Power only depends on (Ua - Uo)/sigma.
+
+- The effect size is very useful because its unit free, it has some hope of interpretability across settings.
+
+## T Test Power
+
+- Calculating power for a Gosset's T test for our example.
+
+- The power is p((Xbar-Uo)/s/sqrt(n) > t1-alpha,n-1;u=Ua).
+
+- Calculating this requires the non-central t distribution.
+
+- power.t.test does this very well. Omit one of the arguments and it solves for it. Power is calculated under the hypothesis that u=Ua. Calculating power requires the ability to evaluate the non central T distribution.
+
+## Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+power.t.test(n=16,delta=2,sd=4,type="one.sample",alt="one.sided")$power
+power.t.test(n=16,delta=100,sd=200,type="one.sample",alt="one.sided")$power
+
+```
+
+- delta is the difference between the means ua - uo. power depends on (ua-uo)/sigma. delta=2/4.
+
+## Example
+
+- Let's calculate the sample size(n).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+power.t.test(power=0.8,delta=2/4,sd=1,type="one.sample",alt="one.sided")$n
+
+```
+
+- Effective size = delta/sd.
+
+- Assignment; put n and solve for delta.
+
+## Multiple Comparisons
+
+### Key ideas
+
+- Hypothesis testing/significance analysis is commonly over used.
+
+- Correcting for multiple testing avoids false positives or discoveries.
+
+- Two key components.
+
+1. Error measure.
+
+2. Correction.
+
+### Three eras of Statistics
+
+- Huge census data was brought to bear.
+
+- Classical period is when data was expensive to collect - Pearson, Neyman, Fisher. Data was also difficult to collect.
+
+- The third era is the era now - era of scientific mass production where data is cheap and easy to collect. This means that we are also performing more and more analysis.
+
+- Reasons for multiple testing.
+
+1. Next generation sequencing machines.
+
+2. Imaging.
+
+### Why correct for multiple tests?
+
+- 5% coincidence by chance. We allow for 5% chance of every hypothesis that we perform.
+
+### Types of errors
+
+- Suppose you are testing a hypothesis that a parameter B equals zero versus the alternative that it does not equal zero. These are the possible outcomes.
+
+-            B=0    B≠0    Hypothesis
+
+- claim B=0   U     T       m-R
+
+- claim B≠0   V     S        R
+
+- claims      ma    m-ma     m
+
+- Type I error or false positive (V) say that the parameter does not equal zero when it does.
+
+- Type II error or false negative (T) say that the parameter equals zero when it doesn't.
+
+### Error rates
+
+- False positive rate - The rate at which false results (B=0) are called significant E[V/ma].
+
+- Family wise error rate (FWER). The probability of at least one false positive Pr(V >= 1).
+
+- False discovery rate (FDR)- The rate at which claims of significance are false E(V/R).
+
+- The false positive rate is closely related to the type I error rate.
+
+### Controlling the false Positive Rate
+
+- If p-values are correctly calculated calling all p < alpha significant will control the false positive rate at level alpha on average (0 < alpha < 1).
+
+- Problem: Suppose that you perform 10,000 tests, and B=0 for all of them. Suppose that you call all p < 0.05 significant. The expected number of false positives is 10,000 * 0.05 = 500 false positives. How do we avoid so many false positives.
+
+### Controlling family wise error rate(FWER)
+
+- The Bonferoni correction is the oldest multiple testing correction.
+
+### Basic idea
+
+- Suppose you do m tests.
+
+- You want to control FWER at level alpha so P(V >= 1) < alpha.
+
+- Calculate p-values normally .
+
+- Set alpha fwer = alpha/m where m is the number of hypothesis tests.
+
+- Call all p-values less than alpha fwer significant.
+
+- Pros: Easy to calculate. Consecutive.
+
+- Cons: May be very conservative.
+
+### Controlling False Discovery Rate (FDR)
+
+- This is the most popular correction when performing lots of tests say in genomics,imaging, astronomy, or other signal - processing disciplines.
+
+### Basic idea
+
+- Suppose you do m tests.
+
+- You want to control FDR at level alpha so E[V/R].
+
+- Calculate p-values normally.
+
+- Order the p-values from smallest to largest p(1),....p(m).
+
+- Call any p(i) <= alpha * i/m significant.
+
+- Pros: still pretty easy to calculate. less conservative (may be much less).
+
+- Cons: Allows for more false positives. May behave strangely under dependence.
+
+## Adjusted P-values
+
+- One approach is to adjust the threshold alpha.
+
+- A different approach is to calculate "adjusted p-values".
+
+- They are not p-values any more.
+
+- But they can be used directly without adjusting alpha.
+
+## Example
+
+- Suppose P-values are Pi,...,Pm.
+
+- You could adjust them by taking Pi fwer = max(m*Pi), 1 for each p-value.
+
+- Then if you call all Pi fwer < alpha significant you will correct the FWER.
+
+## Case Study1: no true positives
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(1010093)
+pvalues <-rep(NA,100)
+for (i in 1:1000){
+  y <-rnorm(20)
+  x <-rnorm(20)
+  pvalues[i] <-summary(lm(y~x))$coeff[2,4]
+}
+# controls false positive rate
+sum(pvalues < 0.05)
+# controls FWER
+sum(p.adjust(pvalues,method="bonferroni") < 0.05)
+# we do not find any significant results because there is no relationship
+# controls FDR
+sum(p.adjust(pvalues,method="BH") < 0.05)
+
+```
+
+## Case Study: 50% true positive
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(1010093)
+pvalues <-rep(NA,1000)
+for(i in 1:1000){
+  x <-rnorm(20)
+# first 500beta=0,last500beta=2
+  if(i <= 500){y <-rnorm(20)}else
+  {y <-rnorm(20,mean=2*x)}
+  pvalues[i] <-summary(lm(y~x))$coeff[2,4]
+}
+trueStatus <-rep(c("zero","not zero"),each=500)
+table(pvalues < 0.05,trueStatus)
+# Here there is a relationship between x and y because y <-rnorm(20,mean=2*x)
+# controls FWER
+table(p.adjust(pvalues,method="bonferroni") < 0.05,trueStatus)
+# controls FDR
+table(p.adjust(pvalues,method="BH") < 0.05,trueStatus)
+
+```
+
+- 13/500 is false positives.
+
+- All these is not necessary for hypothesis testing (Helps understand what pvalues do).
+
+## P-values versus adjusted P-values
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+par(mfrow=c(1,2))
+plot(pvalues,p.adjust(pvalues,method="bonferroni"),pch=19)
+plot(pvalues,p.adjust(pvalues,method="BH"),pch=19)
+
+```
+
+## Notes and Resources
+
+### Notes
+
+- Multiple testing is an entire subfield.
+
+- A basic Bonferroni/BH correction is usually enough.
+
+- If there is strong dependence between tests there may be problems.
+
+- Consider method = "BY".
+
+## Further Resources
+
+- Multiple testing procedures with applications to genomics.
+
+- Statistical significance for genome-wide studies.
+
+- Introduction to multiple testing.
+
+## Resampling
+
+- Resampling based procedures are ways to perform population based statistical inference, while living within our data. Data scientists tend to really like resampling based inferences, since they are very data centric procedures, they scale well to large studies and they often make very few assumptions.
+
+## Bootstrapping
+
+- The bootstrap is a tremendously useful tool for constructing confidence intervals and caluculating standard errors for difficult statistics. Was invented in 1979 by a famous statistician Ephron who is one of the top statisticians in history.
+
+- The bootstrap is one of the most important procedures in statistics mainly because it liberated data analysts from doing a lot of mathematics in order to perform inferences. For example how would one derive a confidence interval for the median? This involves a lot of mathematics but the bootstrap simplifies it.
+
+- The phrase bootstrap, comes from the name of the procedure, bootstrap,i.e. pulling one selves up from their own bootstrap. The idea of pulling ones selves up from one's own bootstrap, is the idea of doing something that' physically impossible. Inspite of all these, it's quite possible and how it is working is pretty clear. It is important to note that, with bootstrapping we sample with replacement.
+
+## Bootstrapping Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(UsingR)
+data(father.son)
+x <-father.son$sheight
+n <-length(x)
+B <-10000 # bootstrap resamples
+resamples <-matrix(sample(x,n*B,replace=TRUE),B,n)
+resampledMedians <-apply(resamples,1,median)
+plot(density(resamples),lwd=2,col="red")
+hist(resamples,col="yellow")
+
+```
+
+- This is an empirical distribution because of 1/n on each of the observed data point. prob=1/n on each observed data point (equal probability).
+
+## Notes on the bootstrap
+
+### The bootstrap principles
+
+- Suppose that i have a statistic that estimates some population parameter but i do not know its sampling distribution. The bootstrap principle suggests using the distribution defined by the data to approximate its sampling distribution.
+
+### The bootstrap in practice
+
+- In practice, the bootstrap principle is always carried out using simulation. We will cover only a few aspects of bootstrap resampling.
+
+1. Creating confidence interval.
+
+2. Estimating standard errors.
+
+- The general procedure follows by first simulating complete datasets from the observed data with replacement. Simulate because it makes it easy.
+
+- This is approximately drawing from the sampling distribution of that statistic, at least as far as the data is able to approximate the true population distribution.
+
+- Calculate the statistic for each simulating data set.
+
+- Use the simulated statistics to either define a confidence interval or take the standard deviation to calculate the standard error.
+
+## Non parametric bootstrap algorithm example
+
+- Bootstrap procedure for calculating confidence interval for the median from a data set of n observations.
+
+1. Sample n observations with replacement from the observed data resulting in on simulated complete data set.
+
+2. Take the median of the simulated data set.
+
+3. Repeat these two steps over and over B times, resulting in B simulated medians. B is the number of bootstrapping samples.Note; we want B to be large so that the monte Carlo error will be small i.e. B >= 10,000 simulations.
+
+4. These medians are approximately drawn from the sampling distribution of the median of n observations, therefore we can;
+
+- Draw a histogram/density of them.
+
+- Calculate their standard deviations to estimate the standard error of the median.
+
+- Take the 2.5th and 97.5th percentiles as a confidence interval for the median.
+
+## Example code
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(UsingR)
+data(father.son)
+x <-father.son$sheight
+n <-length(x)
+B <-10000
+resamples <-matrix(sample(x,n*B,replace=TRUE),B,n)
+medians <-apply(resamples,1,median)
+sd(medians) # estimated standard error of the median
+quantile(medians,c(0.025,0.975))
+
+```
+
+- We using father.son data and x is the son's height(vector). n is the length(x) and B,n is a matrix of B rows and n columns.
+
+## Take medians for each
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+medians <-apply(resamples,1,median)
+# confidence interval
+quantile(medians,c(0.025,0.975))
+# histogram of bootstrap resample
+library(ggplot2)
+library(lattice)
+g <-ggplot(data.frame(medians=medians),aes(x=medians))
+g <-g + geom_histogram(color="black",fill="lightblue",binwidth=0.05)
+g
+
+```
+
+## Notes on the bootstrap
+
+- The way we presented the bootstrap here is non parametric.
+
+- Better percentile bootstrap confidence intervals correct for bias.
+
+- There are lots of variations on bootstrap procedures; the book "An introduction to the Bootstrap" by Efron and Tibshirani is a great place to start for both bootstrap and jackknife information.
+
+- BCA;interval fixes the bias in confidence intervals.
+
+## Permutation Tests
+
+### Group Comparisons
+
+- Consider comparing two independent groups.
+
+- Example, comparing sprays B and C.
+
+- Permutation tests are useful for comparing groups.
+
+### Permutation tests
+
+- Consider the null hypothesis that the distribution of the observations from each group is the same.
+
+- Then the group labels are irrelevant.
+
+- Consider a dataframe with count and spray.
+
+- Permute the spray group labels.
+
+- Recalculate the statistic;
+
+1. Mean difference in counts.
+
+2. Geometric means.
+
+3. T statistic 
+
+- Calculate the percentage of simulations where the simulated statistic was more extreme(toward the alternative) than the observed i.e. calculate the p-value.
+
+## Variations on permutation testing
+
+- Data Type: Ranks; Binary; Raw data.
+
+- Statistic: rank sum; hypergeometric.
+
+- Test Name: rank sum test; Fisher's exact test; Ordinary permutation test.
+
+1. Also so called randomization test are exactly permutation tests, with a different motivation.
+
+2. For matched data, one can randomize the signs.
+
+- For ranks, this results in the signed rank test.
+
+3. Permutation strategies work for regression as well.
+
+- Permuting a regressor of interest.
+
+4. Permutation test work very well in multivariate settings.
+
+## Example
+
+Permutation test B v C.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(InsectSprays)
+subdata <-InsectSprays[InsectSprays$spray%in%c("B","C"),]
+y <-subdata$count
+group <-as.character(subdata$spray)
+testStat <-function(w,g)mean(w[g=="B"])-mean(w[g=="C"])
+observedStat <- testStat(y,group)
+permutations <- sapply(1:1000,function(i)testStat(y,sample(group)))
+observedStat
+mean(permutations > observedStat)
+# histogram of permutations B v C
+hist(permutations,col="yellow")
+
+```
+
+
+
+ 
+
+
+
+
+
+
+
+

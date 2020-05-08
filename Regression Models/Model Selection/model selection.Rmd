@@ -1,0 +1,294 @@
+---
+title: "Model Selection"
+author: "David Asare Kumi"
+date: "June 24, 2019"
+output: html_document
+---
+
+
+## Multivariable Regression
+
+### Model Selection (Part I)
+
+- We have an entire class on prediction and machine learning, so we will focus on modeling.
+
+- Prediction has a different set of criteria, needs for interpretability and standards generalizability.
+
+- In modeling, our interest lies in parsimonious,interpretable representations of the data that enhance our understanding of the phenomena under study.
+
+- A model is a lense through which to look at your data. I attribute this quote to Scott Zeger.
+
+- Under this philosophy, what's the right model? Whatever model connects the data to a true, parsimonious statement about what you are studying.
+
+- There are nearly uncountable ways that a model can be wrong, in this lecture, we will focus on variable inclusion and exclusiion.
+
+## The Rumsfeldian Triplet (Donald Rumsfeld)
+
+- There are known known. These are things we know that we know.
+
+- There are known unknowns. That is to say, there are things that we know we don't know.
+
+- But there are also unknown unknowns. There are things we don't know we don't know.
+
+- Known knowns; Regressors that we know we should check to include in the model and have.
+
+- Known unknowns; Regressors that we would like to include in the model but don't have.
+
+- Unknown unknowns; Regressors that we don't even know about that we should have included in the model.
+
+## General Rules
+
+- Omitting variables results in bias in the coefficients of interest, unless their regressors are uncorrelated with the omitted ones.
+
+- This is why we randomize treatments, it attempts to uncorrelate our treatment indicator with variables that we don't have to put in the model.
+
+- If there is too many unobserved confounding variables, even randomization won't help you.
+
+- Including variables that we shouldn't have,increases standard errors of the regression variables.
+
+- Actually, including any new variables increases  (actual, not estimated) standard errors of other regressors. So we don't want to idly throw variables into the model.
+
+- Introducing unnecessary variables into the model inflates the standard errors but this eliminates bias.
+
+- Rsquared increases monotonically as more regressors are included.
+
+- The sum of squares due to error(SSE) decreases monotonically as more regressors are included.
+
+
+## Model Selection (Part II)
+
+### Variance Inflation
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+n <-100
+nosim <-1000
+x1 <-rnorm(n)
+x2 <-rnorm(n)
+x3 <-rnorm(n)
+betas <-sapply(1:nosim,
+               function(i){
+                 y <-x1 + rnorm(n,sd=0.3)
+                 c(coef(lm(y~x1))[2],
+                   coef(lm(y~x1+x2))[2],
+                   coef(lm(y~x1+x2+x3))[2])
+               })
+round(apply(betas,1,sd),5)
+
+```
+
+- If the variability that you include is highly correlated with the variable you are interested in, it will inflate the variance more.
+
+- If we omit variable that are important we get bias. If we include variables that are unnecessary, we inflate the variance (standard error).
+
+- Things that we include should be relatively balanced and relatively uncorrelated.
+
+
+## Variance Inflation Factors
+
+- The variance inflation factor (VIF) is the increase in the variance for the ith regressor compared to the ideal setting where it is orthogonal to the other regressors.
+
+- The square root of the VIF is the increase in sd.
+
+- Remember, variance inflation is only part of the picture. We want to include certain variables even if they dramatically inflate our variance.
+
+### Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(swiss)
+dim(swiss)
+names(swiss)
+fit1 <-lm(Fertility~Agriculture,data=swiss)
+a <-summary(fit1)$cov.unscaled[2,2]
+a
+fit2 <-update(fit1,Fertility~Agriculture+Examination,data=swiss)
+fit3 <-update(fit2,Fertility~Agriculture+Examination+Education,data=swiss)
+c(summary(fit2)$cov.unscaled[2,2],summary(fit3)$cov.unscaled[2,2])
+
+#swiss data (vifs)
+library(car)
+fit <-lm(Fertility~.,data=swiss)
+summary(fit)$coef
+vif(fit)
+sqrt(vif(fit))
+
+```
+
+- VIF =1 , absence of multicollinearity.
+
+- VIF > 5:10 , multicollinearity is a problem.
+
+- Examination and Education are highly related that is why they have a high vif.
+
+## Residual Variance Estimation
+
+- If we underfit the model, the variance estimate is biases. i.e. we omit variables.
+
+- If we correctly or overfit the model, including all necessary covariates and or unnecessary covariates, the variance estimate is unbiased.
+
+- However the variance of the variance is larger if we include unnecessary variables.
+
+- If the models of interest are nested and without lots of parameters differentiating them, it's fairly uncontroversial to use nested likelihood ratio tests (Example to follow).
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+library(car)
+data(swiss)
+names(swiss)
+fit1 <-lm(Fertility~Agriculture,data=swiss)
+fit3 <-update(fit1,Fertility~Agriculture+Examination+Education)
+fit5 <-update(fit3,Fertility~Agriculture+Examination+Education+Catholic+Infant.Mortality)
+summary(fit1)$coef
+summary(fit3)$coef
+summary(fit5)$coef
+cbind(vif(fit5),sqrt(vif(fit5)))
+#Analysis of variance table (anova)
+anova(fit1)
+anova(fit1,fit3)
+anova(fit1,fit2,fit3)
+
+```
+
+## Model Selection (Part III)
+
+- "All models are wrong but some models are useful". George Bucks.
+
+- Outliers; These are extreme observations in our dataset. They sometimes give an impression of a good fit but actually they are not.
+Outliers can result from a variety of reasons;
+
+1. They can be real but inconvenient data.
+
+2. They could arise from spurious processes like processing or recording errors.
+
+- Leverage; Discusses how outside of the norm a point X values are far from the cloud of other X values. A point with high leverage has the opportunity to dramatically impact the regression model.
+
+- Influence; This is a measure of how much impact a point has on the regression fit. The most direct way to measure influence is fit the model with the point included and excluded.
+
+
+## Residuals,leverage and influence measures
+
+- Suppose, fit=lm(y~x1+x2), then resid(fit) returns the ordinary residuals and plot(resid(fit)) plots the residual graph.
+
+- Efforts to standardize residuals have been made. Two of the most common are ;
+
+1. rstandard; residuals divided by their standard deviations.
+
+2. rstudent; residuals divided by their standard deviations where the ith data point was deleted in the calculation of the standard deviation for the residual to follow a t - distribution.
+
+- These sorts of residuals are called studentized. The rstudent residuals are exactly T distributed while rstandard is not.
+
+- The rstandard residuals are sometimes called internally standardized while the rstudent are called externally standardized.
+
+3. A common use of residuals is to diagnose normality of the errors. This is often done by plotting residual quantiles. This is called a residual QQ plot.
+
+- Leverage is measured by one quantity called hat diagonals which can be obtained in R by the function hatvalues. The hatvalues are necessarily between 0 and 1 with larger values indicating greater (potential for) leverage.
+
+- There are quite a few ways to probe for influence. These are;
+
+1. dffits; change in the predicted response when the ith point is deleted in fitting the model. dffits checks for influence in the fitted values.
+
+2. dfbetas; change in individual coefficients when the ith point is deleted in fitting the model. dfbetas checks for the influence in the coefficients individually.
+
+3. cooks.distance; overall change in the coefficients when the ith point is deleted. cooks.distance checks for influence in the coefficients as a collective.
+
+- Finally, there is a residual measure that is also an influence measure. Particularly consider; resid(fit)/(1-hatvalues(fit)) where fit is the linear model fit. This is the so called PRESS residual.
+
+
+## Diagnostic plot Analysis (i.e. plot(fit))
+
+### Residuals vs fitted
+
+- This plot shows if residuals have non linear patterns.
+
+1. With a good model, we have a horizontal line without a distinct patterns.
+
+2. For a bad model, we have a distinct pattern in the residual plot.
+
+### Normal Q-Q (quantile quantile plots)
+
+- This plot shows if residuals are normally distributed.
+
+1. It's good if residuals are lined well on the straight dashed line (fairly safe assumption).
+
+2. Normal Q-Q plot with points that form a curve instead of a straight line means that your sample data are skewed.
+
+3. Normal Q-Q plots with plots that fall along a line in the middle of the graph, but curve off at the extreme mean your data have more extreme values than would be expected if they truly come from a normal distribution.
+
+4. In R there are two functions to create Q-Q plots. These are qqnorm() and qqplot().
+
+### Scale Location
+
+- This is how you can check the assumption of equal variance (homoskedasticity).
+
+1. It's good if you see a horizontal line with equally (randomly) spread points.
+
+2. It's not good if the red smooth line is not horizontal and shows a steep angle and also if the residuals spread wider and wider as you move along the x-axis.
+
+### Residual vs Leverage
+
+- This plot helps us to find influential cases(i.e. subjects) if any.
+
+1. There is no influencial cases if you can barely see cook's distance lines (a red dashed line) mainly because all cases are well inside the cook's distance lines.
+
+2. There is an influential case if you can see several cook's distance lines and a case is far beyond the cook's distance lines.
+
+## Variance Inflation Factor (VIF) for multicollinearity
+
+1. tolerance = 1 - Rsquared.
+
+2. VIF = 1/tolerance.
+
+3. Rsquared is the coefficient of determination.
+
+4. A tolerance of less than 0.2 or 0.1 and/or a VIF of 5 or 10 and above indicates a multicollinearity problem.
+
+5.When regressors in a general linear model(glm) are orthogonal to each other, they do not share any descriptive variability and are completely uncorrelated.
+
+### Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,fig.width=10,comment=""}
+library(datasets)
+data(swiss)
+names(swiss)
+fit <-lm(Fertility~.,data=swiss)
+#Residual plots
+resid(fit)
+plot(resid(fit),cex=1,pch=20)
+abline(h=0,lwd=2,lty=2,col="red")
+#Diagnostic plots
+par(mfrow=c(2,2),mar=c(4,4,2,1))
+plot(fit,cex=1,pch=20)
+
+```
+
+## Generalized Linear Models (GLM)
+
+- Introduced in a 1972 RSSB paper by Nelder and Werdderburn. GLMs involve three components.
+
+1. An exponential family model for the response.
+
+2. A systematic component via a linear predictor.
+
+3. A link function that connects the means of the response to the linear predictor.
+
+- The three most famous cases of GLMs are;
+
+1. Linear models
+
+2. Binomial and binary regression 
+
+3. Poisson regression
+
+## Linear models (drawbacks)
+
+- Transformations are often hard to interpret.
+
+- There is value in modelling the data on the scale that it was collected.
+
+- Particularly interpretable transformations, natural logarithms in specific, aren't applicable for negative or zero values.
+
+
+
+
+

@@ -1,0 +1,598 @@
+---
+title: "Getting and Cleaning Data"
+author: "David Asare Kumi"
+date: "9/7/2019"
+output: html_document
+---
+
+
+## Content
+
+### Data Collection
+
+- Raw files (.csv, .txt).
+
+- Databases(mySQL).
+
+- APIs
+
+### Data Forms
+
+- Flat files (.csv,.txt).
+
+- XML.
+
+- JSON.
+
+## Obtaining Data Motivation
+
+### About this Course
+
+- This course covers the basic ideas behind getting data ready for analysis.
+
+1. Finding and extracting raw data.
+
+2. Tidy data principles and how to make data tiny.
+
+3. Practical implementation through a range of R packages.
+
+- What this course depends on;
+
+1. The Data Scientist's Toolbox.
+
+2. R programming.
+
+- What will be useful;
+
+1. Exploratory analysis.
+
+2. Reporting Data and Reproducible Research.
+
+### What you wish data looked like
+
+- Look at an excel file.
+
+- Rows/Columns.
+
+- Column names(Variable).
+
+### What does data really look like
+
+- Data actually comes in raw form. You have to extract and tidy it before you can analyze it.
+
+- Excel file.
+
+- Fax cube file(raw text file).
+
+- Data from API portal.
+
+- Text instructions.
+
+### Where is data?
+
+- This talks about where data is stored.
+
+- mySQL.
+
+- MongoDB.
+
+- API(get information from API).
+
+- Web.
+
+### The goal of this course
+
+- Raw data.
+
+- Processing Script.
+
+- tidy data.
+
+- data analysis.
+
+- data communication.
+
+## Raw and Processed Data
+
+### Definition of data
+
+- "Data are values of qualitative and quantitative variables belonging to a set of items".
+
+- Qualitative: Country of origin,sex,treatment etc.
+
+- Quantitative: Height,Weight,blood pressure etc.
+
+### Set of items
+
+- Sometimes called the population; the set of objects you are interested in.
+
+### Variables
+
+-  A measurement or characteristics of an item. Variables can be measured in qualitative terms and quantitative terms.
+
+1. qualitative.
+
+2. quantitative.
+
+## Raw versus processed data
+
+### Raw data
+
+- The original source of the data.
+
+- Often hard to use for data analysis.
+
+- Data analysis includes processing.
+
+- Raw data may only need to be processed once.
+
+### Processed data
+
+- Data that is ready for analysis.
+
+- Processing can include merging,subsetting,transforming etc.
+
+- There may be standards for processing.
+
+- All steps should be recorded (preprocessing).
+
+### An example of a processing pipeline
+
+- Illumina IC machine sequencing machine.
+
+- You end up in a fax cube file.
+
+- Taking raw data and turning it into processed data.
+
+## Components of tidy data
+
+### The raw data
+
+- The strange binary file your measurement machine spits out.
+
+- The unformatted Excel file with 10 worksheets the company you contracted with sent you.
+
+- The complicated JSON data you got from scraping the Twitter API.
+
+- The hand entered numbers you collected looking through a microscope.
+
+- You know the raw data is in the right format if you;
+
+1. Ran no software on the data.
+
+2. Did not manipulate any of the numbers in the data.
+
+3. You did not remove any data from the data set.
+
+4. You did not summarize the data in any way.
+
+### Components of a tidy data
+
+- The four things you should have;
+
+1. The raw data.
+
+2. A tidy data set.
+
+3. A code book describing each variable and its values in the tidy data set.
+
+4. An explicit and exact recipe you used to go from 1 to the end (we will be using Rscript).
+
+## The tidy data
+
+- Each variable you measure should be in one column.
+
+- Each different observation of that variable should be in a different row.
+
+- There should be one table for each "kind" of variable.
+
+- If you have multiple tables, they should include a column in the table that allows them to be linked (merging datasets).
+
+## Some other important tips
+
+- Include a row at the top of each file with variable names.
+
+- Make variable names human readable AgeAtDiagnosis instead of AgeDx.
+
+- In general,data should be saved in one file per table.
+
+## The Code book
+
+1. Information about the variables (including units!) in the data set not contained in the tidy data.
+
+2. Information about the summary choices you made.
+
+3. Information about the experimental study design you used. How you collected the data.
+
+## Some other important tips
+
+- A common format for this document is a Word/text file.
+
+- There should be a section called "study design" that has a thorough description of how you collected the data.
+
+- There must be a section called "code book" that describes each variable and its units.
+
+- ?data gives you information about the data.
+
+## Instruction list
+
+- Ideally a computer script (in R), but I suppose Python is ok too.
+
+- The input for the script is the raw data.
+
+- The output is the processed tidy data.
+
+- There are no parameters to the script.
+
+- In some cases it will not be possible to script every step. In that case you should provide instructions like;
+
+1. Step 1; take the raw file, run version 3.1.2 of summarize software with parameters a=1,b=2,c=3.
+
+2. Step 2; run the software separately for each sample.
+
+3. Step 3; take column three of output file out for each sample and that is the corresponding row in the output data set.
+
+## Why is the instruction list important.
+
+- Very important so that you can audit the data.
+
+## Downloading Files
+
+### Get/set your working directory 
+
+- A basic component of working with data is knowing your working directory.
+
+- The two main commands are getwd() and setwd().
+
+- Beware of relative versus absolute paths.
+
+1. Relative; setwd("./data"), setwd("../").
+
+2. Absolute; set("/Users/jtleek/data/"). This takes you to the exact directory.
+
+- Important difference in windows. setwd("C:\\Users\\Andrew\\Downloads").
+
+- getwd() tells you the directory in which you are in.
+
+- setwd("./data"); you are in the currentl working directory. setwd("../");you are moving up one directory.
+
+## Checking for and creating directories
+
+- file.exists("directoryName") will check to see if the directory exists.
+
+- dir.create("directoryName") will create a directory if it does not exist.
+
+- if(!file.exists("data")){dir.create("data")}. If the directory !file.exists("data") exists it will return True. If !file.exists("data") does not exist, it will return false.
+
+## Getting data from the Internet - download.file() function
+
+- Download a file from the internet.
+
+- Even if you could do this by hand, helps with reproducibility.
+
+- Important parameters are url, destfile, method.
+
+- Useful for downloading tab-delimited,csv,and other files.
+
+## Do by hand
+
+- Go to the internet (website) click and press download.
+
+- Url; where you get your data from.
+
+- destfile; destination i.e. where you want your download.
+
+- method; https.
+
+- Example; Baltimore camera data-export button .
+
+1. right click on the csv file.
+
+2. copy the link address.
+
+## Download a file from the web
+
+- fileUrl <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.csv?access Type=DOWNLOAD"
+
+- download.file(fileUrl,destfile="./data/cameras.csv",method="curl") if you are using a mac. If you are using windows the default will work. Do not specify method.
+
+- destfile="./data/cameras.csv" i.e. directory called cameras.csv
+
+- list.files("./data")
+
+- dateDownloaded <-date()
+
+- We use the date() function to keep track of the date that the download was done.
+
+## Some notes about download.file()
+
+- If the url starts with http you can use download.file().
+
+- If the url starts with https on windows you may be ok.
+
+- If the url starts with https on Mac you may need to set method="curl".
+
+- If the file is big, this might take a while.
+
+- Be sure to record when you downloaded so that you can go back to check the version of the file.
+
+## Read Local files
+
+### Download the file to load
+
+- if(!file.exists("data")){dir.create("data")}
+
+- fileUrl <-"https://data.baltimorecity.gov/api/views/dz54-2aru/rows.csv?accessType=DOWNLOAD"
+
+- download.file(fileUrl,destfile="cameras.csv",method="curl")
+
+- destfile <-"C:/Users/kumi/Desktop/cameras.csv"
+
+- dateDownloaded <-date().
+
+- Now the data is downloaded and sitting on your computer.
+
+## Loading flat files-read.table()
+
+- This is the main function for reading data into R.
+
+- Flexible and robust but requires more parameters.
+
+- Reads the data into RAM - big data can cause problems.
+
+- Important parameters file,header,sep,row.names,nrows.
+
+- Related: read.csv(), read.csv2().
+
+- read.table is not probably the best way to read large data sets into R.
+
+### Baltimore example
+
+- cameraData <-read.table("./data/cameras.csv",sep=",",header=TRUE). This is the correct way.
+
+- You can also use read.csv because it automatically sets sep="," and header=TRUE.
+
+- cameraData <-read.csv("./data/cameras.csv")
+
+### Some more important parameters (read.table)
+
+- quote; you can tell R whether there are any quoted values quote="" means no quotes.
+
+- na.strings; set the character that represents a missing value.
+
+- nrow; how many rows to read of the file (e.g. nrow = 10 reads 10 lines).
+
+- skip; number of lines to skip before starting to read (e.g. skip = 2).
+
+- In my experience, the biggest trouble with reading flat files are quotation marks ' or " placed in data values, setting quote="" often removes these.
+
+### Reading Excel Files
+
+- Still probably the most widely used format for sharing data. The reason is that a lot of people work with spread sheets.
+
+### Example - Baltimore camera data
+
+### Download the file to load
+
+- if(!file.exists("data")){dir.create("data")}
+
+- fileUrl <-"https://data.baltimorecity.gov/api/views/dz54-2aru/rows.xlsx?access=DOWNLOAD"
+
+- download.file(fileUrl,destfile="./data/cameras.xlsx",method="curl")
+
+- dateDownloaded <-date().
+
+- read.xlsx(), read.xlsx2() {xlsx package}. Install.packages xlsx and then library xlsx.
+
+- library(xlsx)
+
+- cameraData <-read.xlsx("./data/cameras.xlsx",sheetIndex=1,header=TRUE)
+
+### Reading specific rows and columns
+
+- colIndex <-2:3
+
+- rowIndex <-1:4
+
+- cameraDataSubset <-read.xlsx("./data/cameras.xlsx",sheetIndex=1,colIndex=colIndex,rowIndex=rowIndex).
+
+### Further Notes
+
+- The write.xlsx function will write out an Excel file with similar arguments.
+
+- read.xlsx2 is much faster than read.xlsx but for reading subsets of rows may be slightly unstable.
+
+- The XLConnect package has more options for writing and manipulating Excel files.
+
+- The XLConnect vignette is a good place to start for that package.
+
+- In general, it is advised to store your data in either a database or in comma separated files(.csv) or tab separated files(.tab/.txt) as they are easier to distribute(not everybody also has excel).
+
+## Reading XML
+
+### Tags,elements and attributes
+
+- Tags correspond to general labels.
+
+1. Start tags <section>
+
+2. End tags </section>
+
+3. Empty tags <line-bread/>
+
+- Elements are specific examples of tags.
+
+1. <Greeting>Hello,world</Greeting>
+
+- Attributes are components of the label.
+
+1. <step number="3"> connect A to B.</step>
+
+## XML
+
+- Extensible markup language.
+
+- Frequently used to store structured data.
+
+- Particularly widely used in internet applications.
+
+- Extracting XML is the basis for most web scraping.
+
+- Components
+
+1. Markup; labels that give the text structure.
+
+2. Content; the actual text of the document.
+
+### Example XML file
+
+- Here you have a text file and this file has a lot of content in it(open and close tags).
+
+- http://www.w3schools.com/xml/simple.xml
+
+### Read the file into R
+
+- library(XML)
+
+- fileUrl <-"http://www.w3schools.com/xml/simple.xml"
+
+- doc <-xmlTreeParse(fileUrl,useInternal=TRUE). You can ignore useInternal.
+
+- rootNode <-xmlRoot(doc)
+
+- xmlName(rootNode)
+
+- names(rootNode)
+
+- names(rootNode) tells you the different elements nested within that root Node.
+
+### Directly access parts of the XML document
+
+- rootNode[[1]] access the first element.
+
+- rootNode[[1]][[1]] access the first element of the first element.
+
+### Programatically extract parts of the file
+
+- > xmlSApply(rootNode,xmlValues)
+
+- xmlSApply(object,function)
+
+### XPath; To be more specific
+
+- /node Top level node
+
+- //node Node at any level
+
+- node[@ attr-name]Node with an attribute name
+
+- node[@ attr-name='bob']Node with attribute name. attr-name='bob'.
+
+- Information from: http://www.stat.berkeley.edu/~statcur/Workshop2/Presentations/XML.pdf
+
+### Get the items on the menu and prices
+
+- XpathSApply(rootNode,"//name",xmlValue)
+
+- data_df <-xmlToDataFrame(url)
+
+- xpathSApply(rootNode,"//price",xmlValue)
+
+### Another example
+
+- http://espn.go.com/nfl/team/-/name/bal/baltimore-ravens
+
+- Viewing the source; right click on the page and then view source
+
+### Extract Content by attributes
+
+- fileUrl <-"http://espn.go.com/nfl/team/-/name/bal/baltimore-ravens"
+
+- doc <-htmlTreeParse(fileUrl,useInternal=TRUE)
+
+- scores <-xpathSApply(doc,"//li[@class='score']",xmlValue)
+
+- teams <-xpathSApply(doc,"//li[@class='team-score']",xmlValue)
+
+- UseInternal=TRUE will give you all the different nodes.
+
+### Notes and Further resources
+
+- Official XML tutorials short,long.
+
+- An outstanding guide to the XML package.
+
+## Reading JSON
+
+- Javascript object Notation.
+
+- Lightweight data storage.
+
+- Common format for data from application programming interfaces (APIs).
+
+- Similar structure to XML but different syntax/format.
+
+- Data stored as;
+
+1. Numbers(double).
+
+2. Strings (double quoted).
+
+3. Boolean (true or false).
+
+4. Array (ordered,comma separated enclosed in square brackets[]).
+
+5. Object (unordered,comma separated collection of key value pairs in curly brackets{}).
+
+- http://en.wikipedia.org/wiki/JSON
+
+### Example JSON file
+
+- https://api.github.com/users/jtleek/repos
+
+### Reading data from JSON {jsonlite package}
+
+- library(jsonlite)
+
+- jsonData <-fromJSON("https://api.github.com/users/jtleek/repos")
+
+- names(jsonData). This gives you the top level variables.
+
+### Nested objects in JSON
+
+- Draw down a little bit.
+
+- names(jsonData$owner)
+
+- You can draw down further.
+
+- names(jsonData$owner$login)
+
+### Writing data frames to JSON
+
+- myjson <-toJSON(iris,pretty=TRUE). use to turn into a json file.
+
+- cat(myjson). The cat command prints it out because its a text variable.
+
+### Convert back to JSON
+
+- iris2 <-fromJSON(myjson). myjson corresponds to text variable.
+
+- head(iris2)
+
+### Further resources
+
+- http://www.json.org/
+
+- A good tutorial on jsonlite-http://www.r-bloggers.com/new-package-jsonlite-a-smarter-json-encoderdecoder/
+
+- jsonlite vignette.
+
+
+
+
+
+
+
+
+

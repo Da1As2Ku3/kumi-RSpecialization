@@ -1,0 +1,485 @@
+---
+title: "Statistical Inference"
+author: "David Asare Kumi"
+date: "7/29/2019"
+output: html_document
+---
+
+## Statistical Inference
+
+- This is the process of generating conclusions about a population from a noisy sample.
+
+- Without statistical inference we are living within our data.
+
+- With statistical inference we are trying to generate new knowledge.
+
+- Statistical inference is the only formal inference that we have.
+
+- There are many different modes of statistical inference. Frequency style of thinking - probability like of doing things.
+
+- Frequency style
+
+1. coin flipping.
+
+2. gambling.
+
+- Example of areas.
+
+1. survey sampling.
+
+2. epidermiological studies.
+
+3. sampling distribution.
+
+4. frequency style.
+
+5. draw inferences about populations.
+
+## Course Content
+
+1. Introduction.
+
+2. Probability.
+
+3. Conditional Probability.
+
+4. Expectations.
+
+5. Variance.
+
+6. Common Distributions.
+
+7. Asymptotics.
+
+8. T confidence intervals.
+
+9. Hypothesis testing.
+
+10. P - values.
+
+11. Power.
+
+12. Multiple testing.
+
+13. Resampling.
+
+## Introduction to probability
+
+- Probability: In these slides, we will cover the basics of probability at low enough level to have a basic understanding for the rest of the series.
+
+- For a more complete treatment see the class Mathematical Biostatistics Boot Camp1 - youtube: www.youtube.com/playlist?list=PLpl-gQKQivXhK6qSyiNj51qamjAtZISJ-
+
+- Coursera: www.coursera.org/course/biostats
+
+- Git: http://github.com/bcaffo/Caffo-Coursera
+
+
+## Probability
+
+- Given a random experiment (say rolling a die) a probability measure is a population quantity that summarizes the randomness. This is a conceptual thing in the population that we would like to estimate.
+
+## Probability Calculus Rules
+
+Specifically, probability takes a possible outcome from the experiment and;
+
+- assigns it a number between 0 and 1
+
+- so that the probability that something occurs is 1 (the die must be rolled) and
+
+- so that the probability of the union of any two sets of outcomes that have nothing in common (mutually exclusive) is the sum of their respective probabilities. That is, if A and B are mutually exclusive, then; P(A U B) = P(A) + P(B) - P(A n B) becomes P(A U B) = P(A) + P(B) since P(A n B) = 0.
+
+- The sum of the probabilities of the sample space is 1. This was discovered by the Russian mathematician Kolmogorov.
+
+## Rules probability must follow
+
+- The probability that nothing occurs is 0.
+
+- The probability something occurs is 1.
+
+- The probability of something is 1 minus the probability that the opposite occurs.       P(A) + P(B) = 1 implies P(A) = 1 - P(B).
+
+- The probability of at least one of two (or more) things that can not simultaneously occur (mutually exclusive) is the sum of their respective probabilities P(A U B) = P(A) + P(B).
+
+- If an event A implies the occurence of event B, then the probability of A occuring is less than the probability that B occurs. That is P(A) < P(B).
+
+- For any two events, the probability that at least one occurs is the sum of their probabilities minus their intersection. That is P(A U B) = P(A) + P(B) - P(A n B).
+
+## Probability mass functions
+
+- Probability calculus is useful for understanding the rules that probabilities must follow. However, we need ways to model and think about probabilities for numeric outcomes of experiments (broadly defined).
+
+- Densities and mass functions for random variables are the best starting point for this; Densities for continuous random variables and mass functions for discrete random variables.
+
+## Random Variables
+
+A random variable is a numerical outcome of an experiment or a random variable is a numerically valued function defined in a sample space.
+
+1. Discrete - a discrete random variable assumes a countable number of values in a designated range of values.
+
+- Things you can count e.g. school enrolment, number of workers in a company or department.
+
+- There are no intermediate terms. That is, no fractional parts.
+
+2. A continuous random variable assumes any value in a designated range of values.
+
+- There are intermediate terms. That is, there are fractional parts.
+
+## Examples of variables that can be thought of as random variables.
+
+- The (0-1) outcome of the flip of a coin. This is discrete.
+
+- The outcome from the role of a die. This is discrete.
+
+- The wed site traffic on a given day. Here we use the poisson distribution.This is discrete but unbounded.
+
+- The BMI of a subject four years after a baseline measurement. This is continuous.
+
+- The hypertension status of a subject randomly drawn from a population. This is discrete.
+
+- The number of people who click on an ad. This is discrete but unbounded.
+
+- Inteligence quotients for a sample of children. This is continuous.
+
+## Probability mass function (PMF)
+
+- A probability mass function evaluated at a value corresponds to the probability that a random variable takes that. To be a valid p.m.f function, p must satisfy;
+
+1. It must always be larger than or equal to zero i.e. p(x) >= 0.
+
+2. The sum of the possible values that the random variable can take has to add up to one i.e. summation p(s) = 1.
+
+- We will focus on binomial and poisson. Binomial - canonical one for flipping coins.
+
+- Poisson - the canonical one for modelling counts.
+
+- If the coin is not fair (unfair coin). This is particularly useful for modelling the prevalence of something.
+
+
+## Probability density function (PDF)
+
+- A probability density function (pdf), is a function associated with a continuous random variable. To be a valid pdf or simply to be legitimate, a function must satisfy;
+
+1. It must be larger than or equal to zero every where. f(x) >= 0.
+
+2. The total area under it must be one i.e. the integration from 0 to infinity f(x)dx = 1.
+
+## Example
+
+- If f(x) = 2x, for 0 < x < 1 or 0, otherwise. What is the probability that 75% or fewer of calls get addressed. We will employ the beta distribution in this case even though there are several approaches in solving this problem.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+pbeta(0.75,2,1)
+
+```
+
+## CDF and Survival function
+
+- F(x) = p(X <= x). pbeta - the p just returns the cumulative distribution function (cdf).
+
+- The survival function s(x) = P(X > x). s(x) = 1 - F(x).
+
+## Example
+
+- Find  p(x<40%), p(x<50%) and p(x<60%).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+pbeta(c(0.40,0.50,0.60),2,1)
+
+```
+
+## Qunatiles
+
+- If you were the 95th percentile on an exam, you know that 95 percent of the people scored worse than you and 5 percent scored better. These are sample quantiles. Here we define their population analogs.
+
+- Definition; The ath quantile of a distribution with distribution function F is the point Xa so that F(Xa) = a.
+
+- A percentile is simply a quantile with a expressed as a percent.
+
+- The median is the 50th percentile.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+qbeta(0.5,2,1)
+
+#qbeta(50%,2,1) will not work
+
+```
+
+### Summary 
+
+- You must be wondering at this point, I have heard of a median before, it didn't require integration. Where is the data?
+
+- We are referring to population quantile. Therefore the median being discussed is the population median.
+
+- A probability model connects the data to the population using assumptions.
+
+- Therefore the median we are discussing is the estimand, the sample median will be the estimator. The sample median (estimator) is estimating the population median (estimand).
+
+
+## Independent and Identically distributed (iid)
+
+- Random variables are said to be independent and identically distributed if they are independent and identically distributed.
+
+- Independent; Statistically unrelated from one another.
+
+- Identically distributed; All having been drawn from the same population distribution.
+
+- iid random variables are the default model for random samples.
+
+## Expected Values
+
+- The empirical average is the expected value - it is the middle of our data in a sense.
+
+- Expected values are very useful for characterizing populations and usually represent the first thing that we are interested in estimating.
+
+- This class is about statistical inference. The process of making conclusions about populations from noisy data that was drawn from it.
+
+- The mean is a characterization of its center.
+
+- The variance is another characteristic of a distribution and it talks about how spread out the data is. The variance and standard deviation are characterizations of how spread out it is.
+
+- The mean is a measure of centrality and the variance and standard deviation is a measure of dispersion (spread).
+
+- The sample expected values (the sample mean and variance) will estimate the population versions.
+
+## The Population Mean
+
+- The expected value or mean of a random variable is the center of its distribution.
+E[X] = summation xp(x). E[X] represents the center of mass of a collection of locations and weights, {xp(x)}.
+
+- The idea of the center of mass is useful in defining the sample mean. The sample mean estimates the population mean. The center of mass of the data is the empirical mean.
+
+- As the mean moves toward the center of the distribution, the MSE reduces. Empirical mean balances the population mean. Beyond the center, the MSE starts to increase again.
+
+## Facts about expected values
+
+1. Recall that expected values are properties of distributions.
+
+2. The average of random variables is itself a random variable and its associated distribution has an expected value. The center of this distribution is the same as that of the original distribution.
+
+3. When the sample mean = the population mean we say that; The sample mean is unbiased because its distribution is centered at what it's trying to estimate.
+
+## Summarizing What we know
+
+- Expected values are properties of distributions.
+
+- The population mean is the center of mass of the population.
+
+- The sample mean is the center of mass of the observed data.
+
+- The sample mean is an estimate of the population mean.
+
+- The sample mean is unbiased estimate of the population mean.
+
+- The more data that goes into the sample mean, the more concentrated it's density/mass function is around the population mean. This looks more Gaussian (Normal).
+
+## Variability
+
+- Standard Deviation = square root (variance). The reason for taking the standard deviation is because the measure has the same units as the population. The variance is the square of the units.
+
+## Uses of Variability in Statistics
+
+1. The population variance is itself an intrinsically interesting quantity that we want to estimate.
+
+2. Secondly, variability in our estimates is what makes them not imprecise. An important aspect of statistics is quantifying the variability in our estimates.
+
+## Introduction to Variability
+
+- The variance of a random variable is a measure of spread.
+var(x) = E(x^2) - [E(x)]^2.
+
+- Densities with higher variances are more spread out than densities with lower variances.
+
+- The square root of the variance is the standard deviation.
+
+- Variance is expressed in unit square and standard deviations are expressed as the same unit of X.
+
+- As we collect more data, the distribution of the sample variance gets more concentrated about what it is trying to estimate and that it's centered in the right place. In other words the sample variance is an unbiased estimate of the population variance. This unbiasness is why we divide by (n-1) instead of n. That makes it unbiased.
+
+- The standard deviation of a statistic is the standard error. A statistic is a characteristic of the sample and a parameter is the characteristic of the population.
+
+- S, the standard deviation talks about how variable the population is.
+
+- S/square root n, the standard error, talks about how variable averages of random samples of size n from the population are.
+
+## Simulation Example
+
+- Standard normals have a variance of 1, means of n standard normals have standard deviation of 1/square root(n)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+nosim <-1000
+    n <-10
+sd(apply(matrix(rnorm(nosim*n),nosim),1,mean))
+
+#alternative approach
+1/sqrt(n)
+
+```
+
+## Simulation Example
+
+- Standard uniforms have variance 1/12, means of random samples of n uniforms have standard deviation of 1/square root(12 * n). Distribution of averages of 10 uniforms.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+nosim <-1000
+    n <-10
+sd(apply(matrix(runif(nosim*n),nosim),1,mean))
+
+#alternative approach
+1/sqrt(12*n)
+
+```
+
+## Simulation Example
+
+- Poisson(4) have variance 4, means of random samples of n poisson(4) have standard deviation of square root(4/n) = 2/square root(n).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+nosim <-1000
+    n <-10
+sd(apply(matrix(rpois(nosim*n,4),nosim),1,mean))
+
+#alternative approach
+2/sqrt(n)
+
+```
+
+## Simulation Example
+
+- For coin flips, have variance 0.25 means of random samples of n coin flips have standard deviation of 1/(2*sqrt(n)).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+nosim <-1000
+    n <-10
+sd(apply(matrix(sample(0:1,nosim*n,replace=TRUE),nosim),1,mean))
+
+#alternative approach
+1/(2*sqrt(n))
+
+```
+
+## Data Example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(UsingR)
+data(father.son)
+x <-father.son$sheight
+n <-length(x)
+#Plot of the son's height
+hist(father.son$sheight,col="pink")
+abline(v=mean(father.son$sheight),lwd=2,col="blue",lty=1)
+#Let's interpret these numbers
+round(c(var(x),var(x)/n,sd(x),sd(x)/sqrt(n)),2)
+
+```
+
+### Interpretation
+
+- Var(x)/n is the variability in the averages of n children's height.
+
+
+## Distributions
+
+- The Bernoulli distribution arises as the result of a binary outcome.
+
+- The Bernoulli random variable take (only) the values 1 and 0 with probabilities of say p and 1-p respectively.
+
+- If x ~ Ber(1,p), then E(x)= p, var(x)= p(1-p). X = 1 is success and X = 0 is failure.
+
+- In specific, let X1,....,Xn be iid Bernoulli(p); then X=summation(Xi) is a binomial random variable. In other words, if there are n repetitions of a Bernoulli experiment, then the Bernoulli distribution assumes a Binomial distribution.
+
+- If X ~ B(n,p), then E(x) = np , Var(x) = np(1-p).
+
+### Example
+
+Suppose a friend has 8 children (oh my!),7 of which are girls and non are twins. If each gender has an independent 50% probability for each birth, what is the probability of getting 7 or more girls out of 8 births.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+choose(8,7)*0.5^8 + choose(8,8)*0.5^8
+#Another r code
+pbinom(6,size=8,prob=0.5,lower.tail=FALSE)
+
+```
+
+## Normal Distribution
+
+- Gaussian distribution with mean u and variance sigma squared.
+
+- X ~ N(u,sigma^2), E(x) = U, var(x) = sigma^2.
+
+- X ~ N(0,1), E(x) = 0, var(x) = 1. They are often labelled Z.
+
+- The standard normal distribution with reference lines. The area of the  normal within 1 standard deviation of the mean is 0.68 i.e 0.34 + 0.34.
+The area of the normal within 2 standard deviations of the mean is 0.95 i.e. 0.475+0.475.
+The area of the normal within 3 standard deviations of hte mean is 0.99 i.e 0.495 + 0.495.
+
+## Facts about the normal density
+
+- If X ~ N(U,sigma^2), then Z = (X - U)/sigma ~ N(0,1).
+
+- Approximately 68%,95% and 99% of the normal density lies within 1,2 and 3 standard deviations from the mean respectively.
+
+- -1.28,-1.645,-1.96 and -2.33 are the 10th,5th,2.5th and 1st percentiles of the standard normal distribution respectively.
+
+- By symmetry, 1.28,1.645,1.96 and 2.33 are the 90th,95th,97.5th and the 99th percentiles of  the standard normal distribution respectively.
+
+## Question
+
+- What is the 90th,95th,97.5th and 99th percentile of a N(u,sigma^2) distribution?
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+qnorm(0.90,mean=0,sd=1,lower.tail=TRUE)
+qnorm(0.95,mean=0,sd=1,lower.tail=TRUE)
+qnorm(0.975,mean=0,sd=1,lower.tail=TRUE)
+qnorm(0.99,mean=0,sd=1,lower.tail=TRUE)
+
+```
+
+## Question
+
+- What is the P(X > 1160) given X ~ N(1020,50^2)
+
+```{r echo=TRUE,message=FALSE,warning=FALSE}
+# pnorm(1160,mean=1020,sd=50,lower.tail=FALSE)
+# the above code runs in r console but does not run in rstudio
+
+
+```
+
+## Poisson Distribution
+
+- The poisson distribution is used to model counts. E(x) = lambda and Var(x) = lambda.
+
+### Some uses for the Poisson Distribution
+
+- Modeling count data.
+
+- Modeling event-time or survival data.
+
+- Modeling contingency tables.
+
+- Approximating binomials when n is large and p is small. Used in epidermiology.
+
+### Example
+
+- X ~ P(lambda=2.5) per hour. If watching the bus stop for 4 hours, what is the probability that 3 or fewer people show up for the whole time?
+
+```{r echo=TRUE,message=FALSE,warning=FALSE}
+# ppois(3,lambda=10)
+# the above code runs in r console but does not run in rstudio
+
+
+```
+
+## Poisson Approximation to the Binomial
+
+- When n is large and p is small,the Poisson distribution is an accurate approximation to the binomial distribution.
+
+### Example
+
+- we flip a coin with success probability 0.01 five hundred times. What is the probability of 2 or fewer successes.
+
+```{r echo=TRUE,message=FALSE,warning=FALSE}
+pbinom(2,size=500,prob=0.01)
+
+```
+

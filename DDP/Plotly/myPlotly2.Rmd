@@ -1,0 +1,38 @@
+---
+title: "myPlotly2"
+author: "David Asare Kumi"
+date: "May 31, 2019"
+output: html_document
+---
+
+## 3D Scatterplot(specify type=scatter3d)
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+library(plotly)
+set.seed(123)
+temp<-rnorm(100,mean=30,sd=5)
+pressure<-rnorm(100)
+dtime<-1:100
+plot_ly(x=temp,y=pressure,z=dtime,type="scatter3d",mode="markers",color=temp)
+
+```
+
+## Line Graph
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE,comment=""}
+library(plotly)
+data(airmiles)
+plot_ly(x=time(airmiles),y=airmiles)
+
+```
+
+## Multi Line Graph
+```{r,echo=FALSE,message=FALSE,warning=FALSE,comment=""}
+library(plotly)
+library(tidyr)
+library(dplyr)
+data(EuStockMarkets)
+stocks<-as.data.frame(EuStockMarkets)%>%gather(index,price)%>%mutate(time=rep(time(EuStockMarkets),4))
+plot_ly(stocks,x=stocks$time,y=stocks$price,color=stocks$index)
+
+```

@@ -1,0 +1,634 @@
+---
+title: "Reshaping Data"
+author: "David Asare Kumi"
+date: "9/27/2019"
+output: html_document
+---
+
+
+## Reshaping Data
+
+- The goal is to tidy data.
+
+1. Each variable forms a column.
+
+2. Each observation forms a row.
+
+3. Each table / file stores data about one kind of observation (e.g. people/hospitals).
+
+- http://vita.had.co.nz/papers/tidy-data.pdf
+
+- Leek, Taub, and Pineda 2011 PLoSOne.
+
+### Start with reshaping
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(reshape2)
+library(dplyr)
+data(mtcars)
+dim(mtcars)
+names(mtcars)
+head(mtcars)
+glimpse(mtcars)
+summary(mtcars)
+
+```
+
+- First thing to do is melting the data set.
+
+### Melting data frames
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+mtcars$carname <-rownames(mtcars)
+mtcars$carname
+carMelt <-melt(mtcars,id=c("carname","gear","cyl"),measure.vars=c("mpg","hp"))
+head(carMelt,n=3)
+tail(carMelt,n=3)
+
+```
+
+- There is one row for every mpg and one row for every hp.
+
+### Casting data frames
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+cylData <-dcast(carMelt,cyl~variable)
+cylData
+cylData <-dcast(carMelt,cyl~variable,mean)
+cylData
+
+```
+
+- Casting is used to re-summarize the data frame.
+
+### Averaging Values
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment="",fig.width=10}
+library(datasets)
+library(dplyr)
+data(InsectSprays)
+dim(InsectSprays)
+names(InsectSprays)
+glimpse(InsectSprays)
+head(InsectSprays)
+TapInsectSprays <-tapply(InsectSprays$count,InsectSprays$spray,sum)
+TapInsectSprays
+barplot(InsectSprays$count,xlab="Spray",ylab="Count",main="Barplot of InsectSprays",col="yellow")
+
+```
+
+- http://www.r-bloggers.com/a-quick-primer-on-split-apply-combine-problems/
+
+### Another way - split
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+spIns <-split(InsectSprays$count,InsectSprays$spray)
+spIns
+# You get the list of the values for A,B,C, etc
+sprCount <-lapply(spIns,sum)
+sprCount
+# We may want to go back to a vector
+unlist(sprCount)
+# Sapply
+sapply(spIns,sum)
+
+```
+
+## Another way - plyr package
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(plyr)
+ddpInsectSprays <-ddply(InsectSprays,.(spray),summarize,sum=sum(count))
+ddpInsectSprays
+# Boxplot of InsectSprays
+boxplot(count~spray,xlab="Spray",ylab="Count",main="Boxplot of InsectSprays",col="pink",data=InsectSprays)
+
+```
+
+- Here we want to summarize spray by summing the count.
+
+### Creating a new variable
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+spraySums <-ddply(InsectSprays,.(spray),summarize,ave=ave(count))
+dim(spraySums)
+head(spraySums)
+# we can also use sum,mean,median etc to compute this
+
+```
+
+### More information
+
+- A tutorial from the developer of plyr - http://plyr.had.co.nz/09-user/
+
+- A nice reshape tutorial http://www.slideshare.net/jeffreybreen/reshaping-data-in-r
+
+- A good plyr primer-http://www.r-bloggers.com/a-quick-primer-on-split-apply-combine-problems/
+
+- See also the functions;
+
+1. acast; for casting as multi-dimensional arrays.
+
+2. arrange; for faster reordering without using order() commands.
+
+3. mutate; for adding new variables.
+
+### Managing dataframes with dplyr - Introduction
+
+- dplyr is designed to help you work with data frames.
+
+### dplyr(basic assumptions)
+
+- The data frame is a key data structure in statistics and in R[Tidy data].
+
+- There is one observation per row.
+
+- Each column represents a variable or measure or characteristic.
+
+- Primary implementation that you will use is the default R implementation.
+
+- Other implementations particularly relational databases systems.
+
+- Developed by Hadley Wickham of Rstudio.
+
+- An optimized and distilled version of plyr package (also by Hadley Wickham).
+
+- Does not provide any "new" functionality per se, but greatly simplifies existing functionality in R.
+
+- Provides a "grammar" (in particular,verbs) for data manipulation.
+
+- Is very fast, as many key operations are coded in c++.
+
+### dplyr verbs (basic)
+
+- select: return a subset of the columns of a data frame. Focuses on the columns. Use column names rather than the indices.
+
+- filter: extract a subset of rows from a data frame based on logical conditions. Focus is on rows.
+
+- arrange: re-order rows of a data frame while preserving the order of the columns. Focus is on rows.
+
+- rename: rename variables in a data frame. Focus is on columns.
+
+- mutate: add new variables/columns or transform existing variables. Focus is on columns.
+
+- summarise/summarize: generate summary statistics of different variables in the data frame possibly within strata.
+
+- There is also a handy print method that prevents you from printing a lot of data to the console.
+
+- The acronym is FARMS: F for filter, A for arrange,R for rename, M for mutate and S for select.
+
+### dplyr properties
+
+- The first argument is a data frame.
+
+- The subsequent arguments describe what to do with it, and you can refer to columns in the data frame directly without using the $ operator (just use the names).
+
+- The result is a new data frame.
+
+- Data frames must be properly formatted and annotated for this to all be useful.
+
+### Managing data frames with dplyr - Basic Tools
+
+### Select
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(dplyr)
+data(airquality)
+dim(airquality)
+names(airquality)
+glimpse(airquality)
+summary(airquality)
+airqSelect <-select(airquality,Solar.R:Temp)
+head(airqSelect)
+airqSelect2 <-select(airquality,-(Month:Day))
+head(airqSelect2)
+
+```
+
+### filter
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(dplyr)
+airqFilter <-filter(airquality,airquality$Ozone>40)
+airqFilter
+airqFilter2 <-filter(airquality,airquality$Ozone>40&airquality$Temp>70)
+airqFilter2
+
+```
+
+### arrange
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(dplyr)
+airqArrange <-arrange(airquality,Day)
+head(airqArrange,10)
+airqArrange2 <-arrange(airquality,desc(Month))
+head(airqArrange2)
+
+```
+
+### rename
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+#library(dplyr)
+#airqRename <-rename(airquality,SolarRadiation=Solar.R,Temperature=Temp)
+#head(airqRename)
+
+```
+
+### mutate
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+airqMutate <-mutate(airquality,Tempdetrend=Temp-mean(Temp,na.rm=TRUE))
+head(select(airqMutate,Temp,Tempdetrend))
+airqMutate2 <-mutate(airquality,tempcat=factor(1*(Temp>80),labels=c("cold","hot")))
+hotcold <-group_by(airqMutate2,tempcat)
+hotcold
+
+```
+
+### Summarize function
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+summarize(hotcold,Temp=mean(Temp),Wind=max(Wind),Ozone=median(Ozone,na.rm=TRUE))
+
+```
+
+### Use mutate function to create a year variable
+
+1. chicago <-mutate(chicago,year=as.POSIXlt(date)$year+1900)
+
+2. years <-group_by(chicago,year)
+
+3. summarize(years,pm25=mean(pm25,na.rm=TRUE),03=max(03tmean2),no2=median(no2tmean2))
+
+### Pipeline Operator
+
+- chicago%>%mutate(month=as.POSIXlt(date)$mon+1)%>%group_by(month)%>%summarize(pm25=mean(pm25,na.rm=TRUE),03=max(03tmean2),no2=median(no2tmean2))
+
+### Additional benefits of dplyr
+
+- dplyr can work with other data frame "backends".
+
+- data.table for large fast tables.
+
+- SQL interface for relational databases via DBI package.
+
+## Merging Data
+
+- Peer review experiment data; http://www.plosone.org/article/info:doi/10.1371/journal.pone.0026895
+
+- Peer review data; if(!file.exists("./data")){dir.create("./data")}
+
+- fileUrl1 <-"https://dl.dropboxusercontent.com/u/7710864/data/reviews-apr29.csv"
+
+- fileUrl2 <-"https://dl.dropboxusercontent.com/u/7710864/data/solutions-apr29.csv"
+
+- download.file(fileUrl1,destfile="./data/reviews.csv",method="curl").for windows ignore method="curl".
+
+- download.file(fileUrl2,destfile="./data/solutions.csv",method="curl")
+
+- reviews <-read.csv("./data/reviews.csv")
+
+- solutions <-read.csv("./data/solutions.csv")
+
+- head(reviews,2)
+
+- head(solutions,2)
+
+### Merging data - merge()
+
+- Merges data frame.
+
+- Important parameters: X,Y,by.X,by.Y,all.
+
+- names(reviews).
+
+- names(solutions).
+
+- Important variables to merge are X and Y, you can use by, by.x, by.y, all.
+
+- By default it merges by all the columns that have a common name.
+
+- mergeData <-merge(reviews,solutions,by.x="solution_id",by.y="id",all=TRUE).
+
+- head(mergeData)
+
+### Default - merge all common column names
+
+- intersect(names(solutions),names(reviews))
+
+- mergeData2 <-merge(reviews,solutions,all=TRUE)
+
+- head(mergeData2)
+
+## Using Join in the plyr package
+
+- Faster, but less full featured - defaults to left join, see help file for more.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(dplyr)
+df1 <-data.frame(id=sample(1:10),x=rnorm(10))
+df2 <-data.frame(id=sample(1:10),y=rnorm(10))
+arrange(join(df1,df2),id)
+
+```
+
+- Join is a bit faster than merge but less full featured.
+
+### If you have multiple data frames
+
+- If you have multiple data frames it is challenging to use merge. If you have a common id it is very straight forward to use join.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+df1<-data.frame(id=sample(1:10),x=rnorm(10))
+df2<-data.frame(id=sample(1:10),y=rnorm(10))
+df3<-data.frame(id=sample(1:10),z=rnorm(10))
+dfList<-list(df1,df2,df3)
+join_all(dfList)
+
+```
+
+### More on merging data
+
+- The quick R data merging page-http://www.statmethods.net/management/merging.html
+
+- plyr information - http://plyr.had.co.nz/
+
+- Types of joins - http://en.wikipedia.org/wiki/Join_(SQL)
+
+## Editing Text Variables
+
+- Example - Baltimore camera data.
+
+### Fixing Character vectors-tolower(),toupper()
+
+1. if(!file.exists("./data")){dir.create("./data")}
+
+2. fileUrl <-"https://data.baltimorecity.gov/api/views/dz542aru/rows.csv?access=DOWNLOAD"
+
+3. download.file(fileUrl,destfile="./data/cameras.csv")
+
+4. cameraData <-read.csv("./data/cameras.csv")
+
+5. names(cameraData)
+
+6. tolower(names(cameraData))
+
+- tolower gives you all the letters in the names in lowercase.
+
+- toupper command gives you all the letters in uppercase.
+
+### Fixingh Character vectors - strsplit()
+
+- Good for automatically splitting variable names.
+
+- Important parameters: x,split.
+
+- Values separated by periods. e.g. Location.1
+
+- splitNames <-strsplit(names(cameraData),"\\."). "\\." split on periods.
+
+- splitNames[[5]]. [1]"intersection". [[5]] represents the fifth column name in the dataframe.
+
+- splitNames[[6]]. [1]"Location" "1". Location.1 is split into Location and 1.
+
+### Quick aside - lists
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+mylist <-list(letters=c("A","b","c"),numbers=1:3,matrix(1:25,ncol=5))
+head(mylist)
+mylist[1]
+mylist$letters
+mylist[[1]]
+
+```
+
+### Fixing Character vectors - sapply()
+
+- Applies a function to each element in a vector or list.
+
+- Important parameters: X,FUN.
+
+- splitNames[[6]][1]. [1]"Location".
+
+- firstElement <-function(x){x[1]}
+
+- sapply(splitNames,firstElement)
+
+### Fixing Character vector - sub()
+
+- Important parameters: pattern,replacement,X.
+
+- names(reviews)
+
+- sub("_","",names(reviews),). This command removes underscore.
+
+### Fixing Character vectors - gsub()
+
+- testName <-"this_is_a_test"
+
+- sub("_","",testName).[1] "this is _a_test".
+
+- gsub("_","",testName).[1] "this is a test".
+
+- gsub removes multiple underscore.
+
+### Finding values - grep(), grepl()
+
+- grep("Alameda",cameraData$intersection).[1]4 5 36.
+
+- table(grepl("Alameda",cameraData$intersection)). FALSE 77 TRUE 3.
+
+- cameraData2 <-cameraData[!grepl("Alameda",cameraData$intersection),].
+
+### More on grep()
+
+- grep("Alameda",cameraData$intersection,value=TRUE).[1]"The Alameda & 33rd st".
+
+- grep("JeffStreet",cameraData$intersection).[1]integer(0).
+
+### More useful string functions
+
+1. library(stringr)
+
+2. nchar("Jeffrey Leek").[1] 12.
+
+3. substr("Jeffrey Leek",1,7).[1]"Jeffrey". 1,7 is the 1st to the 7th letter.
+
+4. paste("Jeffrey","Leek").[1]"Jeffrey Leek"
+
+- paste; pastes two strings together separated by a space. You can actually set the separation with the sep argument.
+
+5. paste0("Jeffrey","Leek").[1]"JeffreyLeek".
+
+- paste0; pastes with no space.
+
+6. str_trim("Jeff   ").[1]"Jeff". str_trim trims excess space.
+
+### Important points about text in data sets
+
+- Names of variables should be;
+
+1. All lower case when possible.
+
+2. Descriptive(Diagnosis versus Dx).
+
+3. Not duplicated.
+
+4. Not have underscores or dots or white spaces.
+
+- Variables with character values;
+
+1. Should usually be made into factor variables(depends on application).
+
+2. Should be descriptive(use TRUE/FALSE instead of 0/1 and Male/Female versus 0/1 or M/F).
+
+### Regular Expressions I
+
+- Regular expressions can be thought of as a combination of literals and metacharacters.
+
+- To draw an analogy with natural language, think of literal text forming the words of this language, and the metacharacters defining its grammar.
+
+- Regualar expressions have a rich set of metacharacters.
+
+### Literals
+
+- Simplest pattern consists only of literals. The literal "nuclear" would match to the following lines:
+
+1. Literals; words that match exactly in differnt lines.
+
+### Regular Expressions
+
+1. Simplest pattern consists only of literals; a match occurs if the sequence of literals occurs anywhere in the text being tested.
+
+2. What if we only want the word "Obama"? or sentences that end in the word "Clinton",or "clinton",or"clinto"?
+
+- We need a way to express;
+
+1. whitespace word boundaries.
+
+2. sets of literals.
+
+3. the beginning and end of a line.
+
+4. alternatives("war" or "peace") Metacharacters to the rescue!
+
+### Metacharacters
+
+- Some metacharacters represent the start of a line ^ i think will match the lines; i think we all rule for participating; i think i have been ousted;... i think i first saw zombo in 1999.
+
+- $ represents the end of a line e.g. morning$ will match the lines morning when morning is the last word. When morning appears in the middle of the text, it won't match.
+
+### Character Classes with [ ]
+
+- We can list a set of characters we will accept at a given point in the match. [Bb] [Uu] [Ss] [Hh] will match the lines with the word/name Bush both lowercase and uppercase anywhere in the text.
+
+- ^ [Ii] am will match all the I am/i am at the beginning of the line.
+
+- Similarly, you can specify a range of letters [a-z] or [a-zA-Z]; notice that the order doesn't matter.
+
+- ^ [0-9][a-zA-Z] will match any number between 0 and 9 at the beginning of the line followed by a letter.
+
+- When used at the beginning of a character class, the "" is also a metacharacter and indicates matching characters NOT in the indicated class.
+
+- [^?.]$ will match the lines with $ at the end and ?. at the beginning.
+
+
+### Regular Expressions II
+
+### More Metacharacters: | (or)
+
+- This does not mean "pipe" in the context of regular expressions; instead it translates to "or"; we can use it to combine two expressions, the subexpressions being called alternatives. Flood | fire will match the lines flood or fire in every line. 
+
+- "." is used to refer to any character. So 9.11 will match 9-11,9/11,203.169.114.66,9:11:46AM.
+
+### More Metacharacters: |
+
+- We can include any number of alternatives...
+
+- flood | earthquake | huricane | coldfire will match the lines containing each of these words.
+
+- The alternatives can be real expressions and not just literals.
+
+- ^ [Gg]ood | [Bb]ad will match the lines Good/good in the beginning of the line or Bad/bad anywhere in the text not necessarily at the beginning of the line.
+
+- bad has not got ^ infront.
+
+### More Metacharacters: (and)
+
+- Subexpressions are often contained in parenthesis to constrain the alternatives.
+
+- ^ ([Gg]ood | [Bb]ad) will match the lines Bad/bad or Good/good at the beginning of the line.
+
+### More Metacharacters: ?
+
+- The question mark indicates that the indicated expression is optional.
+
+- [Gg]eorge([Ww]\.)? [Bb]ush. So ([Ww]\.)? is optional. This will match the line george bush because it does not necessarily have to have W in the middle.
+
+- One thing to note. In the following [Gg]eorge([Ww]\.)? [Bb]ush we wanted to match a "." as a literal period; to do that we had to "escape" the metacharacter, preceeding it with a backlash. In general, we have to this for any metacharacter we want to include in our match.
+
+### More Metacharacter: * and +
+
+- The * and + signs are metacharacters used to indicate repetition; * means "any number, including none of the item" and + means " at least one of the item".
+
+- (.*) will match the lines (24,m,germany), ().
+
+- [0-9] + (.*) [0-9] + will match the lines with any number of possible combinations of at least one number that are separated by something other than numbers.
+
+### More Metacharacters: {and}
+
+- {and} are referred to as interval quantifiers; then let us specify the minimum and maximum number of matches of an expression.
+
+- [Bb]ush (+[^]+ +){1,5} debate will match the lines 1 space + something not a space + space between 1 to 5. There are 5 words between Bush/bush and debate etc.
+
+### More Metacharacters: and
+
+- m,n means at least m but not more than n matches.
+
+- m means exactly m matches.
+
+- m means at least m matches.
+
+### More Metacharacters: (and) revisited
+
+- In most implementations of regular expressions, the parentheses not only limit the scope of alternatives divided by a "|", but also can be used to "remember" text matched by the subexpression enclosed.
+
+- We refer to the matched text with \1, \2, etc. So the expression + ([a-zA-Z]+) +\1 + will match the lines night night, blah blah blah blah, all all, anybody anybody, css css css css etc.
+
+- \1 indicates repetitions of the same phase.
+
+- The * is "greedy" so it always matches the longest possible string that satisfies the regular expression.
+
+- So ^ s(.*)S matches all the strings that starts with s and ends with s.
+
+- The greediness of * can be turned off with the ?, as in ^ s(.*?)s$. We start with s followed by smaller number of strings end with an s.
+
+
+## Lattice graphics example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+require(graphics)
+data(airquality)
+pairs(airquality,panel=panel.smooth,main="airquality data")
+
+```
+
+## Base graphics example
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+plot(airquality,cex=1,pch=20,col="red",main="airquality data")
+
+```
+
+## Summary
+
+- Regular expressions are used in many different languages; not unique to R.
+
+- Regular expressions are composed of literals and metacharacters that represent sets or classes of characters/words.
+
+- Text processing via regular expressions is a very powerful way to extract data from "unfriendly"  sources (not all data comes as a CSV file).
+
+- Used with the functions grep, grepl, sub, gsub and others that involve searching for text strings (Thanks to Mark Hansen for some material in this lecture).

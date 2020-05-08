@@ -1,0 +1,784 @@
+---
+title: "Statistical Inference (Asymptotics)"
+author: "David Asare Kumi"
+date: "8/22/2019"
+output: html_document
+---
+
+
+## Asymptotics
+
+
+- This refers to the behaviour of estimators as the sample size goes to infinity. A potential idea along these lines is the Central Limits Theorem (CLT). It states that, the distribution of averages is often normal, even if the distribution that the data is being sampled from is very non-normal.
+p(X <=2) = p(X=0) + p(X=1) + p(X=2).
+
+
+## Asymptotics and LLN
+
+
+- Asymptotics is the term for the behaviour of statistics as the sample size (or some other relevant quantity) limits to infinity (or some other relevant number).
+
+- Asymptotics are incredibly useful for simple statistical inference and approximations.
+
+- Asymptotics form the basis for frequency interpretation of probabilities (the long run proportion of times an event occurs).
+
+
+## Limits of Random Variables
+
+- These results allow us to talk about the large sample distribution of sample means of a collection of iid observations. The first of these results, the Law of Large Numbers (LLN), we intuitively know.
+
+- It says that, the average limits to what its estimating, the population mean.
+
+- Example Xn bar could be the average of the result of n coin flips (i.e. the sample proportion of heads).
+
+- As we flip a fair coin over and over, it eventually converges to the true probability of a head.
+
+
+## Law of Large Numbers in action
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+n <-1000
+means <-cumsum(rnorm(n))/(1:n)
+plot(means,pch=20,col="red")
+abline(h=0,col="black",lwd=3)
+
+```
+
+## Example (coin flip)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+means <-cumsum(sample(0:1,n,replace=TRUE))/(1:n)
+plot(means,pch=20,col="red")
+abline(h=0.5,col="black",lwd=3)
+
+```
+
+As the sample proportion increases to infinity it converges to the true value which is 0.5 i.e. p.
+
+## Discussion
+
+- An estimator is consistent if it converges to what you want to estimate.
+
+- The LLN says that the sample mean of iid samples is consistent for the population mean i.e. x bar = mean.
+
+- Typically, good estimators are consistent. It is not too much to ask that if we go to the trouble of collecting an infinite amount of data that we get the right answer.
+
+- The sample variance and the sample standard deviations of iid random variables are consistent as well.
+
+## Asymptotics and the CLT
+
+- For our purposes, the CLT states that the distribution of averages of iid variables (properly normalized) becomes that of a standard normal as the sample size increases.
+
+- Estimate - Mean of Estimate/standard error of estimate where standard error is the standard deviation divided by the square root of n. This has a distribution like that of a standard normal for large n.
+
+- The useful way to think about the CLT is that Xn bar is approximately N(mean,sigma squared/n).
+
+## Example
+
+- Simulate a standard normal random variable by rolling n (six sided) die. Let Xi be the outcome for die i. Then note that mean = E(Xi) = 3.5 and Var(Xi) = 2.92. The standard error SE = square root(2.92/n) = 1.71/square root (n).
+
+## Coin CLT
+
+- Let Xi be the 0 and 1 result of the ith flip of a possibly unfair coin.
+
+- The sample proportion, say p cap, is the average of the coin flips.
+
+- E(Xi) = p and Var(Xi) = p(1-p).
+
+- Standard error of the mean is; square root(p(1-p)/n).
+
+- Note that (p cap - p)/square root(p(1-p)/n) ~ N(p,p(1-p)/n).
+
+- p cap is the sample proportion (the empirical average/mean of the coin flip).
+
+- p is the population mean. If the coin is fair p=1/2 then p*(1-p) = 1/4 and then the square root (p*(1-p)) = 1/2.
+
+- It is centered at 0 because we subtracted the mean.
+
+- The speed at which the normalized coin flips converges to normality is governed by how biased the coin is.
+
+- The CLT does not guarantee that the normal distribution will be a good approximation simply that when n approaches infinity, it will eventually be a good approximation. Coin flips limits to infinity.
+
+## Galton's quincunx
+
+- This can be thought of as a binomial expression. Proportion of heads ~ Normally distributed. n(H) ~ Normally distributed.
+
+## Asymptotics and confidence Interval
+
+- X bar is approximately normal with mean mean and standard deviation sigma/sqrt(n).
+
+- Probability X bar is bigger than mean + 2sigma/sqrt(n) or smaller than mean - 2sigma/sqrt(n) is 5%. The probability between these two limits 95%.
+
+- X bar plus or minus 2sigma/sqrt(n) is called a 95% interval for mean i.e. the probability that the population mean lies between X bar plus or minus 2sigma/sqrt is 95%. 1.96 = 97.5th quantile. 1.645 is the 90% interval.
+
+## Example
+
+Give a confidence interval for the average height of sons in Galton's data.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(HistData)
+library(Hmisc)
+library(ggplot2)
+library(UsingR)
+data(father.son)
+names(father.son)
+x <-father.son$sheight
+(mean(x)+c(-1,1)*qnorm(0.975)*sd(x)/sqrt(length(x)))/12
+#We divided by 12 so that the confidence interval will be in feet rather than inches.
+
+```
+
+## Sample Proportions
+
+- In the event that each Xi is 0 or 1 with common success probability p, then sigma squared = p(1-p).
+
+- The interval takes the form p cap plus or minus Z 1-alpha/2 sqrt(p(1-p)/n).
+
+- Replacing p by p cap in the standard error results in what is called Wald confidence interval for p.
+
+- For a 95% confidence interval; p cap plus or minus 1/sqrt(n) is a quick CI estimate for p. This is the back of the envelope calculation of the confidence interval.
+
+## Example
+
+- n = 100, p = 56 and 1-p = 44. Can you relax? Do you have this race in the bag?
+
+- Without access to a computer or a calculator, how precise is this estimate?
+
+- 1/sqrt(100) = 0.1. So at the back of the envelope calculation gives an approximate 95% interval of 0.56 - 0.1 or 0.56 + 0.1 = (0.46,0.66).
+
+- Not enough for you to relax, better go do more campaigning.
+
+- Rough guidelines, 100 for 1 decimal place, 10,000 for 2 decimal place, 1,000,000 for 3.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+round(1/sqrt(10^(1:6)),3)
+
+```
+
+## Binomial Interval
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+0.56 + c(-1,1)*qnorm(0.975)*sqrt(0.56*0.44/100)
+binom.test(56,100)$conf.int
+
+```
+
+- We cannot relax because for the 95% interval we can rule out possibilities below 0.50 so we cannot relax. They do not rely on the CLT.
+
+## Simulation
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+n <-20
+pvals <-seq(0.1,0.9,by=0.05)
+nosim <-1000
+coverage <-sapply(pvals,
+                  function(p){
+                    phats <-rbinom(nosim,prob=p,size=n)/n
+                    ll <-phats-qnorm(0.975)*sqrt(phats*(1-phats)/n)
+                    ul <-phats+qnorm(0.975)*sqrt(phats*(1-phats)/n)
+                    mean(ll<p & ul>p)
+                  })
+plot(coverage,type="l")
+abline(h=0.95,lwd=2,col="blue")
+
+```
+
+- What's happening? A quick fix to the problem. Wald interval.
+
+- n is not large enough for CLT to be applicable for many of the values of p.
+
+- Quick fix, form the interval with x+2/x+4.
+
+- Add two successes and two failures, Agresti/Coull interval.
+
+## Simulation
+
+want to show that the performance is better when n is larger.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+n <-100
+pvals <-seq(0.1,0.9,by=0.05)
+nosim <-1000
+coverage2 <-sapply(pvals,
+                   function(p){
+                     phats <-rbinom(nosim,prob=p,size=n)/n
+                     ll <-phats-qnorm(0.975)*sqrt(phats*(1-phats)/n)
+                     ul <-phats+qnorm(0.975)*sqrt(phats*(1-phats)/n)
+                     mean(ll<p & ul>p)
+                   })
+plot(coverage2,type="l")
+abline(h=0.95,lwd=2,col="red")
+
+```
+
+## Simulation
+
+- Let's look back at the 20 case again. Agresti/Coull interval i.e. adding two successes and two failures. 
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+n <-20
+pvals <-seq(0.1,0.9,by=0.05)
+nosim <-1000
+coverage3 <-sapply(pvals,
+                   function(p){
+                     phats <-(rbinom(nosim,prob=p,size=n)+2)/(n+4)
+                     ll <-phats-qnorm(0.975)*sqrt(phats*(1-phats)/n)
+                     ul <-phats+qnorm(0.975)*sqrt(phats*(1-phats)/n)
+                     mean(ll<p & ul>p)
+                   })
+plot(coverage3,type="l")
+abline(h=0.95,lwd=2,col="green")
+
+```
+
+- This is better than the Wald coverage interval. However, adding 2 successes and 2 failures always makes the interval so wide. Inspite of this, we go for the plus 2 successes and plus 2 failures.
+
+## Poisson Interval
+
+- A nuclear pump failed 5 times out of 94.32 days; give a 95% confidence interval for the failure rate per day.
+
+- X ~ Poisson(lambda t).
+
+- Estimate lambda cap = X/t.
+
+- Var(lambda cap) = lambda/t.
+
+- lambda cap / t is our variance estimate.
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-5
+t <-94.32
+lambda <-x/t
+round(lambda+c(-1,1)*qnorm(0.975)*sqrt(lambda/t),3)
+# Alternative approach
+poisson.test(x,T=94.32)$conf.int
+
+```
+
+- Exact poisson interval means it guarantees the coverage.
+
+
+## Simulating the Poisson Coverage
+
+- Let's see how this interval performs for lambda values near what we have.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+Lambdavals <-seq(0.005,0.1,by=0.01)
+nosim <-1000
+t <-100
+coverage4 <-sapply(Lambdavals,
+                   function(lambda){
+                     lhats <-rpois(nosim,lambda=lambda*t)/t
+                     ll <- lhats-qnorm(0.975)*sqrt(lhats/t)
+                     ul <- lhats+qnorm(0.975)*sqrt(lhats/t)
+                     mean(ll<lambda & ul>lambda)
+                   })
+plot(coverage4,type="l")
+abline(h=0.95,lwd=2,col="red")
+
+```
+
+- Gets really bad for small values of lambda. For small values of lambda we should not use this approach.
+
+- What if we increase t to 1000. The coverage is much better.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+Lambdavals <-seq(0.005,0.1,by=0.01)
+nosim <-1000
+t <-1000
+coverage4 <-sapply(Lambdavals,
+                   function(lambda){
+                     lhats <-rpois(nosim,lambda=lambda*t)/t
+                     ll <- lhats-qnorm(0.975)*sqrt(lhats/t)
+                     ul <- lhats+qnorm(0.975)*sqrt(lhats/t)
+                     mean(ll<lambda & ul>lambda)
+                   })
+plot(coverage4,type="l")
+abline(h=0.95,lwd=2,col="red")
+
+```
+
+
+## Summary
+
+1. The LLN states that averages of iid samples converge to the population means that they are estimating (poisson also).
+
+2. The CLT states that averages are approximately normal, with distributions;
+
+- centered at the population mean.
+
+- with the standard deviation equal to the standard error of the mean.
+
+- CLT gives no guarantee that n is large enough.
+
+3. Taking the mean and adding and subtracting the relevant normal quantile times the SE yields a confidence interval for the mean. These are default ways for creating confidence interval.
+
+- Adding and subtracting 2 SEs works for 95% intervals.
+
+4. Confidence interval get wider as the coverage increases (why?). Just want to be sure the interval contains the parameter.
+
+5. The Poisson and Binomial case have exact intervals that don't require the CLT.
+
+- But a quick fix for small sample size binomial calculations is to add 2 successes and failures.
+
+
+## Confidence Intervals
+
+- They are a convenient way to communicate uncertainty in estimates.
+
+### T Confidence Intervals
+
+- In the previous lecture, we discussed creating a confidence interval using CLT. They took the form ; Est + or - ZQ * SEest.
+
+- In this lecture we are going to talk about small samples and we will be using the student's t distribution OR the Gosset's distribution. Est + or - TQ * SEest.
+
+### Properties of the t - distribution
+
+- Has heavier tails than the normal distribution.
+
+- Sample size is smaller than that of the normal distribution.
+
+- The t - distribution was propounded by William Gosset and named it student's t test or distribution in 1908.
+
+- The t is indexed by one parameter the degree of freedom. As the degree of freedom increase it gets more like the standard normal.
+
+### The reason for the t - distribution
+
+- It assumes that the underlying data are iid Gaussian with the result that (X bar - mean)/S/sqrt(n) ~ tn-1. s/sqrt(n) is the estimated standard error. When you replace s by sigma then it is normal.
+
+- The interval is Xbar + or - S/sqrt(n) where tn-1 is the relevant quantile.
+
+- The normal and the t - distributions are symmetric about 0.
+
+### Notes about the t - interval
+
+- The t interval technically assumes that the data are iid normal, though it is robust to this assumption.
+
+- It works well whenever the distribution of the data is roughly symmetric and mound shaped.
+
+- Paired observations are often analyzed using the t interval by taking differences.
+
+- For large degrees of freedom, the t quantiles become the same as the standard normal quantile; therefore this interval converges to the same interval as the CLT yielded. Use the t interval when sample size is large.
+
+- For skewed distributions, the spirit of the t - interval assumptions are violated. Also for skewed distributions it doesn't make a lot of sense to center the interval at the mean.
+
+- In this case, consider taking logs or using a different summary like median.
+
+- For highly discrete data, like binary, other intervals are available.
+
+## T Confidence Intervals
+
+### Examples
+
+- Sleep Data; originally analyzed in Gosset's Biometrika paper. R treats the data as two groups rather than paired.
+
+- We will treat the data as paired.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(sleep)
+head(sleep)
+tail(sleep)
+g1 <-sleep$extra[1:10]
+g2 <-sleep$extra[11:20]
+difference <-g2-g1
+mn <-mean(difference)
+s <-sd(difference)
+n <-10
+# t confidence interval
+mn + c(-1,1)*qt(0.975,n-1)*s/sqrt(n) # I1 is interval 1 for sleep data.
+
+t.test(difference)
+t.test(g2,g1,paired=TRUE)
+t.test(extra~I(relevel(group,2)),paired=TRUE,data=sleep)
+#Interpretation: The probability that the true mean difference lies between 0.7001 and 2.46 is 0.95.
+
+```
+
+## Independent Group T intervals
+
+- Suppose we want to compare the mean blood pressure between two groups in a randomized trial; those who received the treatment to those who received a placebo.
+
+- We cannot use the paired t - test because the groups are independent and may have different sample sizes.
+
+- We now present methods for comparing independent groups.
+
+- The standard confidence interval in this case is; Ybar - Xbar + or - tnx + ny -2, 1-alpha/2*Sp(1/nx + 1/ny)^1/2. df = nx + ny - 2.
+
+- Spsquared = {(nx-1)Sxsquared - (ny-1)Sysquared}/nx + ny - 2.
+
+- If nx = ny, Spsquared is the simple average of the variance from X group and the variance from the y group.
+
+## Assumption 
+
+- This interval assumes a constant variance across the two groups. If this assumption is violated then this interval will not give you a proper coverage.
+
+### Example
+
+- Xbar oc = 132.86mmHg;n oc = 8;S oc = 15.34mmHg. Xbar c= 127.44mmHg;Sc = 18.23mmHg;n c = 21.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+# Pooled variance estimate
+n1 <-8
+n2 <-21
+S1 <-15.34
+S2 <-18.23
+mn1 <-132.86
+mn2 <-127.44
+Sp <-sqrt(((n1-1)*(S1*S1)+(n2-1)*(S2*S2))/(n1+n2-2))
+# The interval
+mn1-mn2 + c(-1,1)*qt(0.975,27)*Sp*(1/n1+1/n2)^0.5
+
+```
+
+- In this case my interval contains zero so we cannot rule out zero(0) as a possibility for the population difference between the two groups.
+
+## Mistakenly treating the sleep data as independent groups
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(sleep)
+head(sleep)
+tail(sleep)
+g1 <-sleep$extra[1:10]
+g2 <-sleep$extra[11:20]
+n1 <-length(g1)
+n2 <-length(g2)
+md <-mean(g2)-mean(g1)
+s1 <-sd(g1)
+s2 <-sd(g2)
+Sp <-sqrt(((n1-1)*(s1*s1)+(n2-1)*(s2*s2))/(n1+n2-1))
+I2 <-md+c(-1,1)*qt(0.975,n1+n2-2)*Sp*sqrt(1/n1+1/n2)#I2 is interval 2 for sleep data.
+I2
+I3 <-t.test(g2,g1,paired=FALSE,var.equal=TRUE)$conf#I3 is interval 3 for sleep data.
+I3
+I4 <-t.test(g2,g1,paired=TRUE)$conf #I4 is interval 4 for sleep data.
+I4
+rbind(I2,I3,I4)
+
+```
+
+## ChickWeight data in R
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(ChickWeight)
+library(reshape2)
+head(ChickWeight)
+tail(ChickWeight)
+#Define weight gain or loss
+wideCW <-dcast(ChickWeight,Diet + Chick ~ Time,value.var="weight")
+names(wideCW)[-(1:2)] <-paste("time",names(wideCW)[-(1:2)],sep="")
+library(dplyr)
+wideCW <-mutate(wideCW,gain=time21-time0)
+#Plot the raw data
+plot(ChickWeight$Time,ChickWeight$weight,data=ChickWeight,xlab="Time",ylab="Weight",cex=1,pch=20,col="red")
+fit <-lm(ChickWeight$weight~ChickWeight$Time,data=ChickWeight)
+summary(fit)$coef
+abline(fit,lwd=3,lty=2,col="blue")
+
+```
+
+## Let's do a t interval
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+wideCW14 <-subset(wideCW,Diet%in% c(1,4))# c(1,4) is columns 1 and 4.
+rbind(t.test(gain~Diet,paired=FALSE,var.equal=TRUE,data=wideCW14)$conf,t.test(gain~Diet,paired=FALSE,var.equal=FALSE,data=wideCW14)$conf)
+
+```
+
+- Both interval are below zero suggesting less weight gain on diet 1 and 4.
+
+## A note on unqual variance
+
+- Unequal variance; Ybar - Xbar + or - tdf*sqrt(Sxsquared/nx + Sysquared/ny). This can be approximated by a t - distribution since it does not follow the normal.
+
+- df=(Sxsquared/nx + Sysquared/ny)squared/(Sxsquared/nx)squared/(nx-1)+(Sysquared/ny)squared/(ny-1).
+
+- When you are in doubt, just use the unequal variance interval.
+
+## Example
+
+- Comparing SBP for 8 oral contraceptive users versus 21 controls. This implies n1=8 and n2=21.
+
+- mn1=132.86; s1=15.34; mn2=127.44;s2=18.23
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+n1 <- 8
+n2 <- 21
+mn1 <- 132.86
+mn2 <- 127.44
+s1 <- 15.34
+s2 <- 18.23
+df <- ((s1*s1)/n1+(s2*s2)/n2)^2/(s1*s1/n1)^2/(n1-1)+(s2*s2/n2)^2/(n2-1)
+df
+qt(0.975,12.86)
+#Interval
+mn1-mn2+c(-1,1)*qt(0.975,12.86)*df*sqrt((s1*s1/n1)+(s2*s2/n2))
+#Take the df out
+mn1-mn2+c(-1,1)*qt(0.975,12.86)*sqrt((s1*s1/n1)+(s2*s2/n2))
+
+```
+
+- In R, t.test(...,var.equal=FALSE),you need more y and x observations to use this.
+
+## Comparing other kinds of data
+
+- For binomial data, there is lots of ways to compare two groups.
+
+- Relative risk, risk difference, odds ratio.
+
+- Chi-square tests,normal approximations,exact test.
+
+- For count data, there is also chi-squared tests and exact tests.
+
+## Hypothesis Testing
+
+- Statistical hypothesis testing is the normal inferential framework around choosing between hypothesis.
+
+### Hypothesis Testing
+
+- Hypothesis testing is concerned with making decisions using data.
+
+- A null hypothesis specifies what represents the status quo, usually labelled Ho.
+
+- The null hypothesis Ho is assumed to be true and statistical evidence is required to reject it in favour of a research or alternative hypothesis.
+
+## Example
+
+- A respiratory disturbance index of more than 30 events/hour,say, is considered evidence of severe sleep disordered breathing(SDB).
+
+- Suppose that in a sample of 100 over weight subjects, with other risk factors for sleep disordered breathing at a sleep clinic, the mean RDI was 32 events/hour with a standard deviation of 10 events/hour.
+
+- We might want to test the hypothesis that; Ho:mean=30 against H1:mean > 30 where mean is the population mean RDI.
+
+- The alternative hypothesis are typically of the form <, >, or not equal to.
+
+- Note that there are four possible outcomes of our statistical decision process.
+
+- TRUTH          DECIDE            RESULT
+
+-  Ho             Ho              correctly accept null
+
+-  Ho             Ha              Type I error
+
+-  Ha             Ha              correctly reject null
+
+-  Ha             Ho              Type II error
+   
+## Discussion
+
+- Consider a court of law; the null hypothesis is that the defendant is innocent.
+
+- We require a standard on the available evidence to reject the null hypothesis (convict).
+
+- If we set a low standard, then we will increase the percentage of people convicted (type I error); however we would also increase the percentage of guilty people convicted.(correctly rejecting the null hypothesis).
+
+- If we set a high standard, then we increase the percentage of innocent people let free (correctly accepting the null) while we would also increase the percentage of guilty people let free (type II error).
+
+## Example of choosing a rejection region
+
+Consider our sleep example again.
+
+- A reasonable strategy would reject the null hypothesis if X was larger than some constant C.
+
+- Typically, C is chosen so that the probability of a type I error, alpha , is 0.05 ( or some other relevant constant).
+
+- alpha = type I error rate. Probability of rejecting the null hypothesis when infact, the null hypothesis is correct. Rejecting as false a null hypothesis that is infact true.
+
+### Let's choose the constant C
+
+- Standard error of the mean is; 10/sqrt(100) = 1. Under Ho Xbar ~ N(30,1). We want to choose C so that the p(Xbar > C;Ho) is 5%. The 95th percentile of a normal distribution is 1.645 standard deviations from the mean. If C = 30 + 1*1.645 then C = 31.645.
+
+- Then the probability that a N(30,1) is larger than it is 5%.
+
+- So the rule "Reject Ho when Xbar >= 31.645" has the property that there is 5% when Ho is true (for mean,sigma and n given).
+
+## Discussion
+
+- In general, we don't convert C back to the original scale.
+
+- We would just reject because the Z score; which is how many standard errors the sample mean is above the hypothesized mean; (32 - 30)/10/sqrt(100) = 2 is greater than 1.645.
+
+- Or, whenever sqrt(n)(Xbar - Uo)/S > Z1-alpha.
+
+- Since the calculated = 2 is greater than value from table 1.645, we reject the null hypothesis and conclude that the mean(U) is greater than 30.
+
+## T tests
+
+- Consider our example again. Suppose n = 16 (rather than 100).
+
+- The test statistic (Xbar - 30)/S/sqrt(16) follows a t distribution with 16 -1 = 15 df under Ho. Xbar is the sample mean and 30 is the hypothesized mean. Ho: U = 30 ; Ha: U > 30.
+
+- Under Ho, the probability that it is larger than the 95th  percentile of the T distribution is 5%.
+
+- The 95th percentile of T distribution with 15 degrees of freedom is 1.7531 ie qt(0.95,15) from r code.
+
+- So that our test statistic is now sqrt(16)(32 - 30)/10 = 0.8.
+
+- Since our calculated test statistic = 0.8 is lesser than our value from t table = 1.7531 we fail to reject the null hypothesis OR we reject the alternative hypothesis and conclude that our mean(u) is 30.
+
+## R Code (Normal Distribution)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+# When n is larger than 30 we employ the normal distribution; Ho:u = 30; Ha:u > 30.
+n <-100
+Xbar <-32
+mn <-30
+s <-10
+alpha <-0.05
+TestStatistic <-sqrt(100)*(Xbar - mn)/s
+TestStatistic
+# Z value from table
+qnorm(0.95,mean=0,sd=1)
+# conclusion - since the z calculated = 2 is greater than z tables = 1.645, we reject the null hypothesis and conclude that the mean(u) is greater than 30.
+
+```
+
+## R code
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+# When n is less than 30 we employ the t distribution
+n <-16
+Xbar <-32
+mn <-30
+s <-10
+alpha <-0.05
+TestStatistic <-sqrt(16)*(Xbar - mn)/s
+TestStatistic
+# t value from table; qt(0.95,n-1)
+qt(0.95,15)
+# conclusion - since the t calculated = 0.8 is less than value from t tables = 1.7531, we fail to reject the null hypothesis and conclude that the mean(u) is 30.
+
+```
+
+## Two sided test
+
+- Suppose that we would reject the null hypothesis if infact the mean was too large or too small.
+
+- That is we want to test the alternative Ha: u ≠ 30.
+
+- We will reject if the test statistic is too small or too large.
+
+- Then we want the probability of rejecting under the null to be 5%, split equally as 2.5% in the upper tail and 2.5% in the lower tail.
+
+- Thus we reject if our test statistic is larger than qt(0.975,15) or smaller than qt(0.025,15).
+
+- This is the same as say; reject if the absolute value of our statistic is larger than qt(0.975,15) = 2.1314.
+
+- So we fail to reject the two sided test as well.
+
+- If you fail to reject the one sided test, you know that you will fail to reject the two sided test.
+
+## R Code (Two sided test)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment="",cache=TRUE}
+# When n is larger than 30 we employ the normal distribution; Ho:u = 30; Ha:u≠30.
+n <-100
+Xbar <-32
+mn <-30
+s <-10
+alpha <-0.025 # 0.05 divided by 2
+TestStatistic <-sqrt(100)*(Xbar - mn)/s
+TestStatistic
+# Z value from table
+qnorm(0.975,mean=0,sd=1,lower.tail=FALSE)
+# conclusion - since the z calculated = 2 is greater than z tables = -1.95 = 1.95, we reject the null hypothesis and conclude that the mean(u) is greater than 30.
+
+```
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment="",cache=TRUE}
+# When n is less than 30 we employ the t distribution; Ho:u = 30; Ha:u≠30.
+n <-16
+Xbar <-32
+mn <-30
+s <-10
+alpha <-0.025 # 0.05 divided by 2
+TestStatistic <-sqrt(16)*(Xbar - mn)/s
+TestStatistic
+# t value from table
+qt(0.975,15)
+# conclusion - since the t calculated = 0.8 is less than t tables = 2.1314, we fail to reject the null hypothesis and conclude that the mean(u) is 30.
+
+```
+
+## T test in R
+
+- We usually don't calculate the rejection region. We perform our hypothesis in a formal manner.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment="",cache=TRUE}
+library(UsingR)
+data(father.son)
+dim(father.son)
+head(father.son)
+tail(father.son)
+t.test(father.son$sheight,father.son$fheight,paired=TRUE)
+# t value from table
+qt(0.95,1077)
+# Here we are testing whether the difference in the height is zero(0). Since t calc = 11.79 is greater than t value from table, we reject the null hypothesis and conclude that the difference in height in greater than zero.
+
+```
+
+## Confidence Interval
+
+- The confidence interval bridges the gap between statistical significance and practical significance because they expressed in the units of the data that you are interested in.
+
+## Connections with confidence intervals
+
+- Consider testing Ho:U=Uo, versus Ha:U≠Uo.
+
+- Take the set of all possible values for which you fail to reject Ho, this set is a (1-alpha)100% confidence interval of u.
+
+- The same works in reverse; If a (1-alpha)100% interval contains Uo, then we fail to reject Ho.
+
+## Two group intervals
+
+- Test Statisitc: (Estimate - Ho value)/SEest. Ho:U1=U2 implies Ho:U1-U2 = 0. Estimate = Xbar1 - Xbar2. SEest = sqrt((s1*s1)/n1 +(s2*s2)/n2).
+
+- Test Statistic = (Xbar1 - Xbar2)/sqrt((s1*s1)/n1 +(s2*s2)/n2).
+
+
+## ChickWeight Data
+
+- Recall that we reformatted this data.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(ChickWeight)
+library(reshape2)
+dim(ChickWeight)
+summary(ChickWeight)
+# Define weight gain or loss
+wideCW <-dcast(ChickWeight,Diet + Chick ~ Time,value.var="weight")
+names(wideCW)[-(1:2)] <-paste("time",names(wideCW)[-(1:2)],sep="")
+head(names(wideCW)[-(1:2)])
+library(dplyr)
+wideCW <-mutate(wideCW,gain=time21-time0)
+head(wideCW)
+#Unequal variance T test comparing diets 1 and 4
+wideCW14 <-subset(wideCW,Diet%in% c(1,4))
+head(wideCW14)
+t.test(gain~Diet,paired=FALSE,var.equal=FALSE,data=wideCW14)
+
+```
+
+## Exact Binomial Test
+
+- Recall this problem, suppose a friend has 8 childred, 7 of which are girls and none are twins.
+
+- Perform the relevant hypothesis test. Ho: p = 0.5 and Ha: p > 0.5.
+
+- What is the relevant rejection region so that the probability of rejecting is (less than) 5%?
+
+- For these problems, people always create a p-value (next lecture) rather than computing the rejection region.
+
+
+
+
+
+
+
+
+

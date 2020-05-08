@@ -1,0 +1,638 @@
+---
+title: "Communicating Results"
+author: "David Asare Kumi"
+date: "9/5/2019"
+output: html_document
+---
+
+
+## Communicating Results
+
+- This is about how to communicate your results for people to understand.
+
+- You have to present your report or findings in a hierarchical manner i.e. the most important at the top.
+
+## tl ; dr
+
+- People are busy especially managers and leaders.
+
+- Results of data analysis are sometimes presented in oral form, but often the first cut is presented via email.
+
+- It is often useful to break down the results of an analysis into different levels of granularity detail.
+
+- Getting response from busy people;http://googl/sJDb9V
+
+## Hierarchy of Information: Research Paper
+
+- What a typical research paper might look like.
+
+1. Title/Author list.
+
+2. Abstract; what the paper is about.
+
+3. Body/Results; more detail.
+
+4. Supplementary materials/the gory details - a lot more details.
+
+5. Code/Data/really gory details.
+
+## Hierarchy of information: Email Presentation
+
+- Subject line/sender info.
+
+1. At a minimum; include one.
+
+2. Can you summarize findings in one sentence?
+
+- Email body.
+
+1. A brief description of the problem/context; recall what was proposed and executed. Summarize findings/results; 1 - 2 paragraphs.
+
+2. If action needs to be taken as a result of this presentation, suggest some options and make them as concrete as possible.
+
+3. If questions need to be addressed, try to make them yes/no.
+
+## Attachments
+
+- Rmarkdown file.
+
+- knitr report.
+
+- stay concise; don't spit out pages of code(because you used knitr we know it is available).
+
+## Links to supplementary materials
+
+- Code/software/Data
+
+- Github repository/Project website.
+
+## Rpubs
+
+- rpubs.com
+
+- register your account.
+
+- publish your work so that you can share with others.
+
+- Click on publish.
+
+- Rpubs is really useful for publishing and sharing your work in RStudio.
+
+- Rmarkdown files, markdown files, knitr files.
+
+- It's totally public so becareful what you publish.
+
+## Reproducible Research - checklist(Part 1)
+
+### Do: Start with Good Science.
+
+- Garbage in, garbage out.
+
+- Coherent, focused question simplifies many problems.
+
+- Working with good collaborators reinforces good practices.
+
+- Something that is interesting to you will (hopefully) motivate good habits.
+
+### Don't: Do things by Hand
+
+- Editing spreadsheets of data "to clean it up".
+
+1. Removing outliers.
+
+2. QA/QC.
+
+3. Validating.
+
+- Editing tables or figures (e.g. rounding, formatting).
+
+- Downloading data from a website (clicking links in a web browser).
+
+- Moving data around your computer.
+
+1. Splitting/formatting data files.
+
+- "We are just going to do this once ...".
+
+- Things done by hand need to be precisely documented,(this is harder than it sounds).
+
+- Anything you have to do by hand has to be documented to aid reproducibility.
+
+### Don't Point and Click
+
+- Many data processing/statistical analysis packages have graphical user interfaces (GUIs).
+
+- GUIs are convenient/intuitive but the actions you take with a GUI can be difficult for others to reproduce.
+
+- Some GUIs produce a log file or script which includes equivalent commands; these can be saved for later examination.
+
+- In general, becareful with data analysis software that is highly interactive; ease of use can sometimes lead to non-reproducible analyses.
+
+- Other interactive software, such as text editors, are usually fine.
+
+## Reproducible Research - Checklist(Part 2)
+
+### Do: Teach a computer
+
+- If something needs to be done as part of your analysis/investigation, try to teach your computer to do it (even if you only need to do it once). Don't do it by hand.
+
+- In order to give your computer instructions, you need to write down exactly what you mean to do and how it should be done.
+
+- Teaching a computer almost guarantees reproducibility. For example, by hand, you can;
+
+1. Go to the UCI  Machine Learning Repository at http://archive.ics.uci.edu/ml/
+
+2. Download the Bike Sharing dataset by clicking on the link to the Data Folder, then clicking on the link to the zip file of dataset, and then choosing "save linked File As..." and then saving it to a folder on your computer or you can teach your computer to do the same thing using R:
+
+- download.file("http://archive.ics.uci.edu/ml/machine-learning-datasets/00275/Bike-Sharing-Dataset.zip","ProjectData/Bike-Sharing-Dataset.zip")
+
+- Notice here that, the full url to the dataset is specified (no clicking through a series of links).
+
+- The name of the file saved to your local computer is specified.
+
+- The directory in which the file was saved is specified ("ProjectData").
+
+- Code can always be executed in R (as long as link is available).
+
+## Do: Use Some Version Control
+
+- Slow things down.
+
+- Add changes in small chunks (don't just do one massive commit).
+
+- Track/tag snapshots revert to old versions.
+
+- Software like Github/BitBucket/SourceForge make it easy to publish results.
+
+- Git is a version control system. A major advantage is that it helps you slow down a bit. It helps you do things by following step by step. You can go back and forth.
+
+## Do: Keep Track of your software Environment
+
+- If you work on a complex project involving many tools/datasets, the software and computing environment can be critical for reproducing your analysis.
+
+- Computer architecture: CPU,(Intel,AMD,ARM), GPUs.
+
+- Operating System: Windows, MacOS, Linux/Unix.
+
+- Software tool chain: Compilers,interpreters,command shell,programming languages(C,Perl,Python,etc),database backends,data analysis software.
+
+- Supporting software/Infrustructure: Libraries,R packages,dependencies.
+
+- External dependencies: Web sites, data repositories, remote data bases, software repositories.
+
+- Version numbers: Ideally, for everything (if available). Keep track of the version numbers.
+
+- Example: Do keep track of your software environment. >sessionInfo().
+
+## Reproducible Research Checklist (Part 3)
+
+### Don't: save output
+
+- Avoid saving data analysis output (tables,figures,summaries,processed data,etc),except perhaps temporarily for efficiency purposes.
+
+- If a stray output file cannot be easily connected with the means by whick it was created, then it is not reproducible.
+
+- Save the data plus code that generated the output, rather than the output itself.
+
+- Intermediate files are okay as long as there is clear documentation of how they were created.
+
+### Do: Set your seed
+
+- Random number generators generate pseudo-random numbers based on an initial seed(usually a number or set of numbers).
+
+- In R you can use the set.seed() function to set the seed and to specify the random number generator to use.
+
+- Setting the seed allows for the stream of random numbers to be exactly reproducible.
+
+- Whenever you generate random numbers for a non-trivial purpose, always set the seed. These are important for things like;
+
+1. Simulation.
+
+2. Backup chain.
+
+### Do: Think About the Entire Pipeline
+
+- Data analysis is a lengthy process. It is not just tables/figures/reports.
+
+- Raw data > processed data> analysis > report.
+
+- How you got the end is just as important as the end itself.
+
+- The more of the data analysis pipeline you can make reproducible, the better for everyone - This is a general rule since it makes your report credible.
+
+## Summary: Checklist
+
+- Are we doing good science?
+
+- Was any part of this analysis done by hand?
+
+1. If so, are those parts precisely documented?
+
+2. Does the documentation match reality?
+
+- Have we taught a computer to do as much as possible (i.e. coded)?
+
+- Are we using a version control system?
+
+- Have we documented our software environment?
+
+- Have we saved any output that we cannot reconstruct from original data plus code?
+
+- How far back in the analysis pipeline can we go before our results are no longer (automatically) reproducible?
+
+- Ask these questions when analyzing data.
+
+- Version control system e.g git,spn etc.
+
+## Evidence based Data Analysis (Part 1)
+
+### Replication and Reproducibility
+
+### Replication
+
+- Focuses on the validity of the scientific claim.
+
+- "Is this claim true?".
+
+- The ultimate standard for strengthening scientific evidence.
+
+- New investigators, data, analytical methods, laboratories, instruments,etc.
+
+- Particularly important in studies that can impact broad policy or regulatory decisions.
+
+### Reproducibility
+
+- Focuses on the validity of the data analysis.
+
+- "Can we trust this analysis?".
+
+- Arguably a minimum standard for any scientific study.
+
+- New investigators, same data, some methods.
+
+- Important when replication is impossible.
+
+## Background and Underlying Trends
+
+- Some studies cannot be replicated: No time, No money, Unique/opportunistic.
+
+- Technology is increasing data collection throughput, data are more complex and high dimensional.
+
+- Existing databases can be merged to become bigger databases (but data are used off-label).
+
+- Computing power allows more sophisticated analysis, even on "small" data.
+
+- For every field "X" there is a "computational X".
+
+## The Results?
+
+- Even basic analysis are difficult to describe.
+
+- Heavy computational requirements are thrust upon people without adequate training in statistics and computing.
+
+- Errors are more easily introduced into long analysis pipelines.
+
+- Knowledge transfer is inhibited.
+
+- Results are difficult to replicate or reproduce.
+
+- Complicated analysis can not be trusted.
+
+## Evidence based Data Analysis (Part 2)
+
+### What is Reproducible Research?
+
+- Author>Scientific Question>Protoco>Nature>Measured Data>Processing Code>Analytic Data>Analytic code>computational Results>Presentation(Figures,Tables,Numerical Summaries)>Published Article(Text)>Reader.
+
+### What problem does reproducibility solve? 
+
+- What we get is;
+
+1. Transparency.
+
+2. Data Availability.
+
+3. Software/Methods Availability.
+
+4. Improved transfer of knowledge.
+
+- What we do not get;
+
+1. Validity/Correctness of the analysis. An analysis can be reproducible and still be wrong. We want to know "can we trust this analysis?". Does requiring reproducibility deter bad analysis?
+
+### Problems with reproducibility
+
+- The premise of reproducible research is that with data/code available, people can check each other and the whole system is self -correcting.
+
+- Addresses the most "downstream" aspect of the research process - post publication.
+
+- Assumes everyone plays by the same rules and wants to achieve the same goals(i.e. scientific discovery). This is definitely not true.
+
+## Evidence Based Data Analysis (Part 3)
+
+### Scientific Dissemination Process
+
+- Research Conducted(problematic)>Paper Submitted to Journal(Editor judgement)>Paper Publication(Peer review,reproducibility researc)>Post publication review(reproducibility research).
+
+- This is one example of moving reproducibility upstream a bit to the peer review part.
+
+## Evidence Based Data Analysis (Part 4)
+
+### Who Reproduces Research?
+
+- For reproducibility to be effective as a means to check validity, someone needs to do something;
+
+1. Re-run the analysis check results match.
+
+2. Check the code for bugs/errors.
+
+3. Try alternate approaches check sensitivity.
+
+- The need for someone to do something is inherited from traditional notion of replication.
+
+- Who is "someone" and what are their goals?
+
+- Who reproduces research? - Original investigator.
+
+### The story so far
+
+- Reproducibility brings transparency (code + data) and increased transfer of knowledge.
+
+- A lot of discussion about how to get people to share data.
+
+- Key question of "can we trust this analysis?" is not addressed by reproducibility fundamentally.
+
+- Reproducibility addresses potential problems long after they have occured("downstream").
+
+- Secondary analysis are inevitably coloured by the interests/motivations of others.
+
+### Evidence-based Data Analysis
+
+- Most data analysis involve stringing together many different tools and methods.
+
+- Some methods may be standard for a given field, but others are often applied ad hoc.
+
+- We should apply thoroughly studied (via statistical research), mutually agreed upon methods to analyze data whenever possible.
+
+- There should be evidence to justify the application of a given method.
+
+### Evidence based data analysis (Part 5)
+
+- Create analytic pipelines from evidence based components - standardize it.
+
+- A deterministic statistical machine http://goo.gl/QVlhuV
+
+- Once an evidence based analytic pipeline is established, we should not mess with it.
+
+- Analysis with a "transparent box".
+
+- Reduce the "researcher degrees of freedom".
+
+- Analogous to a pre-specified clinical trial protocol.
+
+### Deterministic Statistical Machine
+
+- The basic structure looks like the one below.
+
+- Data set(Input metadata)>Preprocessing(Bench mark dataset)>Model Selection(Bench mark dataset)>Sensitivity analysis(Bench mark dataset)>Report(Output parameters)>Public Repository(methods section).
+
+### Case Study: Estimating Acute Effects of Ambient Air Pollution Exposure
+
+- Acute/short-term effects typically estimated via panel studies or time series studies.
+
+- Work originated in late 1970s early 1980s.
+
+- Key Question: "Are short term changes in pollution associated with short term changes in a population health outcome?".
+
+- Studies usually conducted at community level.
+
+- Long history of statistical research investigating proper methods of analysis.
+
+- Can we encode everything that we have found in statistical/epidermiological research into a single package?
+
+- Time series studies do not  have a huge range of variation; typically involves similar types of data and similar questions.
+
+- We can create a deterministic statistical machine for this area?
+
+### Deterministic statistical Machine(DSM) Modules for Time Series Studies of Air Pollution and Health
+
+1. Check for
+
+- Outliers
+
+- high leverage
+
+- over dispersion
+
+2. Fill in missing data? No!
+
+3. Model Selection: Estimate degrees of freedom to adjust for unmeasured confounders(this is very critical).
+
+- Other aspects of model not as critical.
+
+4. Multiple lag analysis.
+
+5. Sensitivity analysis 
+
+- Unmeasured confounder adjustment.
+
+- Influential points.
+
+- For a time series study these are the things we ask for.
+
+## Where to go from here?
+
+- One DSM is not enough, we need many.
+
+- Differnt problems warrant different approaches and expertise.
+
+- A curated library of machines providing state-of-the art analysis pipelines.
+
+- A CRAN/CPAN/CTAN/... for data analysis.
+
+- Or a "cochrane collaboration" for data analysis.
+
+- A model: Cochrane Collaboration.
+
+## A curated library of Data Analysis
+
+- Provide packages that encode data analysis pipeline for given problems, technologies,questions.
+
+- Curated by experts knowledgeable in the field.
+
+- Documentation/references given supporting each module in the pipeline.
+
+- Changes introduced after passing relevant benchmarks/unit tests.
+
+## Summary
+
+- Reproducible research is important, but does not necessarily solve the critical question of whether a data analysis is trust worthy.
+
+- Reproducible research focuses on the most "downstream" aspect of research dissemination.
+
+- Evidence-based data analysis will provide standardized, best practices for given scientific areas and questions.
+
+- Give reviewers and important tool, without dramatically increasing the burden on them.
+
+- More effort should be put into improving the quality of "upstream" aspects of scientific research.
+
+## Caching computations
+
+### Literate (Statistical) Programming
+
+- An article is a stream of text and code.
+
+- Analysis code is divided into text and code "chunks".
+
+- Each code chunk loads data and computes results.
+
+- Presentation code formats results (tables,figures, etc).
+
+- Article text explains what is going on.
+
+- Literate programs can be weaved to produce human-readable documents and tangled to produce machine-readable documents.
+
+- Literate programming is a general concept that requires;
+
+1. A documentation language (human readable).
+
+2. A programming language (machine readable).
+
+- Sweave uses LaTeX and R as the documentation and programming languages.
+
+- Sweave was developed by Friedrich Leisch (member of the R core) and is maintained by R core.
+
+- Main website: http://www.statistik.lmu.de/leisch/Sweave
+
+- Alternative to LaTex/R exists, such as HTML/R (package R2HTML) and ODF/R(package odfWeave).
+
+## Research Pipeline visited
+
+- Analytic Data > computational Results.
+
+- We focus on these two and make it available to readers.
+
+### Caching Computations
+
+- LaTeX/R(Magnus Opus;code chunk1;code chunk2)> Local/Remote(Cached computations;Database1;Database2)> PDF(Magnum Opus;Figure1;Table1)
+
+### The Cacher package for R
+
+- Add-on package for R.
+
+- Evaluates code written in files and stores intermediate results in a key-value database.
+
+- R expressions are given SHA-1 hash values so that changes can be tracked and code re-evaluated if necessary.
+
+- "Cacher package" can be built for distribution.
+
+- Others can "clone" an analysis and evaluate subsets of code or inspect data objects.
+
+## Conceptual Model
+
+- Source File > Dataset > Code > Result.
+
+### Using Cacher as an Author
+
+1. Parse the R source file; create the necessary cache directories and subdirectories.
+
+2. Cycle through each expression in the source file;
+
+- If an expression has never been evaluated, evaluate it and store any resulting R objects in the cache data base.
+
+- If a cached results exists, lazy-load the results from the cache data base and move to the next expression.
+
+- If an expression does not create any R objects(i.e. there is nothing to cache), add the expression to the list of expressions where evaluation needs to be forced.
+
+- Write out metadata for this expression to the metadata file.
+
+3. The cache package function creates a cacher package storing;
+
+- Source file.
+
+- Cached data objects.
+
+- Meta data.
+
+4. Package file is zipped and can be distributed.
+
+5. Readers can unzip the file and immediately investigate its contents via cacher package.
+
+### Using Cacher as a Reader
+
+- library(cacher)
+
+- cloneCache(id="092dcc...")
+
+- cloneCache(id="092d"), same as above. Created cache directory. Pick first four characters and you can clone the whole thing.
+
+- showFiles()
+
+- sourceFile("top20.R")
+
+### Cloning an Analysis
+
+- Local directories created.
+
+- Source code files and metadata are downloaded.
+
+- Data objects are not downloaded by default.
+
+- References to data objects are loaded and corresponding data can be laze-loaded on demand.
+
+### Examining code
+
+- code()
+
+- graphcode()
+
+### Tracing Code Backwards
+
+- objectcode("data")
+
+### Running Code
+
+- The run code function executes code in the source file.
+
+- By default, expressions that results in an object being created are not run and the resulting object is lazy-loaded into the workspace.
+
+- Expressions not resulting in objects are evaluated.
+
+### Checking Code and Objects
+
+- The checkcode function evaluates all expressions from scratch (no lazy-loading).
+
+- Results of evaluation are checked against stored results to see if the results are the same as what the author calculated.
+
+1. Setting RNG seeds is critical for this to work.
+
+- The integrity of data objects can be verified with the checkobjects function to check for possible corruption of data (i.e. in transit).
+
+### Inspecting Data Objects
+
+- loadcache()
+
+- ls()
+
+- effect
+
+- stderr
+
+### Cacher Summary
+
+- The cacher package can be used by authors to create cache packages from data analysis for distribution.
+
+- Readers can use the cacher package to inspect others data analysis by examining cached computaitons.
+
+- Cacher is mindful of readers' resources and efficiently loads only those data objects that are needed.
+
+
+
+
+
+
+
+
+
+
+

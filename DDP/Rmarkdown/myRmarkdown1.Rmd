@@ -1,0 +1,66 @@
+---
+title: "My Fancy Presentation"
+author: "David Asare Kumi"
+date: "May 31, 2019"
+output: ioslides_presentation
+---
+
+
+## My New Slide
+
+- R markdown is built into Rstudio and allows you to create documents like HTML,PDF,and word documents from R. With R markdown you can embed R code into your documents.
+
+### Why use R markdown?
+
+- Turn work in R into more accessible formats.
+
+- Incorporate R code and R plots into documents.
+
+- R markdown documents are reproducible - the source code get re-run every time a document is generated, so if data changes or source code changes, the output in the document will change with it.
+
+## Some r Code
+
+```{r,comment="",echo=TRUE}
+library(datasets)
+data(mtcars)
+head(mtcars)
+dim(mtcars)
+
+```
+
+## Scatterplot
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+plot(mtcars$wt,mtcars$mpg,xlab="Weight",ylab="MPG",col="red",cex=2,
+     pch=20,main="Scatterplot of MPG on WT")
+fit<-lm(mtcars$mpg~mtcars$wt,data=mtcars)
+abline(fit,lwd=2,lty=2,col="blue")
+
+```
+
+## Regression coefficients
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+summary(fit)$coef
+
+```
+
+## Diagnostic plots
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+par(mfrow=c(2,2))
+plot(fit)
+
+```
+
+##Publishing and Sharing R markdown documents
+
+- We publish in Rpubs.
+
+- GitHub
+
+- Dropbox
+
+- GitHub Pages
+
+- NeoCities

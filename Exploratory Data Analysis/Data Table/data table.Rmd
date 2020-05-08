@@ -1,0 +1,377 @@
+---
+title: "data.table"
+author: "David Asare Kumi"
+date: "June 13, 2019"
+output: html_document
+---
+
+
+##What is data.table::as.data.table
+
+- You can use data.table's fast and friendly file reader fread to load data directly as follows (data <-fread("data.csv")).
+
+- fread accepts https and http URLs directly as well as operating system commands such as sed and awk output. See ?fread for example.
+
+- data.table is an R package that provides an enhanced version of data frames, which are the standard data structure for storing data in base R. We already created a data.table using fread. We can also create one using data.table() function.
+
+- You can also convert existing objects to a data.table using setDT() for (dataframes and lists()) and as.data.table() for other structures. See ?setDT() and ?as.data.table for more details.
+
+##Subset rows in i
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+names(mpg)
+class(mpg)
+library(data.table)
+mpgDT <-as.data.table(mpg)
+class(mpgDT)
+#get all cars with "4" as drv and class as compact
+ans1 <-mpgDT[drv=="4" & class=="compact"]
+ans1
+
+#get all cars with "r" as drv and 1999 as year
+ans11 <-mpgDT[drv=="r" & year==1999,] #in data.table you can ignore the comma
+ans11
+
+```
+
+##Get the first five rows from your data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+mpgDT <-as.data.table(mpg)
+ans2 <-mpgDT[1:5]
+ans2
+ans22 <-mpgDT[1:5,]
+ans22
+
+```
+
+##Sort data first by column hwy in ascending order, and then by year in descending order.
+
+- We can use the R function order() to accomplish this task.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans3 <-mpgDT[order(hwy,-year)]#We can use "-" to sort in descending order.
+head(ans3,10)
+
+```
+
+##Select columns in j
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+#Select hwy column but return it as a vector
+ans4 <-mpgDT[,hwy]
+head(ans4,10)
+#Select hwy column but return it as a data.table instead
+ans44 <-mpgDT[,list(hwy)]
+head(ans44,10)
+
+```
+
+##Select several columns and return them as a data.table
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans5 <-mpgDT[,.(model,displ,year,cyl,drv,hwy)]
+head(ans5,10)
+#Alternatively
+ans55 <-mpgDT[,list(model,displ,year,cyl,drv,hwy)]
+head(ans55,10)
+
+```
+
+##Select both hwy and cyl columns and rename them to Highway and Cylinder
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans6 <-mpgDT[,.(Highway=hwy,Cylinder=cyl)]#the new name is to the left of the equal to sign
+head(ans6,10)
+#Alternatively
+ans66 <-mpgDT[,list(Highway=hwy,Cylinder=cyl)]
+head(ans66,10)
+
+```
+
+##Compute or do in j (column)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+#how many cars have had total gallons > 27
+ans7 <-mpgDT[,sum((hwy + cty)>27)]
+ans7
+#how many cars have had total gallons < 27
+ans77 <-mpgDT[,sum((hwy + cty)< 27)]
+ans77
+
+```
+
+##Subset in i and do in j
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+#calculate the average hwy and cty gallons for all drv=4 for the year 1999
+ans8 <-mpgDT[drv=="4"& year==1999,.(ave_hwy=mean(hwy),ave_cty=mean(cty))]
+ans8
+#calculate the average hwy and cty gallons for all cyl=8 for the year 2008
+ans88 <-mpgDT[cyl=="8"& year==2008,.(ave_hwy=mean(hwy),ave_cty=mean(cty))]
+ans88
+
+```
+
+##Special Symbol .N
+
+- It simply returns the number of rows in the subset.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans9 <-mpgDT[cyl=="8" & year==2008,.N]
+ans9
+
+```
+
+##How can I refer to columns by names in j (like in a data.frame?)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+#select hwy and cty columns in the data.frame way
+ans10 <-mpgDT[,c("hwy","cty")]
+head(ans10)
+
+```
+
+##Select columns named in a variable using the .. prefix
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+select_cols <-c("hwy","cty")
+ans11 <-mpgDT[,..select_cols]
+head(ans11,10)
+
+#select columns named in a variable using with=FALSE
+ans12 <-mpgDT[,select_cols,with=FALSE]
+head(ans12)
+
+```
+
+##We can deselect columns using "-" or !
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans13 <-mpgDT[,!c("hwy","cty")]
+head(ans13)
+ans14 <-mpgDT[,-c("hwy","cty")]
+head(ans14)
+
+```
+
+##Select and deselect range of columns
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+#select range of columns
+ans15 <-mpgDT[,cyl:hwy]
+head(ans15)
+#deselect range of columns
+ans16 <-mpgDT[,-(cyl:hwy)]
+head(ans16)
+ans17 <-mpgDT[,!(cyl:hwy)]
+head(ans17)
+
+```
+
+##Aggregations
+
+###Grouping using by
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans18 <-mpgDT[,.(.N),by=.(year)]
+ans18
+#alternatively
+ans19 <-mpgDT[,.(.N),by="cyl"]
+ans19
+ans20 <-mpgDT[,.N,by=year]
+ans20
+
+```
+
+##How can we calculate the number of cars for each year for manufacturer "audi"
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans21 <-mpgDT[manufacturer=="audi",.N,by=year]
+ans21
+##substitute year with cyl
+ans22 <-mpgDT[manufacturer=="audi",.N,by=cyl]
+ans22
+#extension of conditions
+ans23 <-mpgDT[manufacturer=="dodge",.N,by=.(year,cyl)]
+ans23
+#averages
+ans24 <-mpgDT[manufacturer=="dodge",.(ave_hwy=mean(hwy),ave_cty=mean(cty)),by=.(year,cyl,drv)]
+ans24
+
+```
+
+##sort by: keyby
+
+- Actually keyby does a little more than just ordering. It also sets a key after ordering by setting an attribute called sorted.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans25 <-mpgDT[manufacturer=="dodge",.(ave_hwy=mean(hwy),ave_cty=mean(cty)),keyby=.(year,cyl,drv)]
+ans25
+
+```
+
+##Chaining
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans26 <-mpgDT[manufacturer=="dodge",.N,by=.(hwy,cty)][order(hwy,-cty)]
+head(ans26,10)
+
+```
+
+##Expressions in by
+
+- Can by accept expressions as well or does it just take columns?
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans27 <-mpgDT[,.N,by=.(hwy>23,cty>16)]
+ans27
+
+```
+
+##Special symbol .SD
+
+- .SD stands for subset of data. It's by itself a data.table that holds the data for the current group defined using by.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans28 <-mpgDT[,print(.SD),by=drv]
+ans28
+#To compute on multiple columns, we can use the lapply() function
+ans29 <-mpgDT[,lapply(.SD,mean)]
+ans29
+
+```
+
+##Specify just the columns that we would like to compute the mean() on
+
+- .SDcols accepts either column names or column indices. For e.g. .SDcols=c("arr_delay","dep_delay") ensures that .SD contains only these two columns for each group.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans30 <-mpgDT[manufacturer=="dodge",lapply(.SD,mean),by=.(cyl,drv,year),.SDcols=c("hwy","cty")]
+ans30
+
+```
+
+##Subset .SD for each group
+
+- How can we return the first 2 rows for each year?
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans31 <-mpgDT[,head(.SD,2),by=year]
+head(ans31)
+
+```
+
+##How can we concatenate columns a and b for each group in cyl?
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+ans32 <-mpgDT[,.(val=c(hwy,cty)),by=year]
+ans32
+#return value as a list column
+ans33 <-mpgDT[,.(val=list(c(hwy,cty))),by=cyl]
+ans33
+
+```
+
+##rbind and cbind
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+sport <-c("Hockey","Baseball","Football")
+league <-c("NHL","MLB","NFL")
+trophy <-c("Stanley Cup","Commissioner's Trophy","Vince Lombardi Trophy")
+trophies1 <-cbind(sport,league,trophy)
+trophies1
+trophies2 <-data.frame(sport=c("Basket Ball","Golf"),league=c("NBA","PGA"),trophy=c("Larry Obrian Championship Trophy","Wanamaker Trophy"),stringsAsFactors=FALSE)
+#combine them into one data.frame with rbind
+trophies <-rbind(trophies1,trophies2)
+trophies
+
+```
+
+##Merge data.table
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+data(mpg)
+library(data.table)
+d1 <-mpgDT[,c("hwy","cty")]
+head(d1)
+d2 <-mpgDT[,c("displ","year")]
+head(d2)
+ans34 <-cbind(d1,d2)
+ans34
+#change data.table to data.frame
+d1 <-as.data.frame(d1)
+d2 <-as.data.frame(d2)
+ans35 <-merge(d1,d2)
+dim(ans35)
+head(ans35)
+#check the literature on merge. There is no common column name for the two sets of data
+
+```

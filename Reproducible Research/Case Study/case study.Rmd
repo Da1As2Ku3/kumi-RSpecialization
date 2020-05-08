@@ -1,0 +1,206 @@
+---
+title: "Case Study"
+author: "David Asare Kumi"
+date: "9/6/2019"
+output: html_document
+---
+
+
+## Case Study: Air Pollution
+
+### What causes PM to be Toxic?
+
+- PM is composed of many different chemical elements.
+
+- Some components of PM may be more harmful than others.
+
+- Some sources of PM may be more dangerous than others.
+
+- Identifying harmful chemical constituents may lead us to  strategies for controlling sources of PM.
+
+### NMMAPS
+
+- The National Morbidity,Mortality and Air Pollution Study (NMMAPS) was a national study of the short-term health effects of ambient air pollution.
+
+- Focused primarily on particulate matter (PM10) and Ozone (03).
+
+- Health outcomes included mortality from all causes and hospitalizations for cardiovascular and respiratory diseases.
+
+- Key publications;
+
+1. http://www.ncbi.nlm.nih.gov/pubmed/11098531
+
+2. http://www.ncbi.nlm.nih.gov/pubmed/11354823
+
+- Funded by the Health Efffects Institute;
+
+1. Roger Peng currently serves on the Health Effects Institute Health Review Committee.
+
+### NMMAPS and Reproducibility
+
+- Data made available at the Internet-based Health and Air Pollution Surveillance System (http://www.ihapss.jhsph.edu).
+
+- Research results and software also available at iHAPSS.
+
+- Many studies (over 67 publihed) have been conducted based on the public data http://www.ncbi.nlm.nih.gov/pubmed/22475833
+
+- Has served as an important test bed for methodological development.
+
+### What Causes Particulate Matter to be Toxic?
+
+- Cardiovascular Effects of Nickel in Ambient Air http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1665439/
+
+- Lippman et al. found strong evidence that Ni modified the short-term effect of PM10  across 60 US communities.
+
+- No Other PM chemical constituent seemed to have the same modifying effect.
+
+- Too simple to be true?
+
+### A Re-analysis of the Lippman et al. Study
+
+- http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2137127/
+
+- Re-examine the data from NMMAPS and link with PM chemical constituent data.
+
+- Are the findings sensitive to levels of Nickel in New York City?
+
+- Long term average nickel concentrations appear correlated with PM risk.
+
+- There appear to be some outliers on the right hand side (New York City).
+
+- Regression line statistically significant (p < 0.01).
+
+### Does Nickel make PM Toxic?
+
+- Adjusted regression line (dashed) no longer statistically significant (p < 0.31). The outliers in New York City were removed.
+
+### What have we learned?
+
+- New YorK does have very high levels of Nickel and venadium, much higher than any other US community.
+
+- There is evidence of a positive relationship between Ni concentrations and PM10 risk.
+
+- The strength of this relationship is highly sensitive to the observations from New York City.
+
+- Most of the information in the data is derived from just 3 observations.
+
+### Lessons Learned
+
+- Reproducibility of NMMAPS allowed for a secondary analysis (and linking with PM chemical constituent data) investigating a novel hypothesis (Lippman et al.).
+
+- Reproducibility also allowed for a critique of that new analysis and some additional new analysis (Dominic et al.).
+
+- Original hypothesis not necessarily invalidated, but evidence not as strong as originally suggested (more work should be done).
+
+- Reproducibility allows for the scientific discussion to occur in a timely and informed manner.
+
+- This is how science works.
+
+## Peer-graded Assignment: Course Project 2
+
+### Data
+
+- Comma separated-value compressed via the bzip2 algorithm.
+
+### Document Layout
+
+- Language - English.
+
+- Title: Your document should have title that briefly summarizes your data analysis.
+
+- Synopsis: Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
+
+- There should be a section titled Data Processing:
+
+1. Describe in words and code how data were loaded into R and processed for analysis.
+
+2. Analysis must start from the raw CSV file containing the data.
+
+3. You cannot do any preprocessing outside the document.
+
+4. If preprocessing is time consuming, you may consider using cache=TRUE, option for certain code chunks.
+
+- There should be a section titled results in which your results are presented.
+
+- You may have other sections in your analysis, but Data Processing and Results are required.
+
+- The analysis document must have at least one figure containing a plot.
+
+- Your analysis must have no more than three figures . Figures may have multiple plots in them (i.e. panel plots).
+
+- You must show all your code for the work in your Analysis document. You should ensure that echo=TRUE for every code chunk(this is the default setting in knitr).
+
+### Publishing Your Analysis
+
+1. Publish your analysis on RPubs.com
+
+2. If you do not have an account, create a new account.
+
+3. After you have completed writing your analysis in RStudio, you can publish it to RPubs by doing the following:
+
+- In RStudio, make sure your Rmarkdown document(.Rmd) document is loaded in the editor.
+
+- Click knit HTML button in the doc toolbar to preview your document.
+
+- In the preview window click the publish button.
+
+- Once your document is published to Rpubs, you should get a unique URL to that document. Make a note of this URL as you will need it to submit your assignment.
+
+### Submitting Your Assignment
+
+- In order to submit this assignment, you must copy the RPubs URL for your completed data analysis document in to the peer assessment question.
+
+### Rpubs
+
+- Name: David Asare Kumi.
+
+- Email: krimeirie@gmail.com
+
+- Username: Da_As_Kumi
+
+- Password: dakk$$71
+
+- [URL: https://rpubs.com/Da_As_Kumi]
+
+### A synopsis
+
+- "A synopsis conveys the narrative arc, an explanation of the problem or plot, the characters, and how the book or novel ends. It summarises what happens and who changes from beginning to end of the story".
+
+### Sample synopsis
+
+- Title:
+
+- Team:
+
+- Project Leader: David Asare Kumi
+
+- Team Members: Coursera Mates
+
+- Address for correspondence: krimeirie@gmail.com/Rpubs
+
+- Phone: 
+
+- email: krimeirie@gmail.com
+
+### How to unzip a bzip2 file (algorithm)
+
+- fileUrl <-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+
+- download.file(fileUrl,destfile=paste0("/Users/Kumi/Desktop",'/repdata%2Fdata%2FStormData.csv.bz2'))
+
+- StormDF <-read.csv("/Users/Kumi/Desktop/repdata%2Fdata%2FStormData.csv.bz2")
+
+### Converting dataframe to data.table
+
+- StormDT <-as.data.table(StormDF)
+
+### Check the data
+
+- dim(StormDT)
+
+- glimpse(StormDT)
+
+- names(StormDT)
+
+
+

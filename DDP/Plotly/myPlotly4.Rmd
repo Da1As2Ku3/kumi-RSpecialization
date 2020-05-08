@@ -1,0 +1,37 @@
+---
+title: "myPlotly4"
+author: "David Asare Kumi"
+date: "May 31, 2019"
+output: html_document
+---
+
+
+## Heatmap
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(plotly)
+terrain1<-matrix(rnorm(100*100),nrow=100,ncol=100)
+plot_ly(z=terrain1,type="heatmap")
+
+```
+
+## 3D Surface(movable 3D surfaces with type="surface")
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(100)
+terrain2<-matrix(sort(rnorm(100*100)),nrow=100,ncol=100)
+plot_ly(z=terrain2,type="surface")
+
+```
+
+## GGPlot and Plotly
+
+```{r,echo=TRUE,message=TRUE,warning=TRUE,comment=""}
+set.seed(100)
+d<-diamonds[sample(nrow(diamonds),1000),]
+p<-ggplot(data=d,aes(x=carat,y=price))+geom_point(aes(text=paste("Clarity:",clarity)),size=4)+
+  geom_smooth(aes(color=cut,fill=cut))+facet_wrap(~cut)
+gg<-ggplotly(p)
+gg
+
+```

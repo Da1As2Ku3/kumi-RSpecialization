@@ -1,0 +1,110 @@
+---
+title: "Color in R Plots"
+author: "David Asare Kumi"
+date: "June 12, 2019"
+output: html_document
+---
+
+
+##Part 1
+
+###Plotting and color
+
+- There are functions in R and in external packages that are very handy.
+
+1. color 1 is Black.
+
+2. color 2 is Red.
+
+3. color 3 is Green.
+
+
+- Default Image Plots in R from volcanoes.
+
+1. heat.colors()
+
+2. topo.colors()
+
+- The grDevices package has two functions.
+
+1. colorRamp.
+
+2. colorRampPalette.
+
+- The function colors() lists the names of colors you can use in any plotting function.
+
+
+##colorRamp
+
+There are 256 total numbers that you can specify for each color. colorRamp take a palette of colors and return a function that takes values between 0 and 1, indicating the extremes of the color palette (e.g see the "gray" function).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+pal <-colorRamp(c("red","blue"))
+pal(0)
+pal(1)
+pal(0.5)
+pal(seq(0,1,len=10))
+
+```
+
+##colorRampPalette
+
+colorRampPalette takes a palette of colors and return a function that takes integer arguments and returns a vector of colors interpolating the palette (like heat.colors or topo.colors).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+pal <-colorRampPalette(c("red","yellow"))
+pal(2) #hexadecimal
+
+```
+
+##There are 3 types of palettes
+
+- Sequencial - for ordered data.
+
+- Diverging - data that can deviate.
+
+- Qualitative - data that are not ordered (factors,categorical)
+
+##RColorBrewer and colorRampPalette
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(RColorBrewer)
+cols <-brewer.pal(3,"BuGn")
+cols
+
+pal <-colorRampPalette(cols)
+
+image(volcano,col=pal(20))
+
+```
+
+##The Smooth Scatter function
+
+Another function that uses the color brewer palette is the smooth scatter function. This is useful for plotting (scatter) of a lot of different points.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+x <-rnorm(10000)
+y <-rnorm(10000)
+smoothScatter(x,y) #The default color is the blues
+
+```
+
+##Some other Plotting Notes
+
+- The rgb function can be used to produce any color via red,green,blue proportions.
+
+- Color transparency can be added via the alpha parameter to rgb.
+
+- The colorspace package can be used for a different control over colors.
+
+##Scatterplot with no transparency and Scatterplot with transparency
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+x <-rnorm(10000)
+y <-rnorm(10000)
+plot(x,y,pch=20)
+
+#Scatterplot with transparency
+plot(x,y,col=rgb(0,0,0,alpha=0.2),pch=20)
+
+```

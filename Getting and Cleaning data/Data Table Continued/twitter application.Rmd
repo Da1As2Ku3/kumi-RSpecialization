@@ -1,0 +1,553 @@
+---
+title: "Twitter Application"
+author: "David Asare Kumi"
+date: "9/16/2019"
+output: html_document
+---
+
+
+## How to create a twitter application
+
+1. Visit the twitter developers site.
+
+2. Sign in with your twitter account.
+
+3. Go to "My Applications".
+
+4. Create a new application.
+
+5. Fill in your application details.
+
+6. Create your Access Token.
+
+7. Choose what access type you need.
+
+8. Make a note of your OAuth settings.
+
+- Test app for my assignment: app ID 15872807
+
+## Generating Access Tokens
+
+- Steps to generate access token for an existing app:
+
+1. Log in to the developers portal on this site(must have applied or have been approved) or apps.twitter.com using your Twitter credentials.
+
+2. Open the Twitter app for which you would like to generate access tokens.
+
+3. Navigate to the keys and Token page.
+
+4. Select create under the Access token and access token secret section.
+
+### Next Steps
+
+- Apply for a developer account.
+
+- Learn more about the developer portal.
+
+- Start with the OAuth basics.
+
+- Generate a bearer token for application authentication (app-only auth).
+
+- Securing keys and Access Tokens.
+
+- To use the oauth_app() function, load the httr package i.e. library(httr).
+
+### Consumer key(API key)
+
+- B9val0EJJDg0rwMfiSMFDdTaz.
+
+### Owner ID
+
+- [1045012231275065344].
+
+### Consumer Secret(API Secret)
+
+- 6VwUmP67SCZkMcK7BO1XOU9lgqPFLPOO78GwbOGloWgSjfhQ9n.
+
+### Access Token
+
+- Your Access Token can be used to make API requests on your own account's behalf.
+
+- 1045012231275065344-f6yufmFgXhwGysDhGQyb8hJRMkzh6G.
+
+### Access Token Secret
+
+- g7nxa9olOLbLDuz0ulT4O3f7yDUdZH9jlarGLthw7h8U4.
+
+- https://aps.twitter.com/app/15872807/keys
+
+## Installing the RMySQL source package
+
+1. Download RTools from here https://cloud.r-project.org/bin/windows/Rtools/, making sure to install the correct version for your R version. Be sure that you place the Rtools bin path in your default path so that R can invoke the compilers.
+
+2. Install a MySQL client library from http://www.mysql.com or http://dev.mysql.com
+
+3. Edit or create the file Renviron.site and add the variable MySQL_HOME which contains the location of your MySQL install. You will want to place it under the /etc directory in your R home area. If you don't know where that is, you can issue R.home() at your R prompt. You will be adding a variable named MySQL_HOME in variable = value syntax. Here is an example:
+
+- Location of Renviron.site: C:/PROGRA~1/R/R-35~1.0/etc/Renviron.site
+
+- Content is: MySQL_HOME = C:/PROGRA~1/MySQL/MYSQLS~1.0/
+
+4. Restart R and execute install.packages("RMySQL",type="source") at the R prompt. If there is a problem you can check from here: Sys.getenv("MYSQL_HOME") from the R prompt.
+
+5. If it is empty, then you may want to recheck your Renviron.site file and make sure you have named it correctly, placed it in the correct directory, named MYSQL_HOME correctly, and added the correct value to it.
+
+6. Value is in a notation called 8 dot 3 notation. You can find that value for your directory path by issuing dir/x at the windows command prompt.
+
+### How to restart R
+
+- If you are in Rstudio, command/Ctrl + Shift + F10. You can also use .rs.restartR().
+
+### How to find a version of a package in R
+
+- packageVersion("Rstudio") for example.
+
+## Installing RMySQL under Windows
+
+- Step 1: Requirements
+
+1. R software.
+
+2. RTools(compiling environment for windows).
+
+3. MySQL server (usually the community edition, including the C-connectors).
+
+- Step 2
+
+1. I assume that you already have an installed R and the MySQL server. The next step is to install RTools. Set up RTools.
+
+- RTools set (check the box).
+
+- Cygwin DLLs (check the box).
+
+- R 2.15.x+ toolchain then click Next.
+
+2. The next window is really awkward. Just leave the two boxes checked and move on to the next step.
+
+- %SYSTEM ROOT% (check the box) and then click next.
+
+3. Editing the system path is important and tells R where the compiler is located. There should be four entries. Please be aware when updating RTools. This sometimes causes double entries (can be deleted).
+
+4. System Path(Edit the path leaving RTools\bin first). C:\RTOOLS\BIN; C:\RTOOLS\GCC-4.6.3\BIN;...C:\RTOOLS\MINGW\BIN; C:\RTOOLS\MINGW64\BIN; then click Next.
+
+- Step 3: Tell windows and R where the MySQL-libraries are;
+
+1. RMySQL needs the libmysql.dll to compile successfully. The file should be stored in lib-Folder of your MySQL installation. Usually the path should be C:\ProgramFiles\MySQL\MySQL server 5.5\lib.
+
+2. The problem is that RMySQL expects it to be stored in the bin-Folder(usually C:\ProgramFiles\MySQL\MYSQL server 5.5\bin). So you have to copy it by hand. This step is essential for successful compiling:
+
+3. Telling R where to find the libraries can be done by "three different options":
+
+- Command line, environment file(.Renviron) or environment variables. Using command line options must be passed to R at every start which makes it complicated to use IDEs like Rstudio.
+
+- Using the environment file is easier but you have to copy it into every new installation/update of R (which also requires writing rights). I suggest using environment variables as this causes no problems/extra work especially when updating  R.
+
+- Your environment variables are located under Control Panel--> User Accounts--> change my environment variables. My environment variables look like this(the window is in German as you might have noticed). Now you can add a new variable called MYSQL_Files\MySQL\MySQL Server 5.5\
+The last backslash should be added to avoid compiling errors(if this does not help,please try to use forward slashes instead of backslashes). e.g. C:/Program Files/MySQL/MySQL Server 5.5/
+
+- My installed packages are located at C:\myRLib using the variable R_LIBS(this is optional).
+
+- Variable
+
+- MYSQL_HOME C:\Program Files\MySQL\MySQL Server 5.5\
+
+- R_LIBS C:\myRLib then click OK.
+
+- Step 4: Compiling. Now restart R if you have already opened it and install RMySQL from source. install.packages("RMySQL",type="source"). Your output should look like this. I truncated all warnings which could usually be ignored.
+
+- Now you can load your new packages and access your local MySQL Server.
+
+- library(RMySQL)
+
+- con<-dbConnect(MySQL(),host="127.0.0.1",port=3306,user="user",password="password",dbname="db")
+
+## How do I set environment variables
+
+- Environment variables can be for Rgui.exe and Rterm.exe in three different ways.
+
+1. Command line: On the command line as name=value pairs. For example in the short cut to Rgui you could have "path_to_R\bin\x64\Rgui.exe". HOME=p:/R_LIBS=p:/myRlib
+
+2. In an environment file.Renviron in the working directory or in your home directory, for example containing the line R_LIBS=p:/myRlib. See ?startup for more details of environment files.
+
+3. For all applications via windows. How you set an environment variable is system-specific: Under recent versions of windows, go to User Accounts in the control panel, and select your account and then change the environment variables. The order of precedence for environment variables is the order in which these options are listed, that is the command line then Renviron then the inherited environment.
+
+## MySQL Server
+
+- C:\Program Files(x86)\MySQL\MySQL Server 8.0\
+
+### Test App
+
+1. Client ID: 35ad52f3694adf52521b.
+
+2. Client Secret: 7894e202865a6e9816470449ca3c59333fe57368.
+
+3. Personal access Token: d12eb34baac7b2ac48d1a8965f7f3913df582ec5.
+
+## How to read into R data with a fixed file format
+
+1. x <- read.fwf(file="http://......for",skip=4,widths=c(12,7,4,9,4,9,4,9,4)). Here we use the utils package in R.
+
+2. Call library(readr) which means you have already installed readr then proceed with 1 above.
+
+## Subsetting and Sorting
+
+### Subsetting - quick review
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+set.seed(13435)
+x <-data.frame("var1"=sample(1:5),"var2"=sample(6:10),"var3"=sample(11:15))
+x
+x <-x[sample(1:5),];x$var2[c(1,3)]=NA
+x
+x[,1] #subset the first column
+x[1:2,"var2"] #first two rows of x and the second column of x
+
+```
+
+### Logicals ands and ors
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x[(x$var1 <=3 & x$var3 > 11),]
+x[(x$var1 <= 3 | x$var3 > 15),]
+
+```
+
+### Dealing with missing values
+
+- Subsetting with NAs will not produce the actual rows so we use the which command. Note that the which command does not return the NA.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x[which(x$var2 > 8),]
+
+```
+
+### Sorting (By default it sorts in an increasing /ascending order)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+sort(x$var1)
+sort(x$var1,decreasing=TRUE) #decreasing equal true sorts in decreasing order
+sort(x$var2,na.last=TRUE) #na.last equals true places the NAs at the tail end
+
+```
+
+### Ordering
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x[order(x$var1),] #Here we are sorting all the rows by var1
+
+```
+
+### Ordering - multiple variables
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x[order(x$var1),]
+x[order(x$var1,x$var3),]
+
+```
+
+### Ordering with plyr (default increasing)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(plyr)
+arrange(x,var1)
+arrange(x,desc(var1))
+
+```
+
+### Adding rows and columns
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x$var4 <-rnorm(5)
+x
+
+```
+
+- The number of rows in the new variable var4 must be equal to the number of rows in the data frame or the original dataset.
+
+- You can do this by using cbind function.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+Y <-cbind(x,rnorm(5)) # Note that the new column will be on the R.H.S of x
+Y
+# If you put it on the L.H.S of x, then the column will be on the L.H.S of x
+Y <-cbind(rnorm(5),x)
+Y
+Y <-rbind(x,rnorm(5)) #bind at the bottom of the dataframe
+Y
+Y <-rbind(rnorm(5),x) #bind at the top of the dataframe
+Y
+
+```
+
+## Notes and Further Resources
+
+- R programming in the Data Science Track.
+
+- Andrew Jaffe's lecture notes; http://www.biostat.jhsph.edu/~ajaffe/lec_winterR/Lecture%202.pdf
+
+
+## Summarizing Data
+
+### Example - Data of restaurant in Baltimore
+
+### Getting the data from the web
+
+1. if(!file.exists("./data")){dir.create("./data")}
+
+2. fileUrl <-"https://data.baltimorecity.gov/api/views/k5ry-ef3g/rows.csv?accessType=DOWNLOAD"
+
+3. download.file(fileUrl,destfile="./data/restaurants.csv",method="curl"). For windows don't use curl.
+
+4. restData <-read.csv("./data/restaurants.csv")
+
+### Look at a bit of the data
+
+1. head(restData,3). By default you get the top 6 rows.
+
+2. tail(restData,n=3). This gives the bottom 3 rows.
+
+### Make summary
+
+1. summary(restData).
+
+2. For factor text based variables, summary gives the count of each factor.
+
+### Mpre indepth information
+
+1. str(restData) gives you the structure or information about the dataframe.
+
+2. dim(restData) gives you the dimensions in terms of total rows and total columns of the data.
+
+3. classes(restData) gives you the classes of the dataframe.
+
+### Quantiles of quantitative variables
+
+1. quantile(restData$councilDistrict,na.rm=TRUE)
+
+2. quantile(restData$councilDistrict,probs=c(0.5,0.75,0.90))
+
+### Make Table
+
+1. table(restData$zipCode,useNA="ifany").
+
+2. useNA=if any; if there are missing values there will be an added column telling you the number of missing values.
+
+### Two dimensional table
+
+1. table(restData$councilDistrict,restData$zipCode)
+
+### Check for Missing Values
+
+1. sum(is.na(restData$councilDistrict))
+
+2. any(is.na(restData$councilDistrict))
+
+3. all(restData > 0) is not advisable because of factors.
+
+4. all(restData$zipCode > 0) applies to quantitative variables.
+
+5. sum(restData$zipCode < 0)
+
+### Row and Column sums
+
+1. colSums(is.na(restData))
+
+2. all(colSums(is.na(restData))==0)
+
+### Values with Specific characteristics
+
+1. table(restData$zipCode%in%c("21212")). %in% fall into or equal to.
+
+2. table(restData$zipCode%in%c("21212","21213"))
+
+3. restData[restData$zipCode%in%c("21212","21213"),]. Here we have subsetted only the restaurants with zipcode "21212" and "21213".
+
+## Cross tabs
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+data(UCBAdmissions)
+DF <-as.data.frame(UCBAdmissions)
+summary(DF)
+xt <-xtabs(Freq~Gender+Admit,data=DF)
+xt
+
+```
+
+## Flat Tables
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+warpbreaks$replicate <-rep(1:9,len=54)
+xt <-xtabs(breaks~.,data=warpbreaks)
+xt
+# Flat tables continued (data is summarized)
+ftable(xt)
+
+```
+
+## Size of a data set
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(airquality)
+object.size(airquality)
+print(object.size(airquality),units="Mb")
+
+```
+
+## Creating New Variables
+
+### Getting the Data from the Web
+
+1. if(!file.exists("./data")){dir.create("./data")}
+
+2. fileUrl <-"http://data.baltimorecity.gov/api/views/k5ry-ef3g/rows.csv?accessType=DOWNLOAD"
+
+3. download.file(fileUrl,destfile="./data/restaurants.csv",method="curl")
+
+4. restData <-read.csv("./data/restaurants.csv")
+
+### Why create new variables?
+
+- Often the raw data won't have a value you are looking for.
+
+- You will need to transform the data to get the values you would like.
+
+- Usually, you will add those values to the data frames you are working with.
+
+- Common variables to create;
+
+1. Missingness indicators.
+
+2. "Cutting up" quantitative variables.
+
+3. Applying transform.
+
+### Creating Sequences (used to index)
+
+- Sometimes you need an index for your data set.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+s1 <-seq(1,10,by=2)
+s1
+s2 <-seq(1,10,length=3)
+s2
+x <-c(1,3,8,25,100)
+seq(along=x)
+
+```
+
+## Subsetting Variables
+
+- restData$nearMe <-restData$neighbourhood%in%c("Roland Park","Homeland").
+
+- table(restData$nearMe).
+
+### Creating binary variables
+
+- restData$zipWrong <-ifelse(restData$zipCode < 0,TRUE,FALSE).
+
+- table(restData$zipWrong,restData$zipCode < 0).
+
+### Creating Categorical Variables
+
+- restData$zipGroups <-cut(restData$zipCode,breaks=quantile(restData$zipCode)).
+
+- table(restData$zipGroups).
+
+- table(restData$zipGroups,restData$zipCode).
+
+- Apply cut to quantitative variables.
+
+### Easier Cutting
+
+- library(Hmisc).
+
+- restData$zipGroups <-cut2(restData$zipCode,g=4).
+
+- table(restData$zipGroups).
+
+### Creating factor variables
+
+- restData$zcf <-factor(restData$zipCode).
+
+- restData$zcf[1:10].
+
+- class(restData$zcf).
+
+### Levels of factor variables
+
+- yesno <-sample(c("yes","no"),size=10,replace=TRUE).
+
+- yesnofac <-factor(yesno,levels=c("yes","no")).
+
+- relevel(yesnofac,ref="yes").
+
+- as.numeric(yesnofac) changes the factor variable to numeric variable.
+
+### Cutting produces factor variables
+
+- library(Hmisc).
+
+- restData$zipGroups <-cut2(restData$zipCode,g=4).
+
+- table(restData$zipGroups).
+
+### Using the mutate function
+
+- library(Hmisc).
+
+- library(plyr).
+
+- restData2 <-mutate(restData,zipGroups=cut2(zipCode,g=4)).
+
+- table(restData2$zipGroups).
+
+### Common Transforms
+
+- abs(x) absolute value.
+
+- sqrt(x) square root.
+
+- ceiling(x). ceiling(3.475) is 4.
+
+- floor(x). floor(3.475) is 3.
+
+- round(x,digits=n). round(3.475,digits=2) is 3.48.
+
+- signif(x,digits=n). signif(3.475,digits=2) is 3.5.
+
+- cos(x), sin(x) etc trigonometry functions.
+
+- log(x) natural logarithm.
+
+- log2(x), log10(x) other common logs.
+
+- exp(x) exponentiating x.
+
+### Further Resources
+
+1. http://www.biostat.jhsph.edu/~ajaffe/lec_winterR/Lecture%202.pdf
+
+2. http://statmethods.net/management/functions.html
+
+### Notes and Further Reading
+
+- A tutorial from the developer of plyr - http://plyr.had.co.nz/09-user/
+
+- Andrew Jaffe's R notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

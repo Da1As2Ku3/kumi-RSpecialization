@@ -1,0 +1,564 @@
+---
+title: "Prediction Motivation"
+author: "David Asare Kumi"
+date: "July 2, 2019"
+output: html_document
+---
+
+
+##About this course
+
+- This course covers the basic ideas behind machine learning/prediction.
+
+1. Study design; training versus test sets.
+
+2. Conceptual issues; out of sample error, ROC curves.
+
+3. Practical implementation; the caret package.
+
+- What this course depends on.
+
+1. The data scientist's toolbox.
+
+2. R programming.
+
+- What would be useful.
+
+1. Exploratory analysis.
+
+2. Reporting data and reproducible research.
+
+3. Regression models.
+
+##Who Predicts?
+
+- Local government; pension payments.
+
+- Google; whether you will click on an ad.
+
+- Amazon; what movies you will watch.
+
+- Insurance companies; what your risk of death is.
+
+- Johns Hopkins; who will succeed in their programs.
+
+##Why predict?
+
+- Glory; win awards.
+
+- Riches; prize monies on awards.
+
+- For sports; hold competitions for people to predict.
+
+- Save lives; predict to make better medical decisions to save lives.
+
+##A useful book
+
+- The Elements of Statistical Learning.
+
+##A useful package
+
+- The Caret package combines a very large number of predictors.
+
+- Place to get material; machine learning class(coursera).
+
+- Other resources can be obtained from;
+
+1. List of machine learning resources on Quora.
+
+2. List of machine learning resources from science.
+
+3. Advanced notes from MIT open courseware.
+
+4. Advanced notes from CMU.
+
+5. Kaggle; machine learning competitions.
+
+##What is prediction?
+
+- Machine learning deals with what algorithm is the best algorithm to extract data for prediction.
+
+##The Central dogma of prediction
+
+1. Probability/Sampling.
+
+2. Training set.
+
+3. Prediction function.
+
+4. Test set.
+
+##What can go wrong
+
+- The search term.
+
+- The way those terms were used.
+
+- Internet usage may change.
+
+##Components of a predictor
+
+- Question (well defined question).
+
+- Input data.
+
+- Features.
+
+- Algorithm.
+
+- Parameters.
+
+- Evaluation.
+
+- It is important to note that, the components listed above will resolve the issue of "what can go wrong".
+
+
+##SPAM Example
+
+- Question; Make it concrete. Can i use quantitative characteristics of the emails to classify them as SPAM/HAM? SPAM; emails that are bulk sent that you may not be interested in. HAM; emails that people will like to receive.
+
+- Input data; spam data set.
+
+- Features; frequency of you = 2/17 = 0.118.
+
+- So now we have quantitative characteristics that we can work with to predict.
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(kernlab)
+data(spam)
+names(spam)
+table(spam$type)
+#Let's look at the frequency of your
+plot(density(spam$your[spam$type=="nonspam"]),col="blue",main="",xlab="Frequency of Your")
+lines(density(spam$your[spam$type=="spam"]),col="red")
+#Our algorithm - find a value C where C is a constant(cutoff).If C> 0.5 it is spam.If C< 0.5 it is nonspam.
+abline(v=0.5,col="black",lwd=2)
+#Evaluation
+prediction <-ifelse(spam$your>0.5,"spam","nonspam")
+table(prediction,spam$type)/length(spam$type)
+
+```
+
+##Relative importance of steps
+
+- Question; most important.
+
+- Data; followed by collecting data.
+
+- Features; create features.
+
+- Algorithms; finally algorithm.
+
+- An important point; " The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data". John Tukey.
+
+##Features matter!
+
+1. Question.
+
+2. Input data.
+
+3. Features.
+
+4. Algorithm.
+
+5. Parameters.
+
+6. Evaluation.
+
+##Properties of good features
+
+- Lead to data compression.
+
+- Retain relevant information.
+
+- Are created based on expert application knowledge.
+
+##Common mistakes
+
+- Trying to automate feature selection.
+
+- Not paying attention to data - specific quirks.
+
+- Throwing away information unnecessarily.
+
+##Issues to consider
+
+- The best machine learning method.
+
+1. Interpretable (to understand it).
+
+2. Simple (easy to explain).
+
+3. Accurate.
+
+4. Fast (to train and test).
+
+5. Scalable; easy to apply to large datasets.
+
+##Prediction is about accuracy tradeoffs
+
+- Interpretability versus accuracy.
+
+- Speed versus accuracy.
+
+- simplicity versus accuracy.
+
+- Scalability versus accuracy.
+
+##Interpretability matters
+
+- Decision trees are very interpretable.
+
+- If statements too.
+
+- You need to understand how the features work.
+
+##Scalability matters
+
+- Accuracy is always the one that gets focused on most.
+
+- Scalability also matters because you must be able to apply your method to large datasets without any problems.
+
+##In and Out sample errors
+
+- In sample error; the error rate you get on the same data set you used to build your predictor. Sometimes called resubstitution error.
+
+- Out of sample error; the error rate you get on a new data set. Sometimes called generalization error.
+
+##Key ideas
+
+- Out of sample error is what you care about.
+
+- In sample error is less than out of sample error.
+
+- The reason is overfitting - matching your algorithm to the data you have. We test on new data.
+
+##Example; In sample error versus out of sample error
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(kernlab)
+data(spam)
+set.seed(333)
+smallSpam <-spam[sample(dim(spam)[1],size=10),]
+spamLabel <-(smallSpam$type=="spam")*1+1
+plot(smallSpam$capitalAve,col=spamLabel,main="Plot capitalAve against Index")
+#Prediction rule1 (Apply rule 1 to smallSpam)
+rule1 <-function(x){
+  prediction <-rep(NA,length(x))
+  prediction[x>2.70] <-"spam"
+  prediction[x<2.40] <-"nonspam"
+  prediction[x>=2.40 & x<=2.45] <-"spam"
+  prediction[(x>2.45 & x<=2.70)] <-"nonspam"
+  return(prediction)
+}
+table(rule1(smallSpam$capitalAve),smallSpam$type)
+#Prediction rule2 (Apply rule 2 to smallSpam)
+rule2 <-function(x){
+  prediction <-rep(NA,length(x))
+  prediction[x>2.8] <-"spam"
+  prediction[x<=2.8] <-"nonspam"
+  return(prediction)
+}
+table(rule2(smallSpam$capitalAve),smallSpam$type)
+#Apply to complete spam data
+table(rule1(spam$capitalAve),spam$type)
+table(rule2(spam$capitalAve),spam$type)
+#Look at accuracy
+#complicated rule
+sum(rule1(spam$capitalAve)==spam$type)
+#simplified rule (This rule does better than the complicated rule. The reason is overfitting)
+sum(rule2(spam$capitalAve)==spam$type)
+
+```
+
+##What's going on? Overfitting
+
+- Data have two parts; signal and noise. Find the signal and ignore the noise.
+
+- The goal of a predictor is to find signal.
+
+- You can always design a perfect in-sample predictor.
+
+- You capture both signal plus noise when you do that.
+
+- Predictor won't perform as well on new samples.
+
+- Overfitting; data captures both noise and signal.
+
+##Prediction Study Design
+
+1. Define your error rate (generic error rate).
+
+2. Split data into; Training,Testing and Validation(optional).
+
+3. On the training set pick features.
+
+- Use cross validation.
+
+4. On the training set pick prediction function.
+
+- Use cross validation.
+
+5. If no validation, apply 1 time to test set.
+
+6. If validation,
+
+- Apply to test set and refine.
+
+- Apply 1 time to validation.
+
+7. We build the model using the training data, and apply to the probe dataset.
+
+##Rules of thumb for prediction study design
+
+- If you have a large sample size;
+
+1. 60% training.
+
+2. 20% testing.
+
+3. 20% validation.
+
+- If you have a medium sample size;
+
+1. 60% training.
+
+2. 40% testing.
+
+- If you have a small sample size;
+
+1. Do cross validation.
+
+2. Report caveat of small sample size.
+
+##Some principles to remember
+
+- Set the test/validation set aside and don't look at it.
+
+- In general, randomly sample training and test.
+
+- Your dataset must reflect structure of the problem.
+
+1. If prediction evolve with time, split train/test in time chunks (called backtesting in finance).
+
+- All subsets should reflect as much diversity as possible.
+
+1. Random assignment does this.
+
+2. You can also try to balance by features but this is tricky.
+
+##Types of errors
+
+- Types of errors that you can make when you are doing a binary prediction problem i.e. when trying to predict things into 1 or 2 groups.
+
+###Basic Terms
+
+- In general, positive = identified and negative = rejected. Therefore,
+
+- True positive = correctly identified.
+
+- False positive= incorrectly identified.
+
+- True negative= correctly rejected.
+
+- False negative= incorrectly rejected.
+
+##Medical testing example
+
+- True positive; sick people correctly diagnosed as sick.
+
+- False positive; healthy people incorrectly identified as sick.
+
+- True negative; healthy people correctly identified as healthy.
+
+- False negative; sick people incorrectly identified as healthy.
+
+##Key quantities
+
+1. Sensitivity = p(positive test/disease) = True Positive (TP).
+
+2. Specificity = p(negative test/no disease) = True Negative (TN).
+
+3. Positive Predictive Value = p(disease /positive test).
+
+4. Negative Predictive Value = p(no disease/negative test).
+
+5. Accuracy = p(correct outcome) = TP + TN.
+
+##Key quantities as fractions
+
+1. Sensitivity = TP / (TP + FN).
+
+2. Specificity = TN / (TN + FP).
+
+3. Positive Predictive Value = TP / (TP + FP).
+
+4. Negative Predictive Value = TN / (TN + FN).
+
+5. Accuracy = (TP + TN) / (TP +TN + FP + FN).
+
+##For continuous data
+
+- We use the mean squared error (MSE) or root mean squared error (RMSE) for easy interpretation. This is the most common error measure for continuous data.
+
+##Common Error Measures
+
+1. Mean Squared Error (or root mean squared error)
+
+- continuous data, sensitive to outliers.
+
+2. Median absolute deviation
+
+- continuous data, often more robust.
+
+3. Sensitivity (recall)
+
+- If you want few missed positives.
+
+4. Specificity
+
+- If you want few negatives called positives.
+
+5. Accuracy
+
+- Weights false positives / negatives equally.
+
+6. Concordance
+
+- One example is Kappa.
+
+##Receiver Operating Characteristics (ROC)
+
+- ROC curves are commonly used to measure the quality of the goodness of a prediction algorithm.
+
+###Why a curve?
+
+- In binary classification, you are predicting one of two categories.
+
+1. Alive / dead.
+
+2. Click on ad / don't click.
+
+- But your predictions are often quantitative.
+
+1. Probability of being alive.
+
+2. Prediction on a scale from 1 to 10.
+
+- The cutoff you choose gives different results.
+
+- 1- Specificity = Sensitivity.
+
+- The ROC curve tells you about the tradeoffs.
+
+- You can also look at the area under the curve to determine a better prediction algorithm.
+
+1. Area = 0.5 bad.
+
+2. Area < 0.5 worse.
+
+- The higher the area, the better the predictor is.
+
+##Area under the curve (AUC)
+
+- AUC = 0.5; random guessing.
+
+- AUC = 1; perfect classifier.
+
+- In general, AUC of above 0.8 is considered good.
+
+###What is good?
+
+- AUC = 1; perfect classifier i.e. perfect specificity and perfect sensitivity.
+
+- 45 degree line ; specificity = sensitivity.
+
+- Perfect classifier = 1 - specificity.
+
+##Cross Validation
+
+###Study Design
+
+1. Data set.
+
+2. Training data.
+
+3. Test data.
+
+- You apply what ever you get from the training set to the test set.
+
+###Key Idea
+
+1. Accuracy on the training set (resubstitution accuracy) is optimistic.
+
+2. A better estimate comes from an independent set (test set accuracy).
+
+3. But we can't use the test set when building the model or it becomes part of the training set.
+
+4. So we estimate the test set accuracy with the training set.
+
+###Cross Validation (Approach)
+
+1. Use the training set.
+
+2. Split it into training/test sets.
+
+3. Build a model on the training set.
+
+4. Evaluate on the test.
+
+5. Repeat and average the estimated errors.
+
+###Used for
+
+1. Picking variables to include in a model.
+
+2. Picking the type of prediction function to use.
+
+3. Picking the parameters in the prediction function.
+
+4. Comparing different predictors.
+
+- The different ways people can use training and test set is by;
+
+1. Random subsampling; Do it over and over again and then average the errors.
+
+2. K-folds; Another way is by K - folds.
+
+3. Leave one out; Another approach is leave one out (LOO) cross validation.
+
+###Considerations
+
+- For time series data, data must be used in "chunks".
+
+- For k-fold cross validation; large k = less bias,more variance and small k = more bias, less variance.
+
+- Random sampling must be done without replacement.
+
+- Random sampling with replacement is the bootstrap;
+
+1. Underestimates of the error.
+
+2. Can be corrected, but it is complicated.
+
+- If you cross validate to pick predictors estimate, you must estimate errors on independent data.
+
+###What data should you use
+
+- Use like data to predict like.
+
+- Weighting the data.
+
+###Key idea
+
+1. To predict X use data related to X.
+
+2. To predict player performance, use data about player.
+
+3. To predict movie preferences, use data about movie preferences.
+
+4. To predict hospitalizations, use data about hospitalizations.
+
+
+

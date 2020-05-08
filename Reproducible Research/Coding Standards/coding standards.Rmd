@@ -1,0 +1,707 @@
+---
+title: "Coding Standards in R"
+author: "David Asare Kumi"
+date: "9/2/2019"
+output: html_document
+---
+
+
+## Coding Standards in R
+
+- Useful
+
+1. Help you make your code readable.
+
+2. Allow you and other people understand what's going on.
+
+- Principles; always write your code in R using;
+
+1. Always use text files/test editor; This can be read by any basic editor. Every one can access the code when its a text.
+
+- Indent your code; This is the idea that different blocks of codes should be spaced to the right a little bit more than others so that you can see how the codes flow.
+
+- Limiting the width of your codes (80 columns?) i.e. a recommendation.
+
+- The editor in Rstudio is a text editor. To change indenting scheme;
+
+1. go to preferences menu
+
+2. go to code editing - change to 4(tab width).
+
+3. margin column is set at 80 select all with command A and then command i. The structure of the program is much more obvious.
+
+4. For indenting choose between 4 to 8 spaces. This prevents you from making basic mistakes. Indenting also makes your code readable.
+
+- Limit the length of your (individual) functions.
+
+1. limit it to one basic activity (function).
+
+## Advantage
+
+- Write your function on a page.
+
+- Here you can use traceback, profiler more efficiently.
+
+- Helps in debugging.
+
+- Limiting the size of your function makes it readable.
+
+## Markdown
+
+- Useful for;
+
+1. Creating documents.
+
+2. Easy to integrate with R code and other languages.
+
+## What is Markdown?
+
+- Markdown is a text-to-HTML conversion tool for web writers. Markdown allows you to write using an easy-to-read, easy-to-write plain text format, then convert it to structurally valid XHTML (or HTML).
+
+- John Gruber is the creator of Markdown.
+
+## Markdown Syntax
+
+- Italics; *This text will appear italicized!*
+
+- Bold; **This text will appear bold!**
+
+## Headings
+
+- Secondary heading; ## This is a secondary heading.
+
+- Tertiary heading; ### This is a tertiary heading.
+
+- Primary heading; # The single harsh is the primary heading.
+
+## Create Simple Unordered Lists
+
+- first item in list.
+
+- second item in list.
+
+- third item in list.
+
+## Ordered Lists
+
+1. first item in list.
+
+2. second item in list.
+
+3. third item in list.
+
+## Links
+
+- There are two ways to create links.
+
+1. [Johns Hopkins Blomberg School of Public Health](http://www.jhsph.edu/)
+
+[DownloadR](http://www.r-project.org/)
+
+[RStudio](http://www.rstudio.com/)
+
+2. Another way to create a link. Advanced linking. I spend so much time reading [Rbloggers][1] and [Simply Statistics][2]!
+
+[1]: http://www.r-bloggers.com/"Rbloggers"
+
+[2]: http://simplystatistics.org/"Simply Statistics"
+
+- This type of linking makes your text a little bit cleaner to read and easier to read.
+
+## New Lines
+
+- New lines require a double space after the end of a line.
+
+- First line  Second line.
+
+## Markdown Resources
+
+- The Official Markdown Documentation.
+
+- Github's Markdown Guide.
+
+## R Markdown
+
+- The idea is that we want to have R language integrated with a markdown language.
+
+## What is Markdown?
+
+- Created by John Gruber and Aaron Swartz.
+
+- A simplified version of "markup" languages.
+
+- Allows one to focus on writing as opposed to formatting.
+
+- Simple/minimal intuitive formatting elements.
+
+- Easily converted to valid HTML (and other formats) using existing tools.
+
+- Complete information is available at http://daringfireball.net/projects/markdown/
+
+- Some background information at http://daringfireball.net/2004/03/dive_into_markdown
+
+
+## What is RMarkdown?
+
+- R markdown is the integration of R code with markdown.
+
+- Allows one to create document containing "live" R code.
+
+- R code is evaluated as part of the processing of the markdown.
+
+- Results from R code are inserted into markdown document.
+
+- A core tool in literate statistical programming.
+
+- R markdown has .rmd extension.
+
+- R markdown can be converted to standard markdown using the knitr package in R.
+
+- Markdown can be converted to HTML using markdown package in R.
+
+- Any basic text editor can be used to create a markdown document; no special editing tools needed.
+
+- The Rmarkdown ---> markdown ---> HTML workflow can be easily managed using RStudio (but not required).
+
+- These slides were written in R markdown and converted to slides using the slidify package.
+
+- You do not edit the markdown file and the HTML file. The only file you can edit is the Rmarkdown file.
+
+## Rmarkdown demonstration
+
+- RStudio
+
+- Menu
+
+- Rmarkdown
+
+- Save as Rmarkdown demo.Rmd
+
+- knitr; this converts markdown to html
+
+## Load some data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(datasets)
+data(airquality)
+summary(airquality)
+
+```
+
+- Let's first make a pair.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+pairs(airquality)
+
+```
+
+- Here's a regression model of Ozone on Wind, Solar.R, and Temperature.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(stats)
+fit <-lm(Ozone~Wind+Solar.R+Temp,data=airquality)
+summary(fit) # always save and knitr
+
+```
+
+## knitr (part 1)
+
+- Literate statistical programming with knitr.
+
+### Problems, Problems
+
+- Authors must undertake considerable effort to put data/results on the web.
+
+- Readers must download data/results individually and piece together which data go with which code sections etc.
+
+- Authors/readers must manually interact with websites.
+
+- There is no single document to integrate data analysis with textual representations i.e. data, code, and text are not linked.
+
+## Literate Statistical Programming
+
+- Original idea comes from Don Knuth.
+
+- An article is a stream of text and code.
+
+- Analysis code is divided into text and code "chunks".
+
+- Presentation code formats results (tables,figures etc).
+
+- Article text explains what is going on.
+
+- Literate programs are weaved to produce human readable documents and tangled to produce machine readable documents.
+
+- Human readable documents are text files and machine readable documents are code files.
+
+- Literate programming is a general concept. We need;
+
+1. A documentation language.
+
+2. A programming language.
+
+- The original sweave system developed by Friedrich Leisch used LaTeX and R.
+
+- knitr supports a variety of documentation languages.
+
+- LaTeX is a documentation language and R is a programming language.
+
+### The basic question is how do I make my work reproducible
+
+- Decide to do it (ideally from the start).
+
+- Keep track of things, perhaps with a version control system to track snapshot/changes.
+
+- Use software whose operations can be coded.
+
+- Don't save output.
+
+- Save data in non-proprietary formats.
+
+1. formats whose layout is not publicly known.
+
+## Literate Programming
+
+### Pros
+
+- Text and code all in one place, logical order.
+
+- Data results automatically updated to reflect external changes.
+
+- Code is live -- automatic "regression test" when building a document.
+
+### Cons
+
+- Text and code all in one place; can make documents difficult to read, especially if there is a lot of code.
+
+- Can substantially slow down processing of documents (although there are tools to help).
+
+## Knitr (part 2)
+
+### What is knitr?
+
+- An R package written by Yihui Xie (while he was a grad student at Iowa state). The package is available on CRAN.
+
+- Supports Rmarkdown, LaTeX, and HTML as documentation languages.
+
+- Can export to HTML, pdf.
+
+- Built right into RStudio for your convenience.
+
+## Requirements
+
+- A recent version of R.
+
+- A text editor (the one that comes with RStudio) is okay.
+
+- Some support packages also available on CRAN.
+
+- Some knowledge of Markdown, LaTeX, or HTML.
+
+- We will use markdown here.
+
+## What is Markdown?
+
+- A simplified version of "markup" languages.
+
+- No special editor required.
+
+- Simple, intuitive formatting elements.
+
+- Complete information available at; http://google/MUt9i5
+
+### What is knitr good for?
+
+- Manuals.
+
+- Short/Medium-length technical documents.
+
+- Tutorials.
+
+- Reports (especially if generated periodically).
+
+- Data preprocessing documents/summaries.
+
+
+
+### What is knitr not good for?
+
+- Very long research articles.
+
+- Complex time - consuming computations.
+
+- Documents that require precise formatting.
+
+- Formatting text in knitr is very adhoc.
+
+## knitr (part 3)
+
+- My first knitr document.
+
+1. Click on file.
+
+2. Click on new file.
+
+3. Click on Rmarkdown and then;
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+# means you want to start a code chunk
+set.seed(1)
+x <-rnorm(100)
+mean(x)
+# close the chunk
+
+```
+
+4. Push the knit HTML button.
+
+5. Note; you can name your code chunks.
+
+## If you are not in RStudio
+
+### More complicated way
+
+- library(knitr)
+
+- setwd(<working directory>).
+
+- knit2html("document.Rmd").
+
+- browseURL("document.html").
+
+### A few Notes
+
+- knitr will fill a new document with filler text;delete it.
+
+- Code chunks begin with ```{r} and end with ```.
+
+- All R code goes in between these markers.
+
+- Code chunks can have names, which is useful when we start making graphics.
+
+- By default, code in a code chunk is echoed, as will the results of the computation (if there are results to print).
+
+## knitr (part 4)
+
+- Processing of knitr documents (what happens under the hood).
+
+1. You write the Rmarkdown document(.Rmd).
+
+2. knitr produces a Markdown document(.md).
+
+3. knitr converts the markdown document into HTML (by default).
+
+4. .Rmd-->.md-->.html
+
+5. You should not edit or save the .md or .html documents until you are finished. Only edit the Rmarkdown file.
+
+## Note
+
+1. when you specify echo=FALSE in the r chunk, the r code that produces the output will not show up.
+
+2. You can also hide the results by specifying results="hide".
+
+## Inline Text computations
+
+- time <- format(Sys.time(),"%a%b%d %X%Y") gives the current date and time.
+
+## Incorporating Graphics
+
+- Let's first simulate some data and plot the data.
+
+```{r,simulatesomedata,echo=TRUE,fig.height=4}
+x <-rnorm(100)
+y <-x + rnorm(100,sd=0.5)
+par(mar=c(5,4,2,1),las=1)
+plot(x,y,main="My Simulated Data",cex=1,pch=20,col="red")
+
+```
+
+## Making Tables with Xtable
+
+```{r fitmodel}
+library(datasets)
+data(airquality)
+fit <-lm(Ozone~Wind+Temp+Solar.R,data=airquality)
+
+```
+
+- Here is a table of regression coefficients.
+
+```{r showtable,results="asis"}
+library(xtable)
+xt <-xtable(summary(fit))
+print(xt,type="html")
+
+```
+
+## Setting Global Options
+
+- Sometimes we want to set options for every code chunk that are different from the defaults.
+
+- For example, we may want to suppress all code echoing and results output.
+
+- We have to write some code to set these global options.
+
+```{r setoptions,echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,results="hide")
+
+```
+
+### Some common Options
+
+- Output
+
+1. results:"asis","hide"
+
+2. echo: TRUE, FALSE
+
+- Figures
+
+1. fig.height: numeric
+
+2. fig.width: numeric
+
+- asis: Show the raw results, don't process (post) no html processing.
+
+## Caching Computations
+
+- This is a strategy used to avoid waiting for a long time.
+
+- What if one chunk takes a long time to run?
+
+- All chunks have to be re-computed every time you re-knit the file.
+
+- The cache=TRUE option can be set on a chunk-by-chunk basis to store results of computation.
+
+- After the first run, results are loaded from cache.
+
+## Caching Caveats
+
+- If the data or code (or anything external) changes, you need to re-run the cached code chunks.
+
+- Dependencies are not checked explicitly.
+
+- Chunks with significant side effects may not be cacheable.
+
+## Summary
+
+- Literate statistical programming can be a useful way to put text, code, data, output all in one document.
+
+- knitr is a powerful tool for integrating code and text in a simple document format.
+
+- To create an Rmarkdown  report, open a plain text file and save it with the extention .Rmd.
+
+- You can open a plain text file in your scripts editor by clicking; File>new file>textfile in Rstudio toolbar. Be sure to save the file with the extension .Rmd.
+
+- In CRAN, install.packages("rmarkdown") then library(rmarkdown).
+
+- We knit and convert documents at the same time.
+
+- You can manually render an Rmarkdown file with rmarkdown::render().
+
+- Render: knit and convert as an html file.
+
+- echo=FALSE, is added to the code chunk to prevent printing of the R code that generated the plot.
+
+- In practice, you don't need to call rmarkdown::render(). You can use a button in the RStudio IDE to render your report.
+
+## Reproducible Research - Assessment 1 (Project)
+
+- library(data.table)
+
+- library(ggplot2)
+
+- fileUrl <-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+
+- download.file(fileUrl,destfile=paste0(getwd(),"repdata%2Fdata%2FFactivity.zip"),method="Curl")
+
+- unzip("repdata%2Fdata%2Factivity.zip",exdir="data")
+
+### Reading CSV data into data.table
+
+- activityDT <-data.table::fread(input="data/activity.csv")
+
+### What is mean total number of steps taken per day?
+
+- Calculate the total number of steps taken per day.
+
+- TotalSteps <-activityDT[,c(lapply(.SD,sum,na.rm=FALSE)),.SDcols=c("steps"),by=.(date)]
+
+- head(TotalSteps)
+
+### Make a histogram of the total number of steps taken each day.
+
+- ggplot(TotalSteps,aes(x=steps))+geom_histogram(fill="blue",binwidth=1000)+labs(title="Daily Steps",x="Steps",y="Frequency")
+
+### Calculate and report the mean and median of the total number of steps taken per day
+
+- TotalSteps[,.(MeanSteps=mean(steps,na.rm=TRUE),MedianSteps=median(steps,na.rm=TRUE))]
+
+### What is the average daily activity pattern?
+
+- Time series plot of the average number of steps taken.
+
+- Make a time series plot (i.e. type="l") of the 5 minute interval (x-axis) and the average number of steps taken, average across all days (y-axis).
+
+- IntervalDT <- activityDT[,c(lapply(.SD,mean,na.rm=TRUE)),.SDcols=c("steps"),by=.(interval)]
+
+- ggplot(IntervalDT,aes(x=interval,y=steps))+geom_line(color="blue",size=1)+labs(title="Avg.Daily Steps",x="Interval",y="Avg. Steps per day")
+
+### The 5-minute interval that, an average, contains the maximum number of steps
+
+- IntervalDT[steps==max(steps),.(max_interval=interval)]
+
+### Code to describe and show a strategy for imputing missing data
+
+- Total number of missing values in the data set.
+
+- sum(is.na(activityDT))
+
+### Alternative Solution
+
+- activityDT[is.na(steps),.N]
+
+### Alternative Solution
+
+- nrow(activityDT[is.na(steps),])
+
+### Devise a strategy for filling in all of the missing values in the dataset. The strategy need not be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5 - minute interval etc
+
+#### Filling in missing values with median of the data set
+
+- activityDT[is.na(steps),"steps"]
+
+- activityDT[,c(lapply(.SD,median,na.rm=TRUE)),.SDcols=c("steps)]
+
+#### Create a new data set that is equal to the original data set but with the missing data filled in 
+
+- data.table::fwrite(x=activityDT,file="data/tidyData.csv",quote=FALSE)
+
+#### Histogram of the total number of steps taken each day after missing values are imputed
+
+- Total number of steps taken per day
+
+- TotalSteps <-activityDT[,c(lapply(.SD,sum)),.SDcols=c("steps"),by=.(date)]
+
+#### Mean an median total number of steps taken per day
+
+- TotalSteps[,.(MeanSteps=mean(steps),MedianSteps=median(steps))]
+
+- ggplot(TotalSteps,aes(x=steps))+geom_histogram(fill="blue",binwidth=1000)+labs(title="Daily Steps",x="Steps",y="Frequency")
+
+### Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+
+- Determine if there are differences in activity patterns between weekdays and weekends?
+
+- Create a new factor variable in the data set with two levels-"Weekday" and "Weekend" indicating whether a given date is a weekday or weekend day.
+
+- Check date variable
+
+- class(date)
+
+#### Write date in POSIXct format
+
+- activityDT[,date:=as.POSIXct(date,format="%Y-%m-%d)]
+
+- activityDT[,"Day of Week":=weekdays(x=date)]
+
+- activityDT[grepl(pattern="Monday|Tuesday|Wednesday|Thursday|Friday",x="Day of Week"),"weekday or weekend"]<-"weekday"
+
+- activityDT[grepl(pattern="Saturday|Sunday",x="Day of Week"),"weekday or weekend"]<-"Weekend"
+
+#### Convert weekday or weekend to a factor variable
+
+- activityDTWDWD <-activityDT[,"weekday or weekend":=as.factor("weekday or weekend")]
+
+- class(activityDTWDWE)
+
+- levels(activityDTWDWE)
+
+- head(activityDTWDWE,10)
+
+### Panel plot (Time Series plot)
+
+- activityDTWDWE[is.na(steps),"steps"]<-activityDTWDWE[,c(lapply(.SD,median,na.rm=TRUE)),.SDcols=c("steps")]
+
+- IntervalDTWDWE <-activityDTWDWE[,c(lapply(.SD,mean,na.rm=TRUE)),.SDcols=c("steps"),by=.(interval,"weekday or weekend")]
+
+- ggplot(IntervalDTWDWE,aes(x=interval,y=steps,color="weekday or weekend"))+geom_line()+labs(title="Avg. Daily Steps by Weektype",x="Interval",y="No. of Steps")+facet_wrap(~"weekday or weekend",ncol=1,nrow=2)
+
+- All the R codes needed to reproduce the results (numbers,plots,etc) in the report.
+
+### How to impute missing data
+
+- Ways to approach missing data.
+
+1. Ignore it - which means your software is choosing for you.
+
+2. Imputation simply means replacing the missing values with an estimate, and then analyze the full data set as if the imputed values were actual observed values.
+
+### Mean Imputation
+
+- Simply calculate the mean of the observed values for that variable for all individuals who are non-missing.
+
+- Advantages
+
+1. Keeps the same mean.
+
+2. Keeps the same sample size.
+
+- Disadvantages
+
+1. All single imputation methods underestimate standard errors.
+
+2. They also underestimate p-values.
+
+## Change working directory in RStudio
+
+- Session.
+
+- Set working directory.
+
+- Choose directory.
+
+- Alternative approach;
+
+1. path <-getwd()
+
+2. url <-"https://.....zip"
+
+3. download.file(fileUrl,file.path(path,"dataFiles.zip"))
+
+4. unzip(zipfile="dataFiles.zip")
+
+- Alternative approach 2;
+
+1. setwd("~/Desktop/datasciencecoursera/4_Exploratory_Data_Analysis/project/data")
+
+## Some extra notes
+
+### Sum a numeric variable with respect to factor variables
+
+1. Use tapply
+
+- tapply(NumVar,factor or categoricalVar,Sum)
+
+- tapply(NumVar,catVar,mean)
+
+2. Use lapply
+
+- lapply(x,mean)
+
+- lapply(x,quantile,probs=1:3/4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

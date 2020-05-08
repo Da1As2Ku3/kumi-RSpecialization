@@ -1,0 +1,62 @@
+---
+title: "myLeaflet2"
+author: "David Asare Kumi"
+date: "June 1, 2019"
+output: html_document
+---
+
+## Mapping Clusters
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(leaflet)
+df<-data.frame(lat=runif(500,min=39.25,max=39.35),lng=runif(500,min=-76.65,max=-76.55))
+my_map<-df%>%
+  leaflet()%>%
+  addTiles()%>%
+  addMarkers(clusterOptions=markerClusterOptions())
+my_map
+
+```
+
+## Mapping Circle Markers
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(leaflet)
+df<-data.frame(lat=runif(20,min=39.25,max=39.35),lng=runif(20,min=-76.65,max=-76.55))
+my_map<-df%>%
+  leaflet()%>%
+  addTiles()%>%
+  addCircleMarkers()
+my_map
+
+```
+
+## Drawing Circles(Digitally)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(leaflet)
+md_Cities<-data.frame(name=c("Baltimore","Frederick","Rockville","Gaitherburg","Bowie","Hagerstown",
+                             "Annapolis","College Park","Salisbury","Laurel"),pop=c(619493,66169,
+                              62334,61045,55232,39890,38880,30587,30484,25346),lat=c(39.2920,39.4143,
+                              39.0840,39.1434,39.0068,39.6418,39.9784,38.9897,38.3607,39.0993),
+                      lng=c(-76.6077,-77.4204,-77.1528,-77.2014,-76.7791,-77.7200,-76.4922,-76.9378,
+                            -75.5994,-76.8483))
+#The circle on each city is proportional to the population of the city
+my_map<-md_Cities%>%
+  leaflet()%>%
+  addTiles()%>%
+  addCircles(weight=1,radius=sqrt(md_Cities$pop)*30)
+my_map
+
+```
+
+## Drawing Rectangles(You need two opposite corners)
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+library(leaflet)
+my_map<-leaflet()%>%
+        addTiles()%>%
+  addRectangles(lat1=37.3858,lng1=-122.0595,lat2=37.3890,lng2=-122.0625)
+my_map
+
+```

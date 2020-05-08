@@ -1,0 +1,197 @@
+---
+title: "Dates and Times in R"
+author: "David Asare Kumi"
+date: "10/29/2019"
+output: html_document
+---
+
+
+## Dates/Times in R
+
+- R has developed a special representation of dates and times.
+
+- Dates are represented by Date class.
+
+- Times are represented by the POSIXct or POSIXlt class.
+
+- Dates are stored internally as the number of days since 1970-01-01.
+
+- Times are stored internally as the number of seconds since 1970-01-01.
+
+## Dates in R
+
+- Dates are represented by the Date class and can be coerced from a character string using the as.Date() function.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-as.Date("1970-01-01")
+x
+unclass(x)
+unclass(as.Date("1970-01-02"))
+unclass(as.Date("1970-01-03"))
+
+```
+
+- "1970-01-01" is not a character string but it prints out that way because it uses a special print method.
+
+- Dates before 1970 will be represented by negative numbers.
+
+## Times in R
+
+- Times are represented using the POSIXct or POSIXlt class.
+
+- POSIXct is just a very large integer under the hood; it's a useful class when you want to store times in something like a data frame.
+
+- POSIXlt is a list underneath and it stores a bunch of other useful information like the day of the week, day of the year, month, day of the month.
+
+- There are a number of generic functions that work on dates and times.
+
+1. weekdays: give the day of the week.
+
+2. Months: give the month name.
+
+3. Quarters: give the quarter number ("Q1","Q2","Q3"or "Q4")
+
+- Times can be coerced from a character string using the as.POSIXct or as.POSIXlt function.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-Sys.time()
+x
+p <-as.POSIXlt(x)
+names(unclass(p))
+p$sec 
+
+```
+
+### You can also use the POSIXct format
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-Sys.time()
+x # Already in POSIXct format
+unclass(x)
+p <-as.POSIXlt(x)
+names(unclass(p))
+p$sec
+
+```
+
+- POSIXct don't have list elements. You have to convert it to POSIXlt using the as.POSIXlt before you can get the list elements.
+
+- Finally there is a strptime function in case your dates are written in a different format.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+datestring <-c("January 10,2012 10:40","December 9,2011 09:10")
+x <-strptime(datestring,"%B%d,%Y %H:%M")
+x
+class(x)
+
+```
+
+- If you can't remember the formatting strings check ?strptime for details.
+
+- strptime converts dates written in character string format into time objects or date objects.
+
+- %B gives the month, %d gives the day, %Y gives the year, %H gives the hour and %M gives the minutes.
+
+## Operations on Dates and Time
+
+- You can use mathematical operations on dates and times. We will really just add(+) and subtract(-).
+
+- You can do comparison too (i.e. ==, <=).
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-as.Date("2012-01-01")
+y <-strptime("9 Jan 2011","%d%b%Y %H:%M:%S")
+x <-as.POSIXlt(x)
+x-y 
+
+```
+
+- The nice thing about dates and time is that, they keep track of leap years, leap seconds, daylight savings,and time zones.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+x <-as.Date("2012-03-01")
+y <-as.Date("2012-02-28")
+x-y
+x <-as.POSIXct("2012-10-25 01:00:00")
+y <-as.POSIXct("2012-10-25 06:00:00",tz="GMT")
+y-x
+
+```
+
+## Summary
+
+- Dates and times have special classes in R that allow for numerical and statistical calculations.
+
+- Dates use the Date class.
+
+- Times use the POSIXct and POSIXlt class.
+
+- character strings can be coerced to date/time classes using the strptime function or the as.Date, as.POSIXlt or as.POSIXct.
+
+- A lot of plotting functions recognize date/time object.
+
+## What are the three types of Control Structures?
+
+1. Sequential - default mode.
+
+2. Selection - used for decisions. Branching - choosing between two or more alternative paths.
+
+3. Repetitions - used for looping i.e. repeating a piece of code multiple times in a row.
+
+## What are conditional Control Structures?
+
+- A condition is any variable or expression that returns a Boolean value(TRUE or FALSE).
+
+- The three fundamental control structures;
+
+1. Sequence control structure: This refers to the line by line execution in which statements are executed sequencially, in the same order in which they appear in the script. They might for e.g. carry out a series of read or write operations, arithmetic operations or assignments to variables.
+
+2. Decision control structure - Depending on whether a condition is true or false, the decision control structure may skip the execution of an entire block of statements or even execute one block of statements instead of another.
+
+3. Loop control structure - This is a control structure that allows the execution of a block of statements multiple times until a specified condition is met.
+
+## What is iterative control?
+
+- Iterative learning control (ILC) is a method of tracking control for systems that work in a repetitive mode. Examples of systems that operate in a repetitive manner include;
+
+1. robot arm manipulators.
+
+2. chemical batch processes.
+
+3. reliability testing rigs.
+
+## What is the meaning of iteration in programming
+
+- This is a process where in a set of instructions or structures are repeated in a sequence a specified number of times or until a condition is met. When the first set of instructions is executed again, it is called an iteration.
+
+## The syntax for if ... then ... else is;
+
+- "If (condition is true)" is the control structure.
+
+- "block one" is the code to be executed if the condition is true.
+
+- {"... else ..."} is the fall back if the condition is false.
+
+- "block two" is the block of code executed if the condition is false.
+
+## How it works
+
+- The flow chart shown below illustrates how the if ... then else control structure works.
+
+1. Start
+
+2. Condition True? Yes.
+
+3. Execute code in if block.
+
+4. Condition True? No.
+
+5. Execute code in else block.
+
+6. Execute code outside if block.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,comment=""}
+Sys.timezone()
+Sys.time()
+
+```

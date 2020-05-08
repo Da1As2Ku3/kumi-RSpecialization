@@ -1,0 +1,467 @@
+---
+title: "Preprocessing with principal components analysis(PCA)"
+author: "David Asare Kumi"
+date: "July 9, 2019"
+output: html_document
+---
+
+##Correlated Predictors
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+inTrain <-createDataPartition(y=spam$type,p=0.75,list=FALSE)
+training <-spam[inTrain,]
+testing <-spam[-inTrain,]
+dim(training)
+dim(testing)
+M <-abs(cor(training[,-58]))
+diag(M)<-0
+which(M>0.8,arr.ind=T)
+#diag(M)<-0 means that correlation of each variable is 1, so take those correlations out. The variables num415 and num857 have very high correlation between each other.
+names(spam)[c(34,32)]
+plot(spam[,34],spam[,32])
+
+```
+
+##Basic PCA idea
+
+- We might not need every predictor.
+
+- A weighted combination of predictors might be better.
+
+- We should pick this combination to capture the "most informaiton" possible.
+
+- Benefits
+
+1. Reduced number of predictors.
+
+2. Reduced noise (due to averaging). Basically we are looking at the combination of the variables that explains most of the variability.
+
+###We could rotate the plot
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+x <-0.71*training$num415+0.71*training$num857
+y <-0.71*training$num415-0.71*training$num857
+plot(x,y)
+
+```
+
+##Related Problems
+
+- You have multivariate variables X1,...,Xn so X1=(X11,...,X1m).
+
+- Find a new set of multivariate variables that are uncorrelated and explain as much variance as possible.
+
+- If you put all the variables together in one matrix, find the best matrix created with fewer variables(lower rank) that explains the original data.
+
+- The first goal is statistical and the second goal is data compression. The x variable has much variability and the y variable is almost always 0.
+
+##Principal Components in R - prcomp
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+smallSpam <-spam[,c(34,32)]
+prComp <-prcomp(smallSpam)
+plot(prComp$x[,1],prComp$x[,2])
+#principal components can let you reduce a large number of variables.
+
+#Rotation Matrix
+prComp$rotation
+
+#PCA on SPAM data
+typeColor <-((spam$type=="spam")*1+1)
+prComp <-prcomp(log10(spam[,-58]+1))
+plot(prComp$x[,1],prComp$x[,2],col=typeColor,xlab="PC1",ylab="PC2")
+#PC1 is the one that explains the most variation and PC2 is the one that explains the second most variation.
+
+```
+
+##PCA with caret
+
+- We can do this in caret using the preprocess function.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(kernlab)
+data(spam)
+inTrain <-createDataPartition(y=spam$type,p=0.75,list=FALSE)
+training <-spam[inTrain,]
+testing <-spam[-inTrain,]
+preProc <-preProcess(log10(spam[,-58]+1),method="pca",pcaComp=2)
+spamPC <-predict(preProc,log10(spam[,-58]+1))
+plot(spamPC[,1],spamPC[,2],col=typeColor)
+#Preprocessing with PCA
+preProc <-preProcess(log10(training[,-58]+1),method="pca",pcaComp=2)
+trainPC <-predict(preProc,log10(training[,-58]+1))
+testPC <-predict(preProc,log10(testing[,-58]+1))
+#trainPC and testPC will give you a table of principle components.
+#PCA can reduce the number of variables but maintain accuracy.
+
+```
+
+##Final thoughts on PCs
+
+- Most useful for linear type models.
+
+- Can make it harder to interpret predictors.
+
+- Watch out for outliers!
+
+1. Transform first (with logs/BoxCox).
+
+2. Plot predictors to identify problems.
+
+- For more information see
+
+1. Exploratory Data Analysis.
+
+2. Elements of Statistical Learning.
+
+##Predicting with Regression
+
+###Key ideas
+
+- Fit a simple regression model.
+
+- Plug in new covariates and multiply by the coefficients.
+
+- Useful when linear model is (nearly) correct.
+
+###Pros:
+
+- Easy to implement.
+
+- Easy to interpret.
+
+###Cons:
+
+- Often poor performance in non linear settings.
+
+##Example: Old faithful eruptions.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+data(faithful)
+dim(faithful)
+str(faithful)
+summary(faithful)
+set.seed(333) # so that this can be reproduced
+inTrain <-createDataPartition(y=faithful$eruptions,p=0.5,list=FALSE)
+trainFaith <-faithful[inTrain,]
+testFaith <-faithful[-inTrain,]
+#Eruption Duration versus waiting time
+plot(trainFaith$waiting,trainFaith$eruptions,pch=20,cex=1,col="blue",xlab="Waiting",ylab="Duration")
+#Fit a linear model
+fit <-lm(eruptions~waiting,data=trainFaith)
+summary(fit)
+lines(trainFaith$waiting,fit$fitted,lwd=3,col="red")
+#Predict a new value
+coef(fit)[1]+coef(fit)[2]*80
+#Alternative approach
+newdata <-data.frame(waiting=80)
+predict(fit,newdata)
+#Plot predictions-training and test
+par(mfrow=c(1,2))
+plot(trainFaith$waiting,trainFaith$eruptions,pch=19,col="blue",xlab="Waiting",ylab="Duration")
+lines(trainFaith$waiting,predict(fit),lwd=3,col="red")
+plot(testFaith$waiting,testFaith$eruptions,pch=19,col="red",xlab="Waiting",ylab="Duration")
+lines(testFaith$waiting,predict(fit,newdata=testFaith),lwd=3,col="blue")
+#calculate RMSE on training set
+sqrt(sum((fit$fitted-trainFaith$eruptions)^2))
+#Calculate RMSE on the test set
+sqrt(sum((predict(fit,newdata=testFaith)-testFaith$eruptions)^2))
+#RMSE measures how close the fitted values are to the observed (real) values.
+
+```
+
+##Prediction Intervals
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+pred1 <-predict(fit,newdata=testFaith,interval="prediction")
+ord <-order(testFaith$waiting)
+plot(testFaith$waiting,testFaith$eruptions,pch=19,col="blue")
+matlines(testFaith$waiting[ord],pred1[ord,],type="l",col=c(1,2,2),lty=c(1,1,1),lwd=3)
+#Same process with caret
+modFit <-train(eruptions~waiting,data=trainFaith,method="lm")
+summary(modFit$finalModel)
+
+```
+
+##Notes and Further Reading
+
+- Regression models with multiple covariates can be concluded.
+
+- Often useful in combination with other models.
+
+- Elements of Statistical Learning.
+
+- Modern Applied Statistics with S.
+
+- Introduction to Statistical Learning.
+
+##Predicting with Regression
+
+###Multiple Covariates
+
+###Example: Wage data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(ISLR)
+data(Wage)
+dim(Wage)
+names(Wage)
+str(Wage)
+Wage <-subset(Wage,select=-c(logwage))
+summary(Wage)
+#Getting training and test sets
+inTrain <-createDataPartition(y=Wage$wage,p=0.7,list=FALSE)
+training <-Wage[inTrain,]
+testing <-Wage[-inTrain,]
+dim(training)
+dim(testing)
+#Feature plot
+featurePlot(x=training[,c("age","education","jobclass")],y=training$wage,plot="pairs")
+#Plot age versus wage
+qplot(age,wage,data=training,main="Scatterplot of Age and Wage")+geom_smooth(method="lm")
+#Plot age versus wage,color by jobclass
+qplot(age,wage,color=jobclass,data=training)
+qplot(age,wage,color=jobclass,data=training)+geom_smooth(method="lm",se=FALSE)
+qplot(age,wage,data=training,facets=.~jobclass)+geom_smooth(method="lm",se=FALSE)
+#Plot age versus wage,color by education
+qplot(age,wage,color=education,data=training)
+qplot(age,wage,color=education,data=training)+geom_smooth(method="lm",se=FALSE)
+qplot(age,wage,data=training,facets=.~education)+geom_smooth(method="lm",se=FALSE)
+#These plots help us explain the factors influencing the variations in the upper part of the plot.
+
+#Fit a linear Model
+modFit <-train(wage~age+jobclass+education,method="lm",data=training)
+modFit
+finMod <-modFit$finalModel
+finMod
+#Diagnostics
+plot(finMod,1,pch=19,cex=0.5,col="#00000010") # 1 is the first plot in the diagnostic plot
+par(mfrow=c(2,2))
+plot(finMod,pch=20,cex=1)
+#Color by variables not used in the model
+qplot(finMod$fitted,finMod$residuals,color=race,data=training)
+
+#Plot by index
+plot(finMod$residuals,pch=20)
+
+#Predicted versus truth in test set
+pred <-predict(modFit,testing)
+qplot(wage,pred,color=year,data=testing)
+
+#If you want to use all covariates
+modFitAll <-train(wage~.,data=training,method="lm")
+pred <-predict(modFitAll,testing)
+qplot(wage,pred,data=testing)
+
+```
+
+##Predicting with Trees
+
+###Key Ideas
+
+- Iteratively split variables into groups.
+
+- Evaluate "homogeneity" within each group.
+
+- Split again if necessary. We split the variables to predict the outcome. Groups must be homogeneous or small enough before you stop.
+
+###Pros
+
+- Easy to interpret.
+
+- Better performance in non linear settings.
+
+###Cons
+
+- Without pruning/cross-validation can lead to over-fitting.
+
+- Harder to estimate uncertainty.
+
+- Results may be variable.
+
+##Basic Algorithm
+
+- Start with all variables in one group.
+
+- Find the variable/split that best separates the outcomes.
+
+- Divide the data into two groups ("leaves") on that split("node").
+
+- Within each split, find the best variable/split that separates the outcomes.
+
+- Continue untill the groups are too small or sufficiently "pure"-i.e. sufficiently homogeneous.
+
+##Example:Iris Data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE,cache=TRUE}
+library(ggplot2)
+library(lattice)
+library(caret)
+data(iris)
+names(iris)
+str(iris)
+table(iris$Species)
+#Create training and test sets
+inTrain <-createDataPartition(y=iris$Species,p=0.7,list=FALSE)
+training <-iris[inTrain,]
+testing <-iris[-inTrain,]
+dim(training)
+dim(testing)
+qplot(Petal.Width,Sepal.Width,color=Species,data=iris)
+qplot(Petal.Width,Sepal.Width,color=Species,data=iris)+geom_smooth(method="lm",se=FALSE)
+qplot(Petal.Width,Sepal.Width,data=iris,facets=.~Species)+geom_smooth(method="lm",se=FALSE)
+#Fit the model
+library(rpart)
+modFit <-train(Species~.,method="rpart",data=training)
+modFit$finalModel
+plot(modFit$finalModel,uniform=TRUE,main="Classification Tree")
+text(modFit$finalModel,use.n=TRUE,all=TRUE,cex=0.8)
+#install.packages("rattle",dependencies=c("depends","suggests"))
+library(rattle)
+fancyRpartPlot(modFit$finalModel)
+#Predicting new values
+predict(modFit,newdata=testing)
+
+```
+
+##Notes and further resources
+
+- Classification trees are non-linear models.
+
+1. They use interactions between variables.
+
+2. Data transformations may be less important(monotone transformations).
+
+3. Trees can also be used for regression problems(continuous outcomes).
+
+- Note that there are multiple treee building options in R both in the caret package-party, rpart and out of the caret package-tree.
+
+###Resources
+
+- Introduction to Statistical Learning.
+
+- Element of Statistical Learning.
+
+- Classification and regression trees.
+
+##Bagging:Bootstrap Aggregating(bagging)
+
+###Basic Idea
+
+1. Resample cases and recalculate predictions.
+
+2. Average or majority vote.
+
+###Notes
+- Similar Bias.
+
+- Reduced Variance.
+
+- More useful for non-linear functions.
+
+- Also useful for things like predicting with trees.
+
+##Example:Ozone Data
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(ElemStatLearn)
+data(ozone)
+names(ozone)
+ozone <-ozone[order(ozone$ozone),]
+dim(ozone)
+head(ozone)
+#We are going to try to predict temperature as a function of ozone
+
+#Bagged loess
+ll <-matrix(NA,nrow=10,ncol=155)
+for (i in 1:10){
+  ss <-sample(1:dim(ozone)[1],replace=T)
+  ozone0 <-ozone[ss,]
+  ozone0 <-ozone0[order(ozone0$ozone),]
+  loess0 <-loess(temperature~ozone,data=ozone0,span=0.2)
+  ll[i,] <-predict(loess0,newdata=data.frame(ozone=1:155))
+}
+#span=0.2 tells the smoothness of the curve
+plot(ozone$ozone,ozone$temperature,pch=19,cex=0.5)
+for(i in 1:10){
+  lines(1:155,ll[i,],col="grey",lwd=2)
+}
+lines(1:155,apply(ll,2,mean),col="red",lwd=2)
+#The grey lines have a lot of curviness (overcapture the variability). The red line is the bagged curve (average of multiple loess curve). It is in the middle.
+
+```
+
+##Bagging in Caret
+
+- Some models perform bagging for you, in train function consider method options;
+
+1. bagEarth
+
+2. treebag
+
+3. bagFDA
+
+- Alternatively you can bag any model you choose using the bag function.
+
+##More bagging in caret (Custom bagging)
+
+- Alternatively you can build your own bagging.
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+library(party)
+predictors <-data.frame(ozone=ozone$ozone)
+temperature <-ozone$temperature
+treebag <-bag(predictors,temperature,B=10,bagControl=bagControl(fit=ctreeBag$fit,predict=ctreeBag$pred,aggregate=ctreeBag$aggregate))
+#B=10 is the number of replication(number of subsamples)
+#aggregate; for example you can average the predictions.
+plot(ozone$ozone,temperature,col="lightgrey",pch=19)
+points(ozone$ozone,predict(treebag$fits[[1]]$fit,predictors),pch=19,col="red")
+points(ozone$ozone,predict(treebag,predictors),pch=19,col="blue")
+
+```
+
+##Parts of bagging
+
+1. ctreeBag$fit.
+
+2. ctree$pred.
+
+3. ctreeBag$aggregate.
+
+##Notes and further resources
+
+###Notes
+
+- Bagging is most useful for non-linear models.
+
+- Often used with trees - an extension is random forest.
+
+- Several models use bagging in caret's train function.
+
+###Further resources
+
+- Bagging.
+
+- Bagging and boosting.
+
+- Elements of Statistical Learning.
+
